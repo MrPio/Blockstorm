@@ -1,8 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
 public struct Voxel
 {
-    public byte id;
-    
-    public bool IsSolid => id != 0;
+    public int ID;
+
+    public bool isSolid => ID != 0;
 }
