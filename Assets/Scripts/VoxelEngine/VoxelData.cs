@@ -21,27 +21,26 @@ namespace VoxelEngine
         // The order of each triangle's vertices is constrained by:
         // - Clockwise order to have an outgoing normal vector
         // - The permutation must be the same for all 12 triangles to get a correct UV mapping
-        public static readonly int[,] VoxelTris = new int[6, 6]
+        // NOTE: The number of vertices in each is reduced from 6 (3 for each of the 2 triangles) to 4 by sharing the 2 common vertices.
+        public static readonly int[,] VoxelTris = new int[6, 4]
         {
-            { 0, 3, 1, 1, 3, 2 }, // Back Face
-            { 5, 6, 4, 4, 6, 7 }, // Front Face
-            { 3, 7, 2, 2, 7, 6 }, // Top Face
-            { 1, 5, 0, 0, 5, 4 }, // Bottom Face
-            { 4, 7, 0, 0, 7, 3 }, // Left Face
-            { 1, 2, 5, 5, 2, 6 } // Right Face
+            { 0, 3, 1, 2 }, // Back Face
+            { 5, 6, 4, 7 }, // Front Face
+            { 3, 7, 2, 6 }, // Top Face
+            { 1, 5, 0, 4 }, // Bottom Face
+            { 4, 7, 0, 3 }, // Left Face
+            { 1, 2, 5, 6 } // Right Face
         };
 
 
         // UVs are applied by assigning a normalized texture pixel value to the voxel face.
         // The order of the UV Vector2 list matches the order of the Vector3 vertices list.
         // Now that the order is the same for each face, we can write the lookup table for just one face.
-        public static readonly Vector2[] VoxelUvs = new Vector2[6]
+        public static readonly Vector2[] VoxelUvs = new Vector2[4]
         {
             new(0.0f, 0.0f),
             new(0.0f, 1.0f),
             new(1.0f, 0.0f),
-            new(1.0f, 0.0f),
-            new(0.0f, 1.0f),
             new(1.0f, 1.0f)
         };
 

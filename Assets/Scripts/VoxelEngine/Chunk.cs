@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -25,7 +26,7 @@ namespace VoxelEngine
         private readonly List<Vector3> _vertices = new();
         private readonly List<int> _triangles = new();
         private readonly List<Vector2> _uvs = new();
-
+        private bool[,,] _voxelMap;
 
         private void Awake()
         {
@@ -36,29 +37,51 @@ namespace VoxelEngine
 
         private void Start()
         {
-            for (var y = -10; y < 0; y++)
-            for (var x = -50; x < 50; x++)
-            for (var z = -50; z < 50; z++)
+            _voxelMap = new bool[chunkSize, chunkHeight, chunkSize];
+            for (var y = 0; y < chunkHeight; y++)
+            for (var x = 0; x < chunkSize; x++)
+            for (var z = 0; z < chunkSize; z++)
+                _voxelMap[x, y, z] = true;
+
+            for (var y = 0; y < chunkHeight; y++)
+            for (var x = 0; x < chunkSize; x++)
+            for (var z = 0; z < chunkSize; z++)
                 AddVoxelDataToChunk(new Vector3(x, y, z));
+
             CreateMesh();
         }
 
-        
+        private bool CheckVoxel(Vector3 pos)    
+        {
+            var x = Mathf.FloorToInt(pos.x);
+            var y = Mathf.FloorToInt(pos.y);
+            var z = Mathf.FloorToInt(pos.z);
+
+            if (x < 0 || x > chunkSize - 1 || y < 0 || y > chunkHeight - 1 || z < 0 ||
+                z > chunkSize - 1)
+                return false;
+
+            return _voxelMap[x, y, z];
+        }
+
+        // The following can be (a little) more efficiently rewritten using arrays instead of lists
+        // NOTE: Vertices cannot be shared across different faces, otherwise Unity will attempt to
+        // smoothen them and we won't obtain the desired cube crisp edges 
         private void AddVoxelDataToChunk(Vector3 pos)
         {
-            // The following can be (a little) more efficiently rewritten using arrays instead of lists
-            // NOTE: Vertices cannot be shared across different faces, otherwise Unity will attempt to
-            // smoothen them and we won't obtain the desired cube crisp edges 
             for (var p = 0; p < 6; p++)
             {
-                for (var i = 0; i < 6; i++)
+                // Skip if current face is hidden
+                if (CheckVoxel(pos + VoxelData.FaceChecks[p])) continue;
+                for (var i = 0; i < 4; i++)
                 {
-                    var triangleIndex = VoxelData.VoxelTris[p, i];
-                    _vertices.Add(VoxelData.VoxelVerts[triangleIndex] + pos);
-                    _triangles.Add(_vertexIndex);
+                    _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
                     _uvs.Add(VoxelData.VoxelUvs[i]);
-                    _vertexIndex++;
                 }
+
+                foreach (var i in new[] { 0, 1, 2, 2, 1, 3 })
+                    _triangles.Add(_vertexIndex + i);
+                _vertexIndex += 4;
             }
         }
 
@@ -66,7 +89,7 @@ namespace VoxelEngine
         {
             var mesh = new Mesh
             {
-                // indexFormat = IndexFormat.UInt32,
+                indexFormat = IndexFormat.UInt32,
                 vertices = _vertices.ToArray(),
                 triangles = _triangles.ToArray(),
                 uv = _uvs.ToArray()
