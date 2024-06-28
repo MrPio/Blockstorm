@@ -381,8 +381,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9c68d00fa2d45379c53cc99b1f9e0af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkSize: 5
-  chunkHeight: 15
+  chunkSize: 1
+  chunkHeight: 1
   worldChunks: 50
   viewChunksDistance: 8
   textureAtlasSizeInBlocks: 4
@@ -518,9 +518,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: e5ccba3150114e64fa375de342575fd6, type: 2}
-  blockTypes:
-  - name: dirt
-    isSolid: 1
   atlasCount: 16
 --- !u!1 &1245005833
 GameObject:

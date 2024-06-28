@@ -54,7 +54,7 @@ namespace VoxelEngine
             for (var y = 0; y < chunkHeight; y++)
             for (var x = 0; x < chunkSize; x++)
             for (var z = 0; z < chunkSize; z++)
-                AddVoxelDataToChunk(new Vector3(x, y, z));
+                AddVoxel(new Vector3(x, y, z));
 
             CreateMesh();
         }
@@ -79,21 +79,24 @@ namespace VoxelEngine
         // The used optimizations are:
         // - Faces are drawn only if visible thanks to _voxelMap[,,] (faces pruning)
         // - Each face has 4 vertices instead of 6 (vertices pruning)
-        private void AddVoxelDataToChunk(Vector3 pos)
+        private void AddVoxel(Vector3 pos)
         {
             var faces = 0;
             for (var p = 0; p < 6; p++)
             {
+                var blockID = _voxelMap[(int)pos.x, (int)pos.y, (int)pos.z];
+                var blockType = _worldManager.blockTypes[blockID];
                 // Skip if current face is hidden
                 if (CheckVoxel(pos + VoxelData.FaceChecks[p])) continue;
                 faces++;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
-                AddTexture((faces*11)%256);
+                AddTexture(blockType.GetTextureID(p));
                 foreach (var i in new[] { 0, 1, 2, 2, 1, 3 })
                     _triangles.Add(_vertexIndex + i);
                 _vertexIndex += 4;
             }
+
             // print($"Drawn {faces} faces");
         }
 
