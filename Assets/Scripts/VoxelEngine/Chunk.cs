@@ -1,27 +1,28 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Random = System.Random;
 
 namespace VoxelEngine
 {
-    [RequireComponent(typeof(MeshFilter))] // Vertices
-    [RequireComponent(typeof(MeshRenderer))] // Light + Material
-    [RequireComponent(typeof(MeshCollider))] // Collisions
-    public class Chunk : MonoBehaviour
+    public class ChunkCoord
     {
-        [SerializeField] private int chunkSize = 5;
-        [SerializeField] private int chunkHeight = 15;
-        [SerializeField] private int worldChunks = 50;
-        [SerializeField] private int viewChunksDistance = 8;
-        [SerializeField] private int textureAtlasSizeInBlocks = 4;
-        public int WorldBlocks => worldChunks * chunkSize;
-        public float NormalizedBlockTextureSize => 1f / (float)textureAtlasSizeInBlocks;
+        public readonly int x, z;
 
-        private MeshRenderer _meshRenderer;
-        private MeshFilter _meshFilter;
-        private MeshCollider _meshCollider;
+        public ChunkCoord(int x, int z)
+        {
+            this.x = x;
+            this.z = z;
+        }
+
+        public Vector3 ToWorldPoint() =>
+            new(x * WorldManager.Instance.chunkSize, 0f, z * WorldManager.Instance.chunkSize);
+    }
+    public class Chunk
+    {
+        private GameObject chunkGO;
+        private MeshFilter _meshFilter; // Vertices
+        private MeshRenderer _meshRenderer; // Light + Material
+        private MeshCollider _meshCollider; // Collisions
 
         private int _vertexIndex = 0;
         private readonly List<Vector3> _vertices = new();
@@ -30,30 +31,35 @@ namespace VoxelEngine
         private readonly List<Vector2> _uvs = new();
 
         // We assume to have no more than 256 types of blocks. Otherwise an int would be required (4x size)
-        private byte[,,] _voxelMap;
-        private WorldManager _worldManager;
+        private readonly byte[,,] _voxelMap;
+        private readonly WorldManager _worldManager;
 
-        private void Awake()
+        public ChunkCoord coord;
+
+
+        public Chunk(ChunkCoord coord, WorldManager worldManager)
         {
-            _meshRenderer = GetComponent<MeshRenderer>();
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshCollider = GetComponent<MeshCollider>();
-            _worldManager = WorldManager.Instance;
-        }
+            this.coord = coord;
+            _worldManager = worldManager;
+            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})");
+            chunkGO.transform.SetParent(worldManager.transform);
+            chunkGO.transform.position = coord.ToWorldPoint();
+                
+            _meshRenderer = chunkGO.AddComponent<MeshRenderer>();
+            _meshFilter = chunkGO.AddComponent<MeshFilter>();
+            _meshCollider = chunkGO.AddComponent<MeshCollider>();
+            _meshRenderer.material = worldManager.material;
 
-
-        private void Start()
-        {
-            _voxelMap = new byte[chunkSize, chunkHeight, chunkSize];
+            _voxelMap = new byte[_worldManager.chunkSize, _worldManager.chunkHeight, _worldManager.chunkSize];
             // We initialize to true all the cubes positions. This enables faces pruning.
-            for (var y = 0; y < chunkHeight; y++)
-            for (var x = 0; x < chunkSize; x++)
-            for (var z = 0; z < chunkSize; z++)
+            for (var y = 0; y < _worldManager.chunkHeight; y++)
+            for (var x = 0; x < _worldManager.chunkSize; x++)
+            for (var z = 0; z < _worldManager.chunkSize; z++)
                 _voxelMap[x, y, z] = 0;
 
-            for (var y = 0; y < chunkHeight; y++)
-            for (var x = 0; x < chunkSize; x++)
-            for (var z = 0; z < chunkSize; z++)
+            for (var y = 0; y < _worldManager.chunkHeight; y++)
+            for (var x = 0; x < _worldManager.chunkSize; x++)
+            for (var z = 0; z < _worldManager.chunkSize; z++)
                 AddVoxel(new Vector3(x, y, z));
 
             CreateMesh();
@@ -65,8 +71,8 @@ namespace VoxelEngine
             var y = Mathf.FloorToInt(pos.y);
             var z = Mathf.FloorToInt(pos.z);
 
-            if (x < 0 || x > chunkSize - 1 || y < 0 || y > chunkHeight - 1 || z < 0 ||
-                z > chunkSize - 1)
+            if (x < 0 || x > _worldManager.chunkSize - 1 || y < 0 || y > _worldManager.chunkHeight - 1 || z < 0 ||
+                z > _worldManager.chunkSize - 1)
                 return false;
 
             return _worldManager.blockTypes[_voxelMap[x, y, z]].isSolid;

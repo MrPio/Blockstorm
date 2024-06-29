@@ -5,23 +5,33 @@ namespace VoxelEngine
 {
     public class WorldManager : MonoBehaviour
     {
+        public int chunkSize = 5;
+        public int chunkHeight = 15;
+        public int worldChunks = 50;
+        public int viewChunksDistance = 8;
+        public int textureAtlasSizeInBlocks = 4;
+        public int WorldBlocks => worldChunks * chunkSize;
+        public float NormalizedBlockTextureSize => 1f / textureAtlasSizeInBlocks;
+
         public Material material;
 
-        [NonSerialized]
-        public readonly BlockType[] blockTypes =
+        [NonSerialized] public readonly BlockType[] blockTypes =
         {
             new("grass", topID: 1, bottomID: 0, sideID: 2),
         };
 
         public int atlasCount = 16;
         public float AtlasBlockSize => 1f / atlasCount;
-
         private static WorldManager _instance;
-
         public static WorldManager Instance => _instance ??= FindObjectOfType<WorldManager>();
+
+        private void Start()
+        {
+            var chunk = new Chunk(new ChunkCoord(0,0),this);
+        }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class BlockType
     {
         public string name;
