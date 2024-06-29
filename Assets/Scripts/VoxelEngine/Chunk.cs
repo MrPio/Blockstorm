@@ -57,6 +57,7 @@ namespace VoxelEngine
                 AddVoxel(new Vector3(x, y, z));
 
             CreateMesh();
+            chunkGO.SetActive(false);
         }
 
         public bool IsActive
@@ -111,7 +112,11 @@ namespace VoxelEngine
                 uv = _uvs.ToArray()
             };
             mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            mesh.Optimize();
+            
             _meshFilter.mesh = mesh;
+            _meshCollider.sharedMesh = mesh;
         }
 
         private void AddTexture(int textureID)

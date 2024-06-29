@@ -1,6 +1,8 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VoxelEngine;
 
 public class Player : MonoBehaviour
 {
@@ -15,6 +17,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _transform = transform;
+        WorldManager.instance.UpdatePlayerPos(_transform.position);
     }
 
     private void Update()
@@ -31,6 +34,7 @@ public class Player : MonoBehaviour
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
         characterController.Move(speed * Time.deltaTime * move + _velocity * Time.deltaTime);
+        WorldManager.instance.UpdatePlayerPos(_transform.position);
     }
 
 }
