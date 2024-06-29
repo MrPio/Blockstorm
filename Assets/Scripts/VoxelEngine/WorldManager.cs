@@ -1,5 +1,6 @@
 using System;
 using ExtensionFunctions;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VoxelEngine
@@ -29,38 +30,40 @@ namespace VoxelEngine
         };
 
         public Material material;
-
-        public int chunkSize = 2;
-
-        // public int chunkHeight = 15; // Replaced by Map.MaxHeight
-        public int worldChunks = 50;
-        public int viewChunksDistance = 8;
+        [Range(1, 1024)] public int chunkSize = 2;
+        [Range(1, 1024)] public int worldChunks = 50;
+        [Range(1, 1024)] public int viewChunksDistance = 8;
         public int atlasCount = 16;
         public int textureAtlasSizeInBlocks = 4;
         public int WorldBlocks => worldChunks * chunkSize;
         public float NormalizedBlockTextureSize => 1f / textureAtlasSizeInBlocks;
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
+        public Map map;
 
         private void Start()
         {
             instance = this;
+            chunkSize = math.max(1, chunkSize);
+            worldChunks = math.max(1, worldChunks);
+            viewChunksDistance = math.max(1, viewChunksDistance);
             LoadMap(Map.GetMap("debug"));
         }
 
-        public void LoadMap(Map map)
+        public void LoadMap(Map newMap)
         {
-            var mapSize = map.Size;
+            map = newMap;
+            var mapSize = map.size;
             var chunksX = Mathf.CeilToInt((float)mapSize.x / chunkSize);
             var chunksZ = Mathf.CeilToInt((float)mapSize.y / chunkSize);
             _chunks = new Chunk[chunksX, chunksZ];
             for (var x = 0; x < chunksX; x++)
             for (var z = 0; z < chunksZ; z++)
-                _chunks[x, z] = new Chunk(new ChunkCoord(x, z),
-                    map.blocks.GetSubArray(
-                        from2: x * chunkSize, to2: (x + 1) * chunkSize,
-                        from3: z * chunkSize, to3: (z + 1) * chunkSize), this);
+                _chunks[x, z] = new Chunk(new ChunkCoord(x, z));
         }
+
+        public bool IsVoxelInWorld(Vector3Int pos) =>
+            pos.x >= 0 && pos.x < map.size.x && pos.y >= 0 && pos.y < map.size.y && pos.z >= 0 && pos.z < map.size.z;
     }
 
     [Serializable]

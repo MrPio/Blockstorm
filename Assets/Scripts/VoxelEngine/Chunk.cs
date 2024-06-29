@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,15 +8,14 @@ namespace VoxelEngine
     public class ChunkCoord
     {
         public readonly int x, z;
+        public readonly Vector3Int worldPos;
 
         public ChunkCoord(int x, int z)
         {
             this.x = x;
             this.z = z;
+            worldPos = new Vector3Int(x * WorldManager.instance.chunkSize, 0, z * WorldManager.instance.chunkSize);
         }
-
-        public Vector3 ToWorldPoint() =>
-            new(x * WorldManager.instance.chunkSize, 0f, z * WorldManager.instance.chunkSize);
     }
 
     public class Chunk
@@ -25,54 +25,53 @@ namespace VoxelEngine
         private MeshRenderer _meshRenderer; // Light + Material
         private MeshCollider _meshCollider; // Collisions
 
-        private int _vertexIndex = 0;
+        private int _vertexIndex;
         private readonly List<Vector3> _vertices = new();
         private readonly List<int> _triangles = new();
-
         private readonly List<Vector2> _uvs = new();
-
-        // We assume to have no more than 256 types of blocks. Otherwise an int would be required (4x size)
-        private readonly byte[,,] _blocks; // y,x,z
-        private readonly Vector3Int _mapSize;
+        private readonly Vector3Int _size;
         private readonly WorldManager _wm;
-
         public ChunkCoord coord;
 
-
-        public Chunk(ChunkCoord coord, byte[,,] blocks, WorldManager wm)
+        public Chunk(ChunkCoord coord)
         {
             this.coord = coord;
-            this._blocks = blocks;
-            _mapSize = new Vector3Int(blocks.GetLength(1), blocks.GetLength(0), blocks.GetLength(2));
-            _wm = wm;
+            _wm = WorldManager.instance;
+            _size = new Vector3Int(
+                math.min(_wm.chunkSize, _wm.map.size.x - coord.worldPos.x),
+                Map.MaxHeight,
+                math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
+            );
             chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})");
-            chunkGO.transform.SetParent(wm.transform);
-            chunkGO.transform.position = coord.ToWorldPoint();
+            chunkGO.transform.SetParent(_wm.transform);
+            chunkGO.transform.position = coord.worldPos;
 
             _meshRenderer = chunkGO.AddComponent<MeshRenderer>();
             _meshFilter = chunkGO.AddComponent<MeshFilter>();
             _meshCollider = chunkGO.AddComponent<MeshCollider>();
-            _meshRenderer.material = wm.material;
+            _meshRenderer.material = _wm.material;
 
-            for (var y = 0; y < _mapSize.y; y++)
-            for (var x = 0; x < _mapSize.x; x++)
-            for (var z = 0; z < _mapSize.z; z++)
+            for (var y = 0; y < _size.y; y++)
+            for (var x = 0; x < _size.x; x++)
+            for (var z = 0; z < _size.z; z++)
                 AddVoxel(new Vector3(x, y, z));
 
             CreateMesh();
         }
 
+        public bool IsActive
+        {
+            get => chunkGO.activeSelf;
+            set => chunkGO.SetActive(value);
+        }
+        
+        // Check if there is a solid voxel (in the world) in the given position
+        // NOTE: this is used to apply face pruning
         private bool CheckVoxel(Vector3 pos)
         {
-            var x = Mathf.FloorToInt(pos.x);
-            var y = Mathf.FloorToInt(pos.y);
-            var z = Mathf.FloorToInt(pos.z);
-
-            if (x < 0 || x > _mapSize.x - 1 || y < 0 || y > _mapSize.y - 1 || z < 0 ||
-                z > _mapSize.z - 1)
-                return false;
-
-            return _wm.blockTypes[_blocks[y, x, z]].isSolid;
+            var worldPos = Vector3Int.FloorToInt(pos + coord.worldPos);
+            return _wm.IsVoxelInWorld(worldPos) &&
+                   _wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid;
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
@@ -84,16 +83,15 @@ namespace VoxelEngine
         // - Each face has 4 vertices instead of 6 (vertices pruning)
         private void AddVoxel(Vector3 pos)
         {
-            var blockID = _blocks[(int)pos.y, (int)pos.x, (int)pos.z];
+            var blockType =
+                _wm.blockTypes[
+                    _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z]];
             // Skip if air
-            if (blockID == 0) return;
-            var blockType = _wm.blockTypes[blockID];
-            // var faces = 0;
+            if (blockType.name == "air") return; // var faces = 0;
             for (var p = 0; p < 6; p++)
             {
                 // Skip if current face is hidden
                 if (CheckVoxel(pos + VoxelData.FaceChecks[p])) continue;
-                // faces++;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
                 AddTexture(blockType.GetTextureID(p));
@@ -101,7 +99,6 @@ namespace VoxelEngine
                     _triangles.Add(_vertexIndex + i);
                 _vertexIndex += 4;
             }
-            // print($"Drawn {faces} faces");
         }
 
         private void CreateMesh()
