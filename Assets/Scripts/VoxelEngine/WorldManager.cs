@@ -3,6 +3,14 @@ using UnityEngine;
 
 namespace VoxelEngine
 {
+    // This enum is redundant. It enable accessing the blockTypes array with a name instead of an index
+    public enum BlockTypes
+    {
+        Grass,
+        Dirt,
+        Steel
+    }
+
     public class WorldManager : MonoBehaviour
     {
         public int chunkSize = 5;
@@ -18,6 +26,8 @@ namespace VoxelEngine
         [NonSerialized] public readonly BlockType[] blockTypes =
         {
             new("grass", topID: 1, bottomID: 0, sideID: 2),
+            new("dirt", topID: 0),
+            new("steel", topID: 16),
         };
 
         public int atlasCount = 16;
@@ -27,7 +37,7 @@ namespace VoxelEngine
 
         private void Start()
         {
-            var chunk = new Chunk(new ChunkCoord(0,0),this);
+            var chunk = new Chunk(new ChunkCoord(0, 0), this);
         }
     }
 

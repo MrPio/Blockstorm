@@ -17,6 +17,7 @@ namespace VoxelEngine
         public Vector3 ToWorldPoint() =>
             new(x * WorldManager.Instance.chunkSize, 0f, z * WorldManager.Instance.chunkSize);
     }
+
     public class Chunk
     {
         private GameObject chunkGO;
@@ -32,34 +33,34 @@ namespace VoxelEngine
 
         // We assume to have no more than 256 types of blocks. Otherwise an int would be required (4x size)
         private readonly byte[,,] _voxelMap;
-        private readonly WorldManager _worldManager;
+        private readonly WorldManager _wm;
 
         public ChunkCoord coord;
 
 
-        public Chunk(ChunkCoord coord, WorldManager worldManager)
+        public Chunk(ChunkCoord coord, WorldManager wm)
         {
             this.coord = coord;
-            _worldManager = worldManager;
+            _wm = wm;
             chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})");
-            chunkGO.transform.SetParent(worldManager.transform);
+            chunkGO.transform.SetParent(wm.transform);
             chunkGO.transform.position = coord.ToWorldPoint();
-                
+
             _meshRenderer = chunkGO.AddComponent<MeshRenderer>();
             _meshFilter = chunkGO.AddComponent<MeshFilter>();
             _meshCollider = chunkGO.AddComponent<MeshCollider>();
-            _meshRenderer.material = worldManager.material;
+            _meshRenderer.material = wm.material;
 
-            _voxelMap = new byte[_worldManager.chunkSize, _worldManager.chunkHeight, _worldManager.chunkSize];
+            _voxelMap = new byte[_wm.chunkSize, _wm.chunkHeight, _wm.chunkSize];
             // We initialize to true all the cubes positions. This enables faces pruning.
-            for (var y = 0; y < _worldManager.chunkHeight; y++)
-            for (var x = 0; x < _worldManager.chunkSize; x++)
-            for (var z = 0; z < _worldManager.chunkSize; z++)
-                _voxelMap[x, y, z] = 0;
+            for (var y = 0; y < _wm.chunkHeight; y++)
+            for (var x = 0; x < _wm.chunkSize; x++)
+            for (var z = 0; z < _wm.chunkSize; z++)
+                _voxelMap[x, y, z] = (byte)(y == _wm.chunkHeight - 1 ? BlockTypes.Grass : BlockTypes.Dirt);
 
-            for (var y = 0; y < _worldManager.chunkHeight; y++)
-            for (var x = 0; x < _worldManager.chunkSize; x++)
-            for (var z = 0; z < _worldManager.chunkSize; z++)
+            for (var y = 0; y < _wm.chunkHeight; y++)
+            for (var x = 0; x < _wm.chunkSize; x++)
+            for (var z = 0; z < _wm.chunkSize; z++)
                 AddVoxel(new Vector3(x, y, z));
 
             CreateMesh();
@@ -71,11 +72,11 @@ namespace VoxelEngine
             var y = Mathf.FloorToInt(pos.y);
             var z = Mathf.FloorToInt(pos.z);
 
-            if (x < 0 || x > _worldManager.chunkSize - 1 || y < 0 || y > _worldManager.chunkHeight - 1 || z < 0 ||
-                z > _worldManager.chunkSize - 1)
+            if (x < 0 || x > _wm.chunkSize - 1 || y < 0 || y > _wm.chunkHeight - 1 || z < 0 ||
+                z > _wm.chunkSize - 1)
                 return false;
 
-            return _worldManager.blockTypes[_voxelMap[x, y, z]].isSolid;
+            return _wm.blockTypes[_voxelMap[x, y, z]].isSolid;
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
@@ -87,14 +88,14 @@ namespace VoxelEngine
         // - Each face has 4 vertices instead of 6 (vertices pruning)
         private void AddVoxel(Vector3 pos)
         {
-            var faces = 0;
+            var blockID = _voxelMap[(int)pos.x, (int)pos.y, (int)pos.z];
+            var blockType = _wm.blockTypes[blockID];
+            // var faces = 0;
             for (var p = 0; p < 6; p++)
             {
-                var blockID = _voxelMap[(int)pos.x, (int)pos.y, (int)pos.z];
-                var blockType = _worldManager.blockTypes[blockID];
                 // Skip if current face is hidden
                 if (CheckVoxel(pos + VoxelData.FaceChecks[p])) continue;
-                faces++;
+                // faces++;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
                 AddTexture(blockType.GetTextureID(p));
@@ -102,7 +103,6 @@ namespace VoxelEngine
                     _triangles.Add(_vertexIndex + i);
                 _vertexIndex += 4;
             }
-
             // print($"Drawn {faces} faces");
         }
 
@@ -121,10 +121,10 @@ namespace VoxelEngine
 
         private void AddTexture(int textureID)
         {
-            var y = 1 - Mathf.CeilToInt((float)textureID / _worldManager.atlasCount) * _worldManager.AtlasBlockSize;
-            var x = textureID % _worldManager.atlasCount * _worldManager.AtlasBlockSize;
+            var y = 1 - (Mathf.FloorToInt((float)textureID / _wm.atlasCount)+1) * _wm.AtlasBlockSize;
+            var x = textureID % _wm.atlasCount * _wm.AtlasBlockSize;
             foreach (var uv in VoxelData.VoxelUvs)
-                _uvs.Add(new Vector2(x, y) + uv * _worldManager.AtlasBlockSize);
+                _uvs.Add(new Vector2(x, y) + uv * _wm.AtlasBlockSize);
         }
     }
 }
