@@ -31,8 +31,7 @@ namespace VoxelEngine
         private readonly List<Vector2> _uvs = new();
         private readonly Vector3Int _size;
         private readonly WorldManager _wm;
-        public ChunkCoord coord;
-
+        public readonly ChunkCoord coord;
         public Chunk(ChunkCoord coord)
         {
             this.coord = coord;
@@ -42,7 +41,7 @@ namespace VoxelEngine
                 Map.MaxHeight,
                 math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
             );
-            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})");
+            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})"){layer = LayerMask.NameToLayer("Ground")};
             chunkGO.transform.SetParent(_wm.transform);
             chunkGO.transform.position = coord.worldPos;
 

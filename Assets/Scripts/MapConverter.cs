@@ -13,7 +13,7 @@ public class MapConverter : MonoBehaviour
     private void SaveMap()
     {
         var blockTypesList = WorldManager.instance.blockTypes.ToList();
-        var cubes = GameObject.Find("Map").GetComponentsInChildren<MeshRenderer>();
+        var cubes = GameObject.FindWithTag("MapGenerator").GetComponentsInChildren<MeshRenderer>();
         var blockTypes = new List<byte>();
         var positionsX = new List<int>();
         var positionsY = new List<int>();
@@ -22,7 +22,7 @@ public class MapConverter : MonoBehaviour
         {
             var id = int.Parse(cube.material.mainTexture.name.Split('_')[1]) - 1;
             var blockType = blockTypesList.FindIndex(e => e.topID == id || e.bottomID == id || e.sideID == id);
-            var pos = Vector3Int.FloorToInt(cube.transform.position);
+            var pos = Vector3Int.FloorToInt(cube.transform.position+Vector3.one*0.05f);
             blockTypes.Add((byte)blockType);
             positionsX.Add(pos.x);
             positionsY.Add(pos.y);

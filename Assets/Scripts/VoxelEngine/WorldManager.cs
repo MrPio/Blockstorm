@@ -2,6 +2,7 @@ using System;
 using ExtensionFunctions;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace VoxelEngine
 {
