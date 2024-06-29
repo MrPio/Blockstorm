@@ -142,7 +142,7 @@ namespace VoxelEngine
             instance = this;
             chunkSize = math.max(1, chunkSize);
             viewChunksDistance = math.max(1, viewChunksDistance);
-            LoadMap(Map.GetMap("debug"));
+            LoadMap(Map.GetMap("Harbor"));
         }
 
         private void LoadMap(Map newMap)
