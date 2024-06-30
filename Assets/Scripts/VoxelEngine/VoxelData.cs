@@ -45,14 +45,14 @@ namespace VoxelEngine
         };
 
         // The order matches the faces of the VoxelTris faces.
-        public static readonly Vector3[] FaceChecks = new Vector3[6]
+        public static readonly Vector3Int[] FaceChecks = new Vector3Int[6]
         {
-            new(0.0f, 0.0f, -1.0f), // Back Face
-            new(0.0f, 0.0f, 1.0f), // Front Face
-            new(0.0f, 1.0f, 0.0f), // Top Face
-            new(0.0f, -1.0f, 0.0f), // Bottom Face
-            new(-1.0f, 0.0f, 0.0f), // Left Face
-            new(1.0f, 0.0f, 0.0f) // Right Face
+            new(0, 0, -1), // Back Face
+            new(0, 0, 1), // Front Face
+            new(0, 1, 0), // Top Face
+            new(0, -1, 0), // Bottom Face
+            new(-1, 0, 0), // Left Face
+            new(1, 0, 0) // Right Face
         };
     }
 }

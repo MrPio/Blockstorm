@@ -131,8 +131,8 @@ namespace VoxelEngine
         };
 
         public Material material;
-        [Range(1, 1024)] public int chunkSize = 2;
-        [Range(1, 32)] public int viewChunksDistance = 2;
+        [Range(1, 128)] public int chunkSize = 2;
+        [Range(1, 512)] public int viewDistance = 2;
         public int atlasCount = 16;
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
@@ -143,7 +143,7 @@ namespace VoxelEngine
         {
             instance = this;
             chunkSize = math.max(1, chunkSize);
-            viewChunksDistance = math.max(1, viewChunksDistance);
+            viewDistance = math.max(1, viewDistance);
             LoadMap(Map.GetMap("Harbor"));
         }
 
@@ -162,7 +162,8 @@ namespace VoxelEngine
         public bool IsVoxelInWorld(Vector3Int pos) =>
             pos.x >= 0 && pos.x < map.size.x && pos.y >= 0 && pos.y < map.size.y && pos.z >= 0 && pos.z < map.size.z;
 
-        [CanBeNull] public BlockType GetVoxel(Vector3Int pos) =>
+        [CanBeNull]
+        public BlockType GetVoxel(Vector3Int pos) =>
             IsVoxelInWorld(pos) ? blockTypes[map.blocks[pos.y, pos.x, pos.z]] : null;
 
         public void UpdatePlayerPos(Vector3 playerPos)
@@ -172,8 +173,29 @@ namespace VoxelEngine
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)
             for (var z = 0; z < _chunks.GetLength(1); z++)
-                _chunks[x, z].IsActive = math.abs(x - playerPos.x / chunkSize) < viewChunksDistance &&
-                                         math.abs(z - playerPos.z / chunkSize) < viewChunksDistance;
+                _chunks[x, z].IsActive = math.abs(x*chunkSize - playerPos.x) < viewDistance &&
+                                         math.abs(z*chunkSize - playerPos.z) < viewDistance;
+        }
+
+        [CanBeNull]
+        public Chunk GetChunk(Vector3Int posNorm)
+        {
+            posNorm /= chunkSize;
+            if (posNorm.x < _chunks.GetLength(0) && posNorm.z<_chunks.GetLength(1))
+                return _chunks[posNorm.x, posNorm.z];
+            return null;
+        }
+        
+        public void EditVoxel(Vector3 pos, byte newID)
+        { 
+            var posNorm = Vector3Int.FloorToInt(pos);
+            print(posNorm);
+            print(map.blocks[posNorm.x, posNorm.y, posNorm.z]);
+            map.blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
+            GetChunk(posNorm)?.Apply(e=> {
+                e.UpdateMesh();
+                e.UpdateAdjacentChunks(posNorm);
+            });
         }
     }
 

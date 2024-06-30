@@ -32,6 +32,7 @@ namespace VoxelEngine
         private readonly Vector3Int _size;
         private readonly WorldManager _wm;
         public readonly ChunkCoord coord;
+
         public Chunk(ChunkCoord coord)
         {
             this.coord = coord;
@@ -41,7 +42,7 @@ namespace VoxelEngine
                 Map.MaxHeight,
                 math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
             );
-            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})"){layer = LayerMask.NameToLayer("Ground")};
+            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})") { layer = LayerMask.NameToLayer("Ground") };
             chunkGO.transform.SetParent(_wm.transform);
             chunkGO.transform.position = coord.worldPos;
 
@@ -59,7 +60,7 @@ namespace VoxelEngine
             get => chunkGO.activeSelf;
             set => chunkGO.SetActive(value);
         }
-        
+
         // Check if there is a solid voxel (in the world) in the given position
         // NOTE: this is used to apply face pruning
         private bool CheckVoxel(Vector3 pos)
@@ -104,7 +105,7 @@ namespace VoxelEngine
             for (var x = 0; x < _size.x; x++)
             for (var z = 0; z < _size.z; z++)
                 AddVoxel(new Vector3(x, y, z));
-            
+
             var mesh = new Mesh
             {
                 indexFormat = IndexFormat.UInt32,
@@ -115,17 +116,32 @@ namespace VoxelEngine
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             mesh.Optimize();
-            
+
             _meshFilter.mesh = mesh;
             _meshCollider.sharedMesh = mesh;
         }
 
         private void ClearMesh()
         {
+            _vertexIndex = 0;
             _vertices.Clear();
             _triangles.Clear();
             _uvs.Clear();
         }
+
+        public void UpdateAdjacentChunks(Vector3Int posNorm)
+        {
+            for (var p = 0; p < 6; p++)
+            {
+                var currentVoxel = posNorm + VoxelData.FaceChecks[p];
+                if (!IsVoxelInChunk(currentVoxel))
+                    _wm.GetChunk(currentVoxel)?.UpdateMesh();
+            }
+        }
+
+        public bool IsVoxelInChunk(Vector3Int pos) =>
+            pos.x >= 0 && pos.x < _wm.chunkSize && pos.z >= 0 && pos.z < _wm.chunkSize;
+
 
         private void AddTexture(int textureID)
         {
