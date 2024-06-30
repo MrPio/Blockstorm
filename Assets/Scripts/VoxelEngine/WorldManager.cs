@@ -138,13 +138,14 @@ namespace VoxelEngine
         private Chunk[,] _chunks;
         [NonSerialized] public Map map;
         private Vector3 _playerLastPos;
+        [SerializeField]private string mapName="Harbor";
 
         private void Start()
         {
             instance = this;
             chunkSize = math.max(1, chunkSize);
             viewDistance = math.max(1, viewDistance);
-            LoadMap(Map.GetMap("Harbor"));
+            LoadMap(Map.GetMap(mapName));
         }
 
         private void LoadMap(Map newMap)

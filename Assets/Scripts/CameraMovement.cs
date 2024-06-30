@@ -11,7 +11,7 @@ public class CameraMovement : MonoBehaviour
     public float reach = 8;
     private WorldManager _wm;
     private Transform _transform;
-    private bool _canDig, _canPlace;
+    private bool _canDig=true, _canPlace;
 
     public bool CanDig
     {
