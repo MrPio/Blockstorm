@@ -1,28 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float sensX, sensY;
-    public Transform orientation;
+    public float sensitivity;
+    public Transform player;
     private float _rotX, _rotY;
 
-    void Start()
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    void Update()
+    private void Update()
     {
-        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensX;
-        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensY;
-        _rotY += mouseX;
+        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity;
+        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity;
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
-        _rotX = Mathf.Clamp(_rotX, -90f, 90f);
-        transform.rotation = Quaternion.Euler(_rotX, _rotY, 0);
-        orientation.rotation = Quaternion.Euler(0, _rotY, 0);
+        transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
+        player.Rotate(Vector3.up * mouseX);
     }
 }
