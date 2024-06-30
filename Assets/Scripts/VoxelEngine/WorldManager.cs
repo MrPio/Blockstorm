@@ -1,5 +1,6 @@
 using System;
 using ExtensionFunctions;
+using JetBrains.Annotations;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,13 +14,13 @@ namespace VoxelEngine
         [NonSerialized] public readonly BlockType[] blockTypes =
         {
             new("air", topID: (15, 15), isSolid: false),
+            new("iron", topID: (1, 0)), // Bedrock must be in index 1
 
             new("dirt", topID: (0, 0)),
             new("grass", topID: (0, 1), bottomID: (0, 0), sideID: (0, 2)),
             new("grass_dry", topID: (0, 3), bottomID: (0, 0), sideID: (0, 4)),
             new("snow", topID: (0, 5), bottomID: (0, 0), sideID: (0, 6)),
 
-            new("iron", topID: (1, 0)),
             new("iron_dark", topID: (1, 1)),
             new("iron_white", topID: (1, 2)),
             new("iron_red", topID: (1, 3)),
@@ -108,8 +109,8 @@ namespace VoxelEngine
             new("barrel_yellow", topID: (3, 7), sideID: (3, 6)),
             new("barrel_white", topID: (3, 9), sideID: (3, 8)),
 
-            new("water", topID: (0, 15)),
-            new("water_shallow", topID: (0, 14)),
+            new("water", topID: (0, 15), isSolid: false), // TODO: use specular material + remove collider
+            new("water_shallow", topID: (0, 14), isSolid: false),
 
             new("player_block_red", topID: (12, 1), sideID: (12, 0)),
             new("player_block_blue", topID: (12, 3), sideID: (12, 2)),
@@ -160,6 +161,9 @@ namespace VoxelEngine
 
         public bool IsVoxelInWorld(Vector3Int pos) =>
             pos.x >= 0 && pos.x < map.size.x && pos.y >= 0 && pos.y < map.size.y && pos.z >= 0 && pos.z < map.size.z;
+
+        [CanBeNull] public BlockType GetVoxel(Vector3Int pos) =>
+            IsVoxelInWorld(pos) ? blockTypes[map.blocks[pos.y, pos.x, pos.z]] : null;
 
         public void UpdatePlayerPos(Vector3 playerPos)
         {

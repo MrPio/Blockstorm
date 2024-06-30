@@ -50,12 +50,7 @@ namespace VoxelEngine
             _meshCollider = chunkGO.AddComponent<MeshCollider>();
             _meshRenderer.material = _wm.material;
 
-            for (var y = 0; y < _size.y; y++)
-            for (var x = 0; x < _size.x; x++)
-            for (var z = 0; z < _size.z; z++)
-                AddVoxel(new Vector3(x, y, z));
-
-            CreateMesh();
+            UpdateMesh();
             chunkGO.SetActive(false);
         }
 
@@ -101,8 +96,15 @@ namespace VoxelEngine
             }
         }
 
-        private void CreateMesh()
+        public void UpdateMesh()
         {
+            ClearMesh();
+
+            for (var y = 0; y < _size.y; y++)
+            for (var x = 0; x < _size.x; x++)
+            for (var z = 0; z < _size.z; z++)
+                AddVoxel(new Vector3(x, y, z));
+            
             var mesh = new Mesh
             {
                 indexFormat = IndexFormat.UInt32,
@@ -116,6 +118,13 @@ namespace VoxelEngine
             
             _meshFilter.mesh = mesh;
             _meshCollider.sharedMesh = mesh;
+        }
+
+        private void ClearMesh()
+        {
+            _vertices.Clear();
+            _triangles.Clear();
+            _uvs.Clear();
         }
 
         private void AddTexture(int textureID)
