@@ -769,8 +769,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: e5ccba3150114e64fa375de342575fd6, type: 2}
+  transparentMaterial: {fileID: 2100000, guid: 56087e1e31432574a9dc39f1bfbd2a0f, type: 2}
   chunkSize: 8
-  viewDistance: 128
+  viewDistance: 512
   atlasCount: 16
   mapName: Harbor
 --- !u!1 &1184523946

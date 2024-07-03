@@ -20,54 +20,58 @@ namespace VoxelEngine
 
     public class Chunk
     {
-        private GameObject chunkGO;
+        public readonly GameObject chunkGo;
         private MeshFilter _meshFilter; // Vertices
         private MeshRenderer _meshRenderer; // Light + Material
         private MeshCollider _meshCollider; // Collisions
 
         private int _vertexIndex;
         private readonly List<Vector3> _vertices = new();
-        private readonly List<int> _triangles = new();
+        private readonly List<int> _triangles = new(), _transparentTriangles = new();
         private readonly List<Vector2> _uvs = new();
         private readonly Vector3Int _size;
         private readonly WorldManager _wm;
         public readonly ChunkCoord coord;
+        public readonly bool isSolid;
 
-        public Chunk(ChunkCoord coord)
+        public bool IsEmpty => _vertices.Count == 0;
+        public Chunk(ChunkCoord coord, bool isSolid)
         {
             this.coord = coord;
+            this.isSolid = isSolid;
             _wm = WorldManager.instance;
             _size = new Vector3Int(
                 math.min(_wm.chunkSize, _wm.map.size.x - coord.worldPos.x),
                 Map.MaxHeight,
                 math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
             );
-            chunkGO = new GameObject($"Chunk ({coord.x},{coord.z})") { layer = LayerMask.NameToLayer("Ground") };
-            chunkGO.transform.SetParent(_wm.transform);
-            chunkGO.transform.position = coord.worldPos;
+            chunkGo = new GameObject($"Chunk ({coord.x},{coord.z}) "+ (isSolid ? "Solid" : "NonSolid")) { layer = LayerMask.NameToLayer("Ground") };
+            chunkGo.transform.SetParent(_wm.transform);
+            chunkGo.transform.position = coord.worldPos;
 
-            _meshRenderer = chunkGO.AddComponent<MeshRenderer>();
-            _meshFilter = chunkGO.AddComponent<MeshFilter>();
-            _meshCollider = chunkGO.AddComponent<MeshCollider>();
-            _meshRenderer.material = _wm.material;
+            _meshRenderer = chunkGo.AddComponent<MeshRenderer>();
+            _meshFilter = chunkGo.AddComponent<MeshFilter>();
+            _meshCollider = chunkGo.AddComponent<MeshCollider>();
+            _meshRenderer.materials = new[] { _wm.material, _wm.transparentMaterial };
 
             UpdateMesh();
-            chunkGO.SetActive(false);
+            chunkGo.SetActive(false);
         }
 
         public bool IsActive
         {
-            get => chunkGO.activeSelf;
-            set => chunkGO.SetActive(value);
+            get => chunkGo.activeSelf;
+            set => chunkGo.SetActive(value);
         }
 
         // Check if there is a solid voxel (in the world) in the given position
         // NOTE: this is used to apply face pruning
-        private bool CheckVoxel(Vector3 pos)
+        private bool CheckVoxel(Vector3 pos, byte currentBlockType)
         {
             var worldPos = Vector3Int.FloorToInt(pos + coord.worldPos);
             return _wm.IsVoxelInWorld(worldPos) &&
-                   _wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid;
+                   (_wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
+                    _wm.map.blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
@@ -79,20 +83,24 @@ namespace VoxelEngine
         // - Each face has 4 vertices instead of 6 (vertices pruning)
         private void AddVoxel(Vector3 pos)
         {
-            var blockType =
-                _wm.blockTypes[
-                    _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z]];
+            var blockId = _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z];
+            var blockType = _wm.blockTypes[blockId];
             // Skip if air
-            if (blockType.name == "air") return; // var faces = 0;
+            if (blockType.name == "air") return;
+            if ((isSolid && !blockType.isSolid) || (!isSolid && blockType.isSolid))
+                return;
             for (var p = 0; p < 6; p++)
             {
                 // Skip if current face is hidden
-                if (CheckVoxel(pos + VoxelData.FaceChecks[p])) continue;
+                if (CheckVoxel(pos + VoxelData.FaceChecks[p], blockId)) continue;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
                 AddTexture(blockType.GetTextureID(p));
                 foreach (var i in new[] { 0, 1, 2, 2, 1, 3 })
-                    _triangles.Add(_vertexIndex + i);
+                    if (blockType.isTransparent)
+                        _transparentTriangles.Add(_vertexIndex + i);
+                    else
+                        _triangles.Add(_vertexIndex + i);
                 _vertexIndex += 4;
             }
         }
@@ -105,20 +113,23 @@ namespace VoxelEngine
             for (var x = 0; x < _size.x; x++)
             for (var z = 0; z < _size.z; z++)
                 AddVoxel(new Vector3(x, y, z));
-
+            
             var mesh = new Mesh
             {
                 indexFormat = IndexFormat.UInt32,
                 vertices = _vertices.ToArray(),
-                triangles = _triangles.ToArray(),
+                subMeshCount = 2,
                 uv = _uvs.ToArray()
             };
+            mesh.SetTriangles(_triangles.ToArray(), 0);
+            mesh.SetTriangles(_transparentTriangles.ToArray(), 1);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             mesh.Optimize();
 
+            if (isSolid)
+                _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
-            _meshCollider.sharedMesh = mesh;
         }
 
         private void ClearMesh()
@@ -126,6 +137,7 @@ namespace VoxelEngine
             _vertexIndex = 0;
             _vertices.Clear();
             _triangles.Clear();
+            _transparentTriangles.Clear();
             _uvs.Clear();
         }
 

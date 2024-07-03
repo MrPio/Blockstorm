@@ -13,7 +13,7 @@ public class CameraMovement : MonoBehaviour
     public float reach = 8;
     private WorldManager _wm;
     private Transform _transform;
-    private bool _canDig, _canPlace = true;
+    private bool _canDig= true, _canPlace ;
 
     public bool CanDig
     {
@@ -85,8 +85,9 @@ public class CameraMovement : MonoBehaviour
         {
             var pos = Vector3Int.FloorToInt(_transform.position + _transform.forward * (lenght));
             var blockType = _wm.GetVoxel(pos);
-            if (_canDig && blockType is { isSolid: true })
+            if (_canDig && blockType != null && blockType.name != "air")
             {
+                if (!blockType.isSolid) return;
                 highlightBlock.position = pos + Vector3.one * 0.5f;
                 highlightBlock.gameObject.SetActive(true);
                 placeBlock.gameObject.SetActive(false);
@@ -96,11 +97,14 @@ public class CameraMovement : MonoBehaviour
             if (_canPlace && blockType is { isSolid: true })
             {
                 var newPos = lastPos + Vector3.one * 0.5f;
+                if (_wm.GetVoxel(Vector3Int.FloorToInt(newPos))?.name != "air")
+                    return;
                 var characterPos = characterController.transform.position;
                 var distanceXZ = Vector3.Distance(new Vector3(newPos.x, 0, newPos.z),
                     new Vector3(characterPos.x, 0, characterPos.z));
                 var distanceY = math.abs(newPos.y - characterPos.y);
-                var intersect = distanceXZ < characterController.radius+0.25f && distanceY < characterController.height-0.2f;
+                var intersect = distanceXZ < characterController.radius + 0.25f &&
+                                distanceY < characterController.height - 0.2f;
                 placeBlock.position = newPos;
                 print($"{distanceXZ}/{distanceY}");
                 placeBlock.gameObject.SetActive(!intersect);

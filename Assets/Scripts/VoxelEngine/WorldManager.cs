@@ -13,7 +13,7 @@ namespace VoxelEngine
 
         [NonSerialized] public readonly BlockType[] blockTypes =
         {
-            new("air", topID: (15, 15), isSolid: false),
+            new("air", topID: (15, 15), isSolid: false, isTransparent: true),
             new("iron", topID: (1, 0)), // Bedrock must be in index 1
 
             new("dirt", topID: (0, 0)),
@@ -102,15 +102,14 @@ namespace VoxelEngine
             new("steel_white", topID: (3, 14)),
             new("steel_black", topID: (3, 15)),
 
-
             new("barrel", topID: (3, 1), sideID: (3, 0)),
             new("barrel_blue", topID: (3, 3), sideID: (3, 2)),
             new("barrel_green", topID: (3, 5), sideID: (3, 4)),
             new("barrel_yellow", topID: (3, 7), sideID: (3, 6)),
             new("barrel_white", topID: (3, 9), sideID: (3, 8)),
 
-            new("water", topID: (0, 15), isSolid: false), // TODO: use specular material + remove collider
-            new("water_shallow", topID: (0, 14), isSolid: false),
+            new("water", topID: (0, 15), isSolid: false, isTransparent: true),
+            new("water_shallow", topID: (0, 14), isSolid: false, isTransparent: true),
 
             new("player_block_red", topID: (12, 1), sideID: (12, 0)),
             new("player_block_blue", topID: (12, 3), sideID: (12, 2)),
@@ -130,15 +129,16 @@ namespace VoxelEngine
             new("flame_box", topID: (2, 12)),
         };
 
-        public Material material;
+        public Material material, transparentMaterial;
         [Range(1, 128)] public int chunkSize = 2;
         [Range(1, 512)] public int viewDistance = 2;
         public int atlasCount = 16;
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
+        [ItemCanBeNull] private Chunk[,] _nonSolidChunks;
         [NonSerialized] public Map map;
         private Vector3 _playerLastPos;
-        [SerializeField]private string mapName="Harbor";
+        [SerializeField] private string mapName = "Harbor";
 
         private void Start()
         {
@@ -155,9 +155,19 @@ namespace VoxelEngine
             var chunksX = Mathf.CeilToInt((float)mapSize.x / chunkSize);
             var chunksZ = Mathf.CeilToInt((float)mapSize.y / chunkSize);
             _chunks = new Chunk[chunksX, chunksZ];
+            _nonSolidChunks = new Chunk[chunksX, chunksZ];
             for (var x = 0; x < chunksX; x++)
             for (var z = 0; z < chunksZ; z++)
-                _chunks[x, z] = new Chunk(new ChunkCoord(x, z));
+            {
+                _chunks[x, z] = new Chunk(new ChunkCoord(x, z), isSolid: true);
+
+                _nonSolidChunks[x, z] = new Chunk(new ChunkCoord(x, z), isSolid: false);
+                if (_nonSolidChunks[x, z].IsEmpty)
+                {
+                    Destroy(_nonSolidChunks[x, z].chunkGo);
+                    _nonSolidChunks[x, z] = null;
+                }
+            }
         }
 
         public bool IsVoxelInWorld(Vector3Int pos) =>
@@ -174,26 +184,32 @@ namespace VoxelEngine
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)
             for (var z = 0; z < _chunks.GetLength(1); z++)
-                _chunks[x, z].IsActive = math.abs(x*chunkSize - playerPos.x) < viewDistance &&
-                                         math.abs(z*chunkSize - playerPos.z) < viewDistance;
+            {
+                _chunks[x, z].IsActive = math.abs(x * chunkSize - playerPos.x) < viewDistance &&
+                                         math.abs(z * chunkSize - playerPos.z) < viewDistance;
+                if (_nonSolidChunks[x, z] != null)
+                    _nonSolidChunks[x, z].IsActive = math.abs(x * chunkSize - playerPos.x) < viewDistance &&
+                                                     math.abs(z * chunkSize - playerPos.z) < viewDistance;
+            }
         }
 
         [CanBeNull]
         public Chunk GetChunk(Vector3Int posNorm)
         {
             posNorm /= chunkSize;
-            if (posNorm.x < _chunks.GetLength(0) && posNorm.z<_chunks.GetLength(1))
+            if (posNorm.x < _chunks.GetLength(0) && posNorm.z < _chunks.GetLength(1))
                 return _chunks[posNorm.x, posNorm.z];
             return null;
         }
-        
+
         public void EditVoxel(Vector3 pos, byte newID)
-        { 
+        {
             var posNorm = Vector3Int.FloorToInt(pos);
             print(posNorm);
             print(map.blocks[posNorm.x, posNorm.y, posNorm.z]);
             map.blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
-            GetChunk(posNorm)?.Apply(e=> {
+            GetChunk(posNorm)?.Apply(e =>
+            {
                 e.UpdateMesh();
                 e.UpdateAdjacentChunks(posNorm);
             });
@@ -204,14 +220,18 @@ namespace VoxelEngine
     public class BlockType
     {
         public string name;
-        public bool isSolid;
+
+        public bool isSolid, // Do the block generate collision?
+            isTransparent; // Can you see through the block?
+
         public ushort topID, sideID, bottomID;
 
         public BlockType(string name, (ushort, ushort) topID, (ushort, ushort)? sideID = null,
-            (ushort, ushort)? bottomID = null, bool isSolid = true)
+            (ushort, ushort)? bottomID = null, bool isSolid = true, bool isTransparent = false)
         {
             this.name = name;
             this.isSolid = isSolid;
+            this.isTransparent = isTransparent;
             this.topID = (ushort)(topID.Item1 * 16 + topID.Item2);
             this.sideID = sideID == null ? this.topID : (ushort)(sideID.Value.Item1 * 16 + sideID.Value.Item2);
             this.bottomID = bottomID == null ? this.topID : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
