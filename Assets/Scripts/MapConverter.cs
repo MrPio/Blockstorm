@@ -8,9 +8,15 @@ using VoxelEngine;
 public class MapConverter : MonoBehaviour
 {
     public string mapName = "";
+    public GameObject cube;
 
+    /*
+     * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
+     * Instead of dumping the whole 3-dimensional array, which is not even possible, the map is converted
+     * to a smaller list representation that only stores non-air blocks. 
+     */
     [Button]
-    private void SaveMap()
+    private void Map2Voxel()
     {
         var blockTypesList = WorldManager.instance.blockTypes.ToList();
         var cubes = GameObject.FindWithTag("MapGenerator").GetComponentsInChildren<MeshRenderer>();
@@ -46,5 +52,31 @@ public class MapConverter : MonoBehaviour
         var map = new Map(mapName, blocksList, new Vector3Int(maxX - minX + 1, Map.MaxHeight, maxZ - minZ + 1));
         IOManager.Serialize(map, "maps", map.name);
         print($"Map [{map.name}] saved successfully!");
+    }
+
+    /*
+     * Convert a voxel into a cube map. This became necessary when I lost a good prefab of a map in
+     * progress due to a mistake of mine. So I wrote the following code to retrieve it from the JSON
+     * voxel serialised file that I had luckily saved.
+     * This can be used to avoid storing large prefabs (~10x memory usage compared to the JSON serialised voxel version).
+     */
+    [Button]
+    private void Voxel2Map()
+    {
+        var map = GameObject.FindWithTag("MapGenerator").transform;
+        var blocks = WorldManager.instance.map.blocks;
+        var size = WorldManager.instance.map.size;
+        for (var y = 1; y < size.y; y++) // Ignoring the indestructible base
+        for (var x = 0; x < size.x; x++)
+        for (var z = 0; z < size.z; z++)
+        {
+            if (blocks[y, x, z] == 0)
+                continue;
+            var cubeGo = Instantiate(cube, map);
+            cubeGo.transform.position = new Vector3(x, y, z) + Vector3.one * 0.5f;
+            var textureId = WorldManager.instance.blockTypes[blocks[y, x, z]].topID;
+            cubeGo.GetComponent<MeshRenderer>().material =
+                Resources.Load($"Textures/texturepacks/blockade/Materials/blockade_{(textureId + 1):D1}") as Material;
+        }
     }
 }
