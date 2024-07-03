@@ -1,5 +1,7 @@
-Library
-.vscode
-Logs
-Temp
+Library/
+.vscode/
+.idea/
+Logs/
+Temp/
 *.meta
+obj/
