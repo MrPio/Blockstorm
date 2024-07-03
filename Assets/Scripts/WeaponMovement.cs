@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public class WeaponMovement : MonoBehaviour
 {
     public AudioClip fireClip;
     public AudioSource audioSource;
@@ -13,6 +13,7 @@ public class Weapon : MonoBehaviour
     public float fireRate = 4;
     private float _lastFire;
     private float _fireCooldown;
+    
 
     private void Start()
     {

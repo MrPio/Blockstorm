@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using Managers;
 using Unity.Mathematics;
 using UnityEngine;
 using VoxelEngine;
@@ -10,10 +13,13 @@ public class CameraMovement : MonoBehaviour
     public Transform player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
-    public float reach = 8;
+    public float Reach => _canDig ? InventoryManager.Instance.shovel!.distance : 8;
     private WorldManager _wm;
     private Transform _transform;
-    private bool _canDig= true, _canPlace ;
+    private bool _canDig= true , _canPlace;
+    private float _lastDig, _lastPlace;
+    [SerializeField] private AudioClip crateDigAudioClip, digAudioClip, indestructibleAudioClip, blockPlaceAudioClip;
+    [SerializeField] private AudioSource audioSource;
 
     public bool CanDig
     {
@@ -33,7 +39,7 @@ public class CameraMovement : MonoBehaviour
         get => _canPlace;
         set
         {
-            _canPlace = value;
+            _canPlace = InventoryManager.Instance.blocks > 0 && value;
             if (value)
                 _canDig = false;
             highlightBlock.gameObject.SetActive(false);
@@ -59,16 +65,31 @@ public class CameraMovement : MonoBehaviour
         player.Rotate(Vector3.up * mouseX);
         if (_canDig || _canPlace)
             PlaceCursorBlocks();
-        if (highlightBlock.gameObject.activeSelf && Input.GetMouseButtonDown(0))
+        if (highlightBlock.gameObject.activeSelf && Input.GetMouseButton(0) &&
+            Time.time - _lastDig > InventoryManager.Instance.shovel!.Delay)
         {
-            _wm.EditVoxel(highlightBlock.transform.position, 0);
-            highlightBlock.gameObject.SetActive(false);
+            _lastDig = Time.time;
+            var block = _wm.map.GetBlock(Vector3Int.FloorToInt(highlightBlock.transform.position));
+            if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
+                    block.name.Contains(it)))
+                audioSource.PlayOneShot(crateDigAudioClip);
+            else if (block.blockHealth == BlockHealth.Indestructible)
+                audioSource.PlayOneShot(indestructibleAudioClip);
+            else
+                audioSource.PlayOneShot(digAudioClip);
+            if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.shovel!.damage))
+                highlightBlock.gameObject.SetActive(false);
         }
-        else if (placeBlock.gameObject.activeSelf && Input.GetMouseButtonDown(0))
+        else if (placeBlock.gameObject.activeSelf && Input.GetMouseButton(0) &&
+                 Time.time - _lastPlace > InventoryManager.Instance.placeDelay)
         {
-            _wm.EditVoxel(placeBlock.transform.position, 6);
+            _lastPlace = Time.time;
+            audioSource.PlayOneShot(blockPlaceAudioClip);
+            _wm.EditVoxel(placeBlock.transform.position, InventoryManager.Instance.block);
             placeBlock.gameObject.SetActive(false);
         }
+        if(_canPlace && Input.GetMouseButtonUp(0))
+            _lastPlace -= InventoryManager.Instance.placeDelay*0.65f;
     }
 
     // We use voxels, so we don't have a collider in every cube.
@@ -81,7 +102,7 @@ public class CameraMovement : MonoBehaviour
         angleFactor = angleFactor < 0 ? 0 : angleFactor;
         var minDistance = _canPlace ? 1.04f + 1f * Mathf.Pow(angleFactor, 4.85f) - headOffset : 0;
         var lastPos = Vector3Int.FloorToInt(_transform.position);
-        for (var lenght = checkIncrement; lenght < reach; lenght += checkIncrement)
+        for (var lenght = checkIncrement; lenght < Reach; lenght += checkIncrement)
         {
             var pos = Vector3Int.FloorToInt(_transform.position + _transform.forward * (lenght));
             var blockType = _wm.GetVoxel(pos);
@@ -106,7 +127,6 @@ public class CameraMovement : MonoBehaviour
                 var intersect = distanceXZ < characterController.radius + 0.25f &&
                                 distanceY < characterController.height - 0.2f;
                 placeBlock.position = newPos;
-                print($"{distanceXZ}/{distanceY}");
                 placeBlock.gameObject.SetActive(!intersect);
                 highlightBlock.gameObject.SetActive(false);
                 return;
