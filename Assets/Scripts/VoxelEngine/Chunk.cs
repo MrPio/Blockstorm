@@ -33,8 +33,10 @@ namespace VoxelEngine
         private readonly WorldManager _wm;
         public readonly ChunkCoord coord;
         public readonly bool isSolid;
+        private Dictionary<Vector3Int, byte> _removedBlocks = null;
 
         public bool IsEmpty => _vertices.Count == 0;
+
         public Chunk(ChunkCoord coord, bool isSolid)
         {
             this.coord = coord;
@@ -45,7 +47,8 @@ namespace VoxelEngine
                 Map.MaxHeight,
                 math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
             );
-            chunkGo = new GameObject($"Chunk ({coord.x},{coord.z}) "+ (isSolid ? "Solid" : "NonSolid")) { layer = LayerMask.NameToLayer("Ground") };
+            chunkGo = new GameObject($"Chunk ({coord.x},{coord.z}) " + (isSolid ? "Solid" : "NonSolid"))
+                { layer = LayerMask.NameToLayer("Ground") };
             chunkGo.transform.SetParent(_wm.transform);
             chunkGo.transform.position = coord.worldPos;
 
@@ -58,6 +61,24 @@ namespace VoxelEngine
             chunkGo.SetActive(false);
         }
 
+        public Chunk(Dictionary<Vector3Int, byte> removedBlocks)
+        {
+            this._removedBlocks = removedBlocks;
+            this.isSolid = false;
+            _wm = WorldManager.instance;
+            chunkGo = new GameObject($"Debris Chunk");
+            chunkGo.transform.SetParent(_wm.transform);
+            // chunkGo.transform.position = coord.worldPos;
+
+            _meshRenderer = chunkGo.AddComponent<MeshRenderer>();
+            _meshFilter = chunkGo.AddComponent<MeshFilter>();
+            _meshCollider = chunkGo.AddComponent<MeshCollider>();
+            _meshRenderer.materials = new[] { _wm.material };
+
+            UpdateMesh();
+            chunkGo.SetActive(true);
+        }
+
         public bool IsActive
         {
             get => chunkGo.activeSelf;
@@ -68,10 +89,13 @@ namespace VoxelEngine
         // NOTE: this is used to apply face pruning
         private bool CheckVoxel(Vector3 pos, byte currentBlockType)
         {
+            var posNorm = Vector3Int.FloorToInt(pos);
             var worldPos = Vector3Int.FloorToInt(pos + coord.worldPos);
-            return _wm.IsVoxelInWorld(worldPos) &&
-                   (_wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
-                    _wm.map.blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
+            if (_removedBlocks == null)
+                return _wm.IsVoxelInWorld(worldPos) &&
+                       (_wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
+                        _wm.map.blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
+            return _removedBlocks.ContainsKey(posNorm);
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
@@ -83,7 +107,10 @@ namespace VoxelEngine
         // - Each face has 4 vertices instead of 6 (vertices pruning)
         private void AddVoxel(Vector3 pos)
         {
-            var blockId = _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z];
+            //TODO debris not rendered
+            var blockId = _removedBlocks == null
+                ? _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z]
+                : _removedBlocks[Vector3Int.FloorToInt(pos)];
             var blockType = _wm.blockTypes[blockId];
             // Skip if air
             if (blockType.name == "air") return;
@@ -109,11 +136,15 @@ namespace VoxelEngine
         {
             ClearMesh();
 
-            for (var y = 0; y < _size.y; y++)
-            for (var x = 0; x < _size.x; x++)
-            for (var z = 0; z < _size.z; z++)
-                AddVoxel(new Vector3(x, y, z));
-            
+            if (_removedBlocks == null)
+                for (var y = 0; y < _size.y; y++)
+                for (var x = 0; x < _size.x; x++)
+                for (var z = 0; z < _size.z; z++)
+                    AddVoxel(new Vector3(x, y, z));
+            else
+                foreach (var block in _removedBlocks.Keys)
+                    AddVoxel(block);
+
             var mesh = new Mesh
             {
                 indexFormat = IndexFormat.UInt32,
@@ -130,6 +161,8 @@ namespace VoxelEngine
             if (isSolid)
                 _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
+            // if (_removedBlocks != null)
+            //     chunkGo.AddComponent<Rigidbody>();
         }
 
         private void ClearMesh()

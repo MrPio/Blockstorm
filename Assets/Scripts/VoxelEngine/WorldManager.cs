@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Unity.Mathematics;
@@ -136,6 +137,7 @@ namespace VoxelEngine
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
         [ItemCanBeNull] private Chunk[,] _nonSolidChunks;
+        [CanBeNull] private List<Chunk> _brokenChunks=new();
         [NonSerialized] public Map map;
         private Vector3 _playerLastPos;
         [SerializeField] private string mapName = "Harbor";
@@ -206,6 +208,8 @@ namespace VoxelEngine
         {
             var posNorm = Vector3Int.FloorToInt(pos);
             map.blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
+            if (newID == 0)
+                CheckForFlyingMesh(posNorm);
             GetChunk(posNorm)?.Apply(e =>
             {
                 e.UpdateMesh();
@@ -223,6 +227,69 @@ namespace VoxelEngine
             }
 
             return false;
+        }
+
+        [CanBeNull]
+        private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited)
+        {
+            var totalAdjacentSolids = new List<Vector3Int> { posNorm };
+            visited.Add(posNorm);
+            foreach (var adjacent in new Vector3Int[]
+                     {
+                         new(0, -1, 0), new(0, 1, 0),
+                         new(0, 0, 1), new(0, 0, -1),
+                         new(1, 0, 0), new(-1, 0, 0),
+                     })
+            {
+                var newPos = posNorm + adjacent;
+                if (visited.Contains(newPos))
+                    continue;
+                if (newPos.y < 1)
+                    return null;
+                var adjacentVoxel = GetVoxel(newPos);
+                if (adjacentVoxel != null && adjacentVoxel.name != "air")
+                {
+                    var adjacentSolids = GetAdjacentSolids(newPos, visited);
+                    if (adjacentSolids == null)
+                        return null;
+                    totalAdjacentSolids.AddRange(adjacentSolids);
+                    if (totalAdjacentSolids.Count > 1000)
+                        return null;
+                }
+            }
+
+            return totalAdjacentSolids;
+        }
+
+        private bool CheckForFlyingMesh(Vector3Int posNorm)
+        {
+            var chunksToUpdate = new List<Chunk>();
+            foreach (var adjacent in new Vector3Int[]
+                     {
+                         new(0, -1, 0), new(0, 1, 0),
+                         new(0, 0, 1), new(0, 0, -1),
+                         new(1, 0, 0), new(-1, 0, 0),
+                     })
+            {
+                var flyingBlocks = GetAdjacentSolids(posNorm + adjacent, new List<Vector3Int>());
+                if (flyingBlocks == null)
+                    continue;
+                var removedBlocks = new Dictionary<Vector3Int, byte>();
+                foreach (var block in flyingBlocks)
+                {
+                    removedBlocks[new Vector3Int(block.y, block.x, block.z)] = map.blocks[block.y, block.x, block.z];
+                    map.blocks[block.y, block.x, block.z] = 0;
+                    var chunk = GetChunk(block);
+                    if (!chunksToUpdate.Contains(chunk))
+                        chunksToUpdate.Add(chunk);
+                }
+
+                _brokenChunks.Add(new Chunk(removedBlocks));
+            }
+
+            foreach (var chunk in chunksToUpdate)
+                chunk.UpdateMesh();
+            return true;
         }
     }
 
@@ -256,7 +323,9 @@ namespace VoxelEngine
             this.isTransparent = isTransparent;
             this.topID = (ushort)(topID.Item1 * 16 + topID.Item2);
             this.sideID = sideID == null ? this.topID : (ushort)(sideID.Value.Item1 * 16 + sideID.Value.Item2);
-            this.bottomID = bottomID == null ? this.topID : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
+            this.bottomID = bottomID == null
+                ? this.topID
+                : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
             this.blockHealth = blockHealth;
         }
 

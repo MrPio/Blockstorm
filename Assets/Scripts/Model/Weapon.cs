@@ -18,7 +18,7 @@ namespace Model
 
         public static readonly List<Weapon> Blocks = new()
         {
-            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 8, type: WeaponType.Block),
+            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block),
         };
         public static readonly List<Weapon> Melees = new()
         {
