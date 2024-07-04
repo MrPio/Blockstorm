@@ -26,8 +26,6 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        // audioSource.Play();
-        // audioSource.Pause();
         _transform = transform;
         WorldManager.instance.UpdatePlayerPos(_transform.position);
         _cameraInitialLocalPosition = cameraTransform.localPosition;
@@ -62,10 +60,12 @@ public class Player : MonoBehaviour
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
         characterController.Move(speed * Time.deltaTime * move + _velocity * Time.deltaTime);
-        // WorldManager.instance.UpdatePlayerPos(_transform.position);
+        WorldManager.instance.UpdatePlayerPos(_transform.position);
         // Play walk sound
-        /*if (_isGrounded && move.magnitude > 0.1f)
+        if (_isGrounded && move.magnitude > 0.1f)
         {
+            // TODO switch sound when walking and terrain changes
+            // TODO water need further check!
             if (!audioSource.isPlaying)
             {
                 var terrainType =
@@ -85,6 +85,6 @@ public class Player : MonoBehaviour
             }
         }
         else if (audioSource.isPlaying)
-            audioSource.Pause();*/
+            audioSource.Pause();
     }
 }

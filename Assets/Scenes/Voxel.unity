@@ -5972,6 +5972,7 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 6397451773994913177}
   bullet: {fileID: 3287888696289537785, guid: 2624975d26ada844fbcbcea0fc678cbe, type: 3}
   fireRate: 16
+  cameraMovement: {fileID: 6221473449013849262}
 --- !u!114 &6221473449013849262
 MonoBehaviour:
   m_ObjectHideFlags: 0
