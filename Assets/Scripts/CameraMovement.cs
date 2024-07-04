@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
+using Model;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 
 public class CameraMovement : MonoBehaviour
@@ -13,12 +15,16 @@ public class CameraMovement : MonoBehaviour
     public Transform player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
-    public float Reach => _canDig ? InventoryManager.Instance.shovel!.distance : 8;
+    private float Reach => weaponManager.WeaponModel?.distance??0f;
     private WorldManager _wm;
     private Transform _transform;
-    private bool _canDig= true , _canPlace;
+    private bool _canDig , _canPlace;
     private float _lastDig, _lastPlace;
-    [SerializeField] private AudioClip crateDigAudioClip, digAudioClip, indestructibleAudioClip, blockPlaceAudioClip;
+    public WeaponManager weaponManager;
+
+    [SerializeField]
+    private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip, blockPlaceAudioClip;
+
     [SerializeField] private AudioSource audioSource;
 
     public bool CanDig
@@ -57,39 +63,50 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
+        // Handle camera rotation
         var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity;
         var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity;
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
         _transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
         player.Rotate(Vector3.up * mouseX);
+
+        // Handle green&red block indicators
         if (_canDig || _canPlace)
             PlaceCursorBlocks();
-        if (highlightBlock.gameObject.activeSelf && Input.GetMouseButton(0) &&
-            Time.time - _lastDig > InventoryManager.Instance.shovel!.Delay)
+
+        // If I am digging with a melee weapon
+        if (weaponManager.WeaponModel is { type: WeaponType.Melee } &&
+            highlightBlock.gameObject.activeSelf &&
+            Input.GetMouseButton(0) && Time.time - _lastDig > weaponManager.WeaponModel.Delay)
         {
             _lastDig = Time.time;
             var block = _wm.map.GetBlock(Vector3Int.FloorToInt(highlightBlock.transform.position));
             if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
                     block.name.Contains(it)))
-                audioSource.PlayOneShot(crateDigAudioClip);
+                audioSource.PlayOneShot(blockDamageLightClip);
             else if (block.blockHealth == BlockHealth.Indestructible)
-                audioSource.PlayOneShot(indestructibleAudioClip);
+                audioSource.PlayOneShot(noBlockDamageClip);
             else
-                audioSource.PlayOneShot(digAudioClip);
-            if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.shovel!.damage))
+                audioSource.PlayOneShot(blockDamageMediumClip);
+            if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.melee!.damage))
                 highlightBlock.gameObject.SetActive(false);
+            weaponManager.Fire();
         }
-        else if (placeBlock.gameObject.activeSelf && Input.GetMouseButton(0) &&
-                 Time.time - _lastPlace > InventoryManager.Instance.placeDelay)
+
+        // If I am placing with a melee weapon
+        else if (weaponManager.WeaponModel is { type: WeaponType.Block } && placeBlock.gameObject.activeSelf &&
+                 Input.GetMouseButton(0) &&
+                 Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
             audioSource.PlayOneShot(blockPlaceAudioClip);
-            _wm.EditVoxel(placeBlock.transform.position, InventoryManager.Instance.block);
+            _wm.EditVoxel(placeBlock.transform.position, InventoryManager.Instance.blockType);
             placeBlock.gameObject.SetActive(false);
         }
-        if(_canPlace && Input.GetMouseButtonUp(0))
-            _lastPlace -= InventoryManager.Instance.placeDelay*0.65f;
+
+        if (weaponManager.WeaponModel is { type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
+            _lastPlace -= weaponManager.WeaponModel.Delay * 0.65f;
     }
 
     // We use voxels, so we don't have a collider in every cube.
