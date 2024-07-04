@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     private Vector3 _cameraInitialLocalPosition;
     public AudioSource audioSource;
     public AudioClip walkGeneric, walkMetal, walkWater;
+    private float _lastWalkCheck;
 
     private void Start()
     {
@@ -33,7 +34,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.45f, 0.2f, 0.45f), Quaternion.identity,
+        _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.2f, 0.4f), Quaternion.identity,
             groundLayerMask);
         if (_isGrounded && _velocity.y < 0)
         {
@@ -60,31 +61,44 @@ public class Player : MonoBehaviour
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
         characterController.Move(speed * Time.deltaTime * move + _velocity * Time.deltaTime);
+
+        // Invisible walls on map edges
+        var mapSize = WorldManager.instance.map.size;
+        if (_transform.position.x > mapSize.x || _transform.position.y > mapSize.y ||
+            _transform.position.z > mapSize.z || _transform.position.x > 0 || _transform.position.y > 0 ||
+            _transform.position.z > 0)
+            transform.position = new Vector3(MathF.Max(0.5f, Mathf.Min(_transform.position.x, mapSize.x - 0.5f)),
+                MathF.Max(0.5f, Mathf.Min(_transform.position.y, mapSize.y - 0.5f)),
+                MathF.Max(0.5f, Mathf.Min(_transform.position.z, mapSize.z - 0.5f)));
+
         WorldManager.instance.UpdatePlayerPos(_transform.position);
         // Play walk sound
-        if (_isGrounded && move.magnitude > 0.1f)
+        if (Time.time - _lastWalkCheck > 0.075f)
         {
-            // TODO switch sound when walking and terrain changes
-            // TODO water need further check!
-            if (!audioSource.isPlaying)
+            _lastWalkCheck = Time.time;
+            if (_isGrounded && move.magnitude > 0.1f)
             {
                 var terrainType =
                     WorldManager.instance.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 2));
+                var hasWater =
+                    WorldManager.instance.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 1))!
+                        .name.Contains("water");
+
                 if (terrainType == null)
                     return;
                 var clip = walkGeneric;
                 if (new List<string> { "iron", "steel" }.Any(it =>
                         terrainType.name.Contains(it)))
                     clip = walkMetal;
-                else if (new List<string> { "water" }.Any(it =>
-                             terrainType.name.Contains(it)))
+                if (hasWater)
                     clip = walkWater;
                 if (audioSource.clip != clip)
                     audioSource.clip = clip;
-                audioSource.Play();
+                if (!audioSource.isPlaying)
+                    audioSource.Play();
             }
+            else if (audioSource.isPlaying)
+                audioSource.Pause();
         }
-        else if (audioSource.isPlaying)
-            audioSource.Pause();
     }
 }

@@ -15,12 +15,13 @@ public class CameraMovement : MonoBehaviour
     public Transform player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
-    private float Reach => weaponManager.WeaponModel?.distance??0f;
+    private float Reach => weaponManager.WeaponModel?.distance ?? 0f;
     private WorldManager _wm;
     private Transform _transform;
-    private bool _canDig , _canPlace;
+    private bool _canDig, _canPlace;
     private float _lastDig, _lastPlace;
     public WeaponManager weaponManager;
+    [SerializeField] private ParticleSystem blockDigEffect;
 
     [SerializeField]
     private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip, blockPlaceAudioClip;
@@ -81,7 +82,13 @@ public class CameraMovement : MonoBehaviour
             Input.GetMouseButton(0) && Time.time - _lastDig > weaponManager.WeaponModel.Delay)
         {
             _lastDig = Time.time;
-            var block = _wm.map.GetBlock(Vector3Int.FloorToInt(highlightBlock.transform.position));
+            var highlightBlockPos = highlightBlock.transform.position;
+            var pos = Vector3Int.FloorToInt(highlightBlockPos);
+            var block = _wm.map.GetBlock(pos);
+            blockDigEffect.transform.position = highlightBlockPos;
+            blockDigEffect.GetComponent<Renderer>().material =
+                Resources.Load<Material>($"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
+            blockDigEffect.Play();
             if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
                     block.name.Contains(it)))
                 audioSource.PlayOneShot(blockDamageLightClip);
@@ -90,11 +97,18 @@ public class CameraMovement : MonoBehaviour
             else
                 audioSource.PlayOneShot(blockDamageMediumClip);
             if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.melee!.damage))
+            {
                 highlightBlock.gameObject.SetActive(false);
+                blockDigEffect.Stop();
+            }
+
             weaponManager.Fire();
         }
 
-        // If I am placing with a melee weapon
+        if (blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
+            blockDigEffect.Stop();
+
+        // If I am placing with an equipped block
         else if (weaponManager.WeaponModel is { type: WeaponType.Block } && placeBlock.gameObject.activeSelf &&
                  Input.GetMouseButton(0) &&
                  Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
