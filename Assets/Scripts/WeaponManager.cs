@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using Managers;
 using Model;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 using Debug = UnityEngine.Debug;
 
@@ -25,6 +26,9 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private ParticleSystem blockDigEffect;
     private WorldManager _wm;
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
+    [NonSerialized] public static bool isAiming;
+    [SerializeField] private Camera mainCamera, weaponCamera;
+    [SerializeField] private Transform crosshair;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -52,6 +56,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
+        isAiming = false;
         _wm = WorldManager.instance;
         SwitchEquipped(WeaponType.Block);
     }
@@ -70,6 +75,9 @@ public class WeaponManager : MonoBehaviour
                 SwitchEquipped(WeaponType.Secondary);
             else if (Input.GetKeyDown(KeyCode.Alpha5) && _weaponModel.type != WeaponType.Tertiary)
                 SwitchEquipped(WeaponType.Tertiary);
+            
+            if(Input.GetMouseButtonDown(1) && _weaponModel.type!=WeaponType.Block && _weaponModel.type!=WeaponType.Melee)
+                ToggleAim();
         }
     }
 
@@ -77,21 +85,20 @@ public class WeaponManager : MonoBehaviour
     {
         if (_weaponModel != null)
         {
-            audioSource.PlayOneShot(_fireClip,0.5f);
+            audioSource.PlayOneShot(_fireClip, 0.5f);
             animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.fireAnimation}"));
 
             if (_weaponModel.type != WeaponType.Block && _weaponModel.type != WeaponType.Melee)
             {
                 var cameraTransform = cameraMovement.transform;
-                Ray ray = new Ray(cameraTransform.position+cameraTransform.forward*0.45f, cameraTransform.forward);
+                Ray ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
                 RaycastHit hit;
 
-                if (Physics.Raycast(ray, out hit,_weaponModel.distance, ~LayerMask.NameToLayer("Ground")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, ~LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
                     {
-                        var pos = Vector3Int.FloorToInt(hit.point+cameraTransform.forward*0.05f);
+                        var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
                         var blockType = _wm.GetVoxel(Vector3Int.FloorToInt(pos));
-                        print(blockType.name);
                         if (blockType is { isSolid: true })
                         {
                             blockDigEffect.transform.position = pos;
@@ -118,6 +125,8 @@ public class WeaponManager : MonoBehaviour
         if (Time.time - _lastSwitch < 0.25f)
             return;
         _lastSwitch = Time.time;
+        if(isAiming)
+            ToggleAim();
         WeaponModel = weaponType switch
         {
             WeaponType.Block => InventoryManager.Instance.block,
@@ -144,6 +153,24 @@ public class WeaponManager : MonoBehaviour
             if (WeaponModel.type == WeaponType.Block)
                 go.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
                     $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
+        });
+    }
+
+    private void ToggleAim()
+    {
+        isAiming = !isAiming;
+        crosshair.gameObject.SetActive(!isAiming);
+        foreach (var child in transform.parent.GetComponentsInChildren<Transform>()
+                     .Where(it => it != transform && it != transform.parent))
+            Destroy(child.gameObject);
+        var go = Resources.Load<GameObject>(
+            $"Prefabs/weapons/{WeaponModel!.name.ToUpper()}" + (isAiming ? "_aim" : ""));
+        Instantiate(go, isAiming ? transform.parent : transform).Apply(it =>
+        {
+            it.layer = LayerMask.NameToLayer("WeaponCamera");
+            it.AddComponent<WeaponSway>();
+            mainCamera.fieldOfView = CameraMovement.FOV / (isAiming ? _weaponModel!.zoom : 1);
+            weaponCamera.fieldOfView = CameraMovement.FOV / (isAiming ? _weaponModel!.zoom : 1);
         });
     }
 }

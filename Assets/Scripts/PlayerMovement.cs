@@ -56,11 +56,12 @@ public class Player : MonoBehaviour
         var x = Input.GetAxis("Horizontal");
         var z = Input.GetAxis("Vertical");
         var move = _transform.right * x + _transform.forward * z;
-        if (Input.GetButtonDown("Jump") && _isGrounded)
+        if (Input.GetButtonDown("Jump") && _isGrounded && !WeaponManager.isAiming)
             _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
-        characterController.Move(speed * Time.deltaTime * move + _velocity * Time.deltaTime);
+        characterController.Move(move * (speed * Time.deltaTime * (WeaponManager.isAiming ? 0.66f : 1f)) +
+                                 _velocity * Time.deltaTime);
 
         // Invisible walls on map edges
         var mapSize = WorldManager.instance.map.size;

@@ -9,6 +9,7 @@ using VoxelEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+    public const float FOV = 68;
     [SerializeField] private Transform highlightBlock, placeBlock;
     [SerializeField] private CharacterController characterController;
     public float sensitivity;
@@ -64,8 +65,8 @@ public class CameraMovement : MonoBehaviour
     private void LateUpdate()
     {
         // Handle camera rotation
-        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity;
-        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity;
+        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
+        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
         _transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
@@ -177,4 +178,6 @@ public class CameraMovement : MonoBehaviour
         highlightBlock.gameObject.SetActive(false);
         placeBlock.gameObject.SetActive(false);
     }
+
+
 }
