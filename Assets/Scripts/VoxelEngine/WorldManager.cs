@@ -14,9 +14,9 @@ namespace VoxelEngine
         [NonSerialized] public readonly BlockType[] blockTypes =
         {
             new("air", topID: (15, 15), isSolid: false, isTransparent: true),
-            new("iron", topID: (1, 0), blockHealth: BlockHealth.Indestructible), // Bedrock must be in index 1
+            new("iron", topID: (1, 0), blockHealth: BlockHealth.Medium), // Bedrock must be in index 1
 
-            new("dirt", topID: (0, 0), blockHealth: BlockHealth.NonDiggable),
+            new("dirt", topID: (0, 0), blockHealth: BlockHealth.Medium),
             new("grass", topID: (0, 1), bottomID: (0, 0), sideID: (0, 2), blockHealth: BlockHealth.Medium),
             new("grass_dry", topID: (0, 3), bottomID: (0, 0), sideID: (0, 4), blockHealth: BlockHealth.Medium),
             new("snow", topID: (0, 5), bottomID: (0, 0), sideID: (0, 6), blockHealth: BlockHealth.Medium),
@@ -277,7 +277,7 @@ namespace VoxelEngine
                 var removedBlocks = new Dictionary<Vector3Int, byte>();
                 foreach (var block in flyingBlocks)
                 {
-                    removedBlocks[new Vector3Int(block.y, block.x, block.z)] = map.blocks[block.y, block.x, block.z];
+                    removedBlocks[new Vector3Int(block.x, block.y, block.z)] = map.blocks[block.y, block.x, block.z];
                     map.blocks[block.y, block.x, block.z] = 0;
                     var chunk = GetChunk(block);
                     if (!chunksToUpdate.Contains(chunk))

@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Utils;
+using Random = UnityEngine.Random;
 
 namespace VoxelEngine
 {
@@ -64,11 +67,14 @@ namespace VoxelEngine
         public Chunk(Dictionary<Vector3Int, byte> removedBlocks)
         {
             this._removedBlocks = removedBlocks;
-            this.isSolid = false;
+            this.isSolid = true;
             _wm = WorldManager.instance;
             chunkGo = new GameObject($"Debris Chunk");
             chunkGo.transform.SetParent(_wm.transform);
-            // chunkGo.transform.position = coord.worldPos;
+
+            // coord = new ChunkCoord(removedBlocks.Keys.Min(it => it.x), removedBlocks.Keys.Min(it => it.z));
+            chunkGo.transform.position = removedBlocks.Keys.Aggregate(Vector3.zero, (acc, v) => acc + v) /
+                                         removedBlocks.Keys.Count;
 
             _meshRenderer = chunkGo.AddComponent<MeshRenderer>();
             _meshFilter = chunkGo.AddComponent<MeshFilter>();
@@ -90,11 +96,14 @@ namespace VoxelEngine
         private bool CheckVoxel(Vector3 pos, byte currentBlockType)
         {
             var posNorm = Vector3Int.FloorToInt(pos);
-            var worldPos = Vector3Int.FloorToInt(pos + coord.worldPos);
             if (_removedBlocks == null)
+            {
+                var worldPos = Vector3Int.FloorToInt(pos + coord.worldPos);
                 return _wm.IsVoxelInWorld(worldPos) &&
                        (_wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
                         _wm.map.blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
+            }
+
             return _removedBlocks.ContainsKey(posNorm);
         }
 
@@ -107,10 +116,9 @@ namespace VoxelEngine
         // - Each face has 4 vertices instead of 6 (vertices pruning)
         private void AddVoxel(Vector3 pos)
         {
-            //TODO debris not rendered
             var blockId = _removedBlocks == null
                 ? _wm.map.blocks[(int)pos.y, (int)pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z]
-                : _removedBlocks[Vector3Int.FloorToInt(pos)];
+                : _removedBlocks[Vector3Int.FloorToInt(pos + chunkGo.transform.position)];
             var blockType = _wm.blockTypes[blockId];
             // Skip if air
             if (blockType.name == "air") return;
@@ -143,26 +151,36 @@ namespace VoxelEngine
                     AddVoxel(new Vector3(x, y, z));
             else
                 foreach (var block in _removedBlocks.Keys)
-                    AddVoxel(block);
+                    AddVoxel(block - chunkGo.transform.position);
 
             var mesh = new Mesh
             {
                 indexFormat = IndexFormat.UInt32,
                 vertices = _vertices.ToArray(),
-                subMeshCount = 2,
+                subMeshCount = _removedBlocks == null ? 2 : 1,
                 uv = _uvs.ToArray()
             };
             mesh.SetTriangles(_triangles.ToArray(), 0);
-            mesh.SetTriangles(_transparentTriangles.ToArray(), 1);
+            if (_removedBlocks == null)
+                mesh.SetTriangles(_transparentTriangles.ToArray(), 1);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             mesh.Optimize();
 
-            if (isSolid)
+            if (isSolid && _removedBlocks == null)
                 _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
-            // if (_removedBlocks != null)
-            //     chunkGo.AddComponent<Rigidbody>();
+
+            if (_removedBlocks != null)
+            {
+                _meshCollider.convex = true;
+                var rb = chunkGo.AddComponent<Rigidbody>();
+                var dir = Vector3.up * Random.Range(1f, 2f); //+ Vector3.left * Random.Range(-0.5f, 0.5f) +Vector3.forward * Random.Range(-0.5f, 0.5f);
+                rb.AddRelativeForce(dir, ForceMode.Impulse);
+                // rb.AddForceAtPosition(dir, Vector3.zero, ForceMode.Impulse);
+                rb.angularVelocity = Vector3.up * 0.25f + Vector3.left * Random.Range(-0.35f, 0.35f) +Vector3.forward * Random.Range(-0.35f, 0.35f);
+                chunkGo.AddComponent<Destroyable>().lifespan = 10f;
+            }
         }
 
         private void ClearMesh()

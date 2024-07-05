@@ -22,7 +22,7 @@ namespace Model
         };
         public static readonly List<Weapon> Melees = new()
         {
-            new Weapon(name: "shovel", damage: 30, rof: 50, distance: 4, type: WeaponType.Melee)
+            new Weapon(name: "shovel", damage: 35, rof: 35, distance: 4, type: WeaponType.Melee)
         };
 
         public string name, audio, fireAnimation;
