@@ -14,14 +14,14 @@ namespace VoxelEngine
         [NonSerialized] public readonly BlockType[] blockTypes =
         {
             new("air", topID: (15, 15), isSolid: false, isTransparent: true),
-            new("iron", topID: (1, 0), blockHealth: BlockHealth.Medium), // Bedrock must be in index 1
+            new("iron", topID: (1, 0), blockHealth: BlockHealth.Indestructible), // Bedrock must be in index 1
 
             new("dirt", topID: (0, 0), blockHealth: BlockHealth.Medium),
             new("grass", topID: (0, 1), bottomID: (0, 0), sideID: (0, 2), blockHealth: BlockHealth.Medium),
             new("grass_dry", topID: (0, 3), bottomID: (0, 0), sideID: (0, 4), blockHealth: BlockHealth.Medium),
             new("snow", topID: (0, 5), bottomID: (0, 0), sideID: (0, 6), blockHealth: BlockHealth.Medium),
 
-            new("iron_dark", topID: (1, 1), blockHealth: BlockHealth.Medium),
+            new("iron_dark", topID: (1, 1), blockHealth: BlockHealth.Indestructible),
             new("iron_white", topID: (1, 2), blockHealth: BlockHealth.Medium),
             new("iron_red", topID: (1, 3), blockHealth: BlockHealth.Medium),
 

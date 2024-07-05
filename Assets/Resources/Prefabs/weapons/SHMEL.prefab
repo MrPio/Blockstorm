@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 5981166303565690959}
   - component: {fileID: 8083784131744376369}
   - component: {fileID: 6066367716647540805}
-  m_Layer: 0
-  m_Name: SHMEL_BODY
+  m_Layer: 7
+  m_Name: SHMEL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 6871835701543998534}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 69.02624, y: 0, z: 19.310173}
+  m_LocalPosition: {x: 0.12, y: -0.03, z: 0.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

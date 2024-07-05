@@ -2,10 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers;
 using Model;
 using UnityEngine;
+using VoxelEngine;
+using Debug = UnityEngine.Debug;
 
 public class WeaponManager : MonoBehaviour
 {
@@ -15,12 +19,12 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private AudioClip switchEquippedClip;
     public AudioSource audioSource;
     public Animator animator;
-    public Transform bulletSpawnPoint;
-    public GameObject bullet;
-    public float fireRate = 4;
-    private float _lastFire;
-    private float _fireCooldown;
+    private float _lastSwitch = -99;
     [SerializeField] private CameraMovement cameraMovement;
+    [SerializeField] private Transform highlightBlock;
+    [SerializeField] private ParticleSystem blockDigEffect;
+    private WorldManager _wm;
+    [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -31,7 +35,7 @@ public class WeaponManager : MonoBehaviour
             _weaponModel = value;
             if (value != null)
             {
-                _fireClip = Resources.Load<AudioClip>(value.audio);
+                _fireClip = Resources.Load<AudioClip>($"Audio/weapons/{value.audio.ToUpper()}");
                 if (value.type == WeaponType.Block)
                     cameraMovement.CanPlace = true;
                 else if (value.type == WeaponType.Melee)
@@ -48,8 +52,8 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
-        _fireCooldown = 1 / fireRate;
-        WeaponModel = InventoryManager.Instance.block;
+        _wm = WorldManager.instance;
+        SwitchEquipped(WeaponType.Block);
     }
 
     private void Update()
@@ -73,18 +77,47 @@ public class WeaponManager : MonoBehaviour
     {
         if (_weaponModel != null)
         {
-            _lastFire = Time.time;
-            audioSource.PlayOneShot(_fireClip);
+            audioSource.PlayOneShot(_fireClip,0.5f);
             animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.fireAnimation}"));
-            // var bulletGO=Instantiate(bullet);
-            // bulletGO.transform.position = bulletSpawnPoint.transform.position;
-            // bulletGO.GetComponent<Rigidbody>().AddForce(transform.parent.forward*0.4f,ForceMode.Impulse);
+
+            if (_weaponModel.type != WeaponType.Block && _weaponModel.type != WeaponType.Melee)
+            {
+                var cameraTransform = cameraMovement.transform;
+                Ray ray = new Ray(cameraTransform.position+cameraTransform.forward*0.45f, cameraTransform.forward);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit,_weaponModel.distance, ~LayerMask.NameToLayer("Ground")))
+                    if (hit.collider != null)
+                    {
+                        var pos = Vector3Int.FloorToInt(hit.point+cameraTransform.forward*0.05f);
+                        var blockType = _wm.GetVoxel(Vector3Int.FloorToInt(pos));
+                        print(blockType.name);
+                        if (blockType is { isSolid: true })
+                        {
+                            blockDigEffect.transform.position = pos;
+                            blockDigEffect.GetComponent<Renderer>().material =
+                                Resources.Load<Material>(
+                                    $"Textures/texturepacks/blockade/Materials/blockade_{(blockType.topID + 1):D1}");
+                            blockDigEffect.Play();
+                            if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
+                                    blockType.name.Contains(it)))
+                                audioSource.PlayOneShot(blockDamageLightClip, 1);
+                            else if (blockType.blockHealth == BlockHealth.Indestructible)
+                                audioSource.PlayOneShot(noBlockDamageClip, 1);
+                            else
+                                audioSource.PlayOneShot(blockDamageMediumClip, 1);
+                            _wm.DamageBlock(pos, _weaponModel.damage);
+                        }
+                    }
+            }
         }
     }
 
     public void SwitchEquipped(WeaponType weaponType)
     {
-        audioSource.PlayOneShot(switchEquippedClip);
+        if (Time.time - _lastSwitch < 0.25f)
+            return;
+        _lastSwitch = Time.time;
         WeaponModel = weaponType switch
         {
             WeaponType.Block => InventoryManager.Instance.block,
@@ -94,5 +127,23 @@ public class WeaponManager : MonoBehaviour
             WeaponType.Tertiary => InventoryManager.Instance.tertiary,
             _ => throw new ArgumentOutOfRangeException(nameof(weaponType), weaponType, null)
         };
-    }   
+        audioSource.PlayOneShot(switchEquippedClip);
+        animator.SetTrigger(Animator.StringToHash("inventory_switch"));
+    }
+
+    // Called by inventory_switch animation
+    public void ChangeWeaponPrefab()
+    {
+        foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
+            Destroy(child.gameObject);
+        var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.name.ToUpper()}");
+        Instantiate(go, transform).Apply(go =>
+        {
+            go.layer = LayerMask.NameToLayer("WeaponCamera");
+            go.AddComponent<WeaponSway>();
+            if (WeaponModel.type == WeaponType.Block)
+                go.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
+                    $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
+        });
+    }
 }

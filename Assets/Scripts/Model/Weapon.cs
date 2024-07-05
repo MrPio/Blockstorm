@@ -18,11 +18,15 @@ namespace Model
 
         public static readonly List<Weapon> Blocks = new()
         {
-            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block),
+            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block, fireAnimation:"shovel"),
         };
         public static readonly List<Weapon> Melees = new()
         {
             new Weapon(name: "shovel", damage: 35, rof: 35, distance: 4, type: WeaponType.Melee, fireAnimation:"shovel")
+        };
+        public static readonly List<Weapon> Primaries = new()
+        {
+            new Weapon(name: "ak47", damage: 24, rof: 70, distance: 36, type: WeaponType.Primary, fireAnimation:"gun")
         };
 
         public string name, audio, fireAnimation;

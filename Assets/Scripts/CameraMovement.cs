@@ -19,12 +19,11 @@ public class CameraMovement : MonoBehaviour
     private WorldManager _wm;
     private Transform _transform;
     private bool _canDig, _canPlace;
-    private float _lastDig, _lastPlace;
+    private float _lastDig, _lastPlace, _lastFire;
     public WeaponManager weaponManager;
     [SerializeField] private ParticleSystem blockDigEffect;
 
-    [SerializeField]
-    private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip, blockPlaceAudioClip;
+    [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
     [SerializeField] private AudioSource audioSource;
 
@@ -78,35 +77,32 @@ public class CameraMovement : MonoBehaviour
 
         // If I am digging with a melee weapon
         if (weaponManager.WeaponModel is { type: WeaponType.Melee } &&
-            highlightBlock.gameObject.activeSelf &&
             Input.GetMouseButton(0) && Time.time - _lastDig > weaponManager.WeaponModel.Delay)
         {
             _lastDig = Time.time;
-            var highlightBlockPos = highlightBlock.transform.position;
-            var pos = Vector3Int.FloorToInt(highlightBlockPos);
-            var block = _wm.map.GetBlock(pos);
-            blockDigEffect.transform.position = highlightBlockPos;
-            blockDigEffect.GetComponent<Renderer>().material =
-                Resources.Load<Material>($"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
-            blockDigEffect.Play();
-            if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
-                    block.name.Contains(it)))
-                audioSource.PlayOneShot(blockDamageLightClip);
-            else if (block.blockHealth == BlockHealth.Indestructible)
-                audioSource.PlayOneShot(noBlockDamageClip);
-            else
-                audioSource.PlayOneShot(blockDamageMediumClip);
-            if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.melee!.damage))
+            if (highlightBlock.gameObject.activeSelf)
             {
-                highlightBlock.gameObject.SetActive(false);
-                blockDigEffect.Stop();
+                var highlightBlockPos = highlightBlock.transform.position;
+                var pos = Vector3Int.FloorToInt(highlightBlockPos);
+                var block = _wm.map.GetBlock(pos);
+                blockDigEffect.transform.position = highlightBlockPos;
+                blockDigEffect.GetComponent<Renderer>().material =
+                    Resources.Load<Material>(
+                        $"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
+                blockDigEffect.Play();
+                if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
+                        block.name.Contains(it)))
+                    audioSource.PlayOneShot(blockDamageLightClip);
+                else if (block.blockHealth == BlockHealth.Indestructible)
+                    audioSource.PlayOneShot(noBlockDamageClip);
+                else
+                    audioSource.PlayOneShot(blockDamageMediumClip);
+                if (_wm.DamageBlock(highlightBlock.transform.position, InventoryManager.Instance.melee!.damage))
+                    highlightBlock.gameObject.SetActive(false);
+                
             }
-
             weaponManager.Fire();
         }
-
-        if (blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
-            blockDigEffect.Stop();
 
         // If I am placing with an equipped block
         else if (weaponManager.WeaponModel is { type: WeaponType.Block } && placeBlock.gameObject.activeSelf &&
@@ -114,13 +110,25 @@ public class CameraMovement : MonoBehaviour
                  Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
-            audioSource.PlayOneShot(blockPlaceAudioClip);
-            _wm.EditVoxel(placeBlock.transform.position, InventoryManager.Instance.blockType);
+            _wm.EditVoxel(placeBlock.transform.position, InventoryManager.Instance.blockId);
             placeBlock.gameObject.SetActive(false);
+            weaponManager.Fire();
+        }
+
+        else if (weaponManager.WeaponModel is { type: WeaponType.Primary } or { type: WeaponType.Secondary } or
+                     { type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
+                 Time.time - _lastFire > weaponManager.WeaponModel.Delay)
+        {
+            print("ok");
+            _lastFire = Time.time;
+            weaponManager.Fire();
         }
 
         if (weaponManager.WeaponModel is { type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
             _lastPlace -= weaponManager.WeaponModel.Delay * 0.65f;
+
+        if (blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
+            blockDigEffect.Stop();
     }
 
     // We use voxels, so we don't have a collider in every cube.

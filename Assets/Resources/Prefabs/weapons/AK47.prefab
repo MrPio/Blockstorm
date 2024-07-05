@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8652471379544603874}
   - component: {fileID: 6916945853576445887}
   - component: {fileID: 6015169999955907039}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AK47_CLIP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,8 +94,9 @@ GameObject:
   - component: {fileID: 7476551211793568285}
   - component: {fileID: 4429358377214409484}
   - component: {fileID: 552747693256381387}
-  m_Layer: 0
-  m_Name: AK47_BODY
+  - component: {fileID: 6186671738491051125}
+  m_Layer: 7
+  m_Name: AK47
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110,7 +111,7 @@ Transform:
   m_GameObject: {fileID: 6211343100905639805}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.39779425, y: 0.463, z: -0.7178674}
+  m_LocalPosition: {x: 0.04, y: -0.04, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -167,3 +168,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6186671738491051125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6211343100905639805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6924c21937638914fb8d2a266e0bfa7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smooth: 2
+  multiplier: 2
