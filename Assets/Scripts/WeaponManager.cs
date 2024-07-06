@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using VoxelEngine;
 using Debug = UnityEngine.Debug;
+using Random = UnityEngine.Random;
 
 public class WeaponManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class WeaponManager : MonoBehaviour
     [NonSerialized] public static bool isAiming;
     [SerializeField] private Camera mainCamera, weaponCamera;
     [SerializeField] private Transform crosshair;
+    [SerializeField] private List<GameObject> muzzleEffects;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -75,8 +77,9 @@ public class WeaponManager : MonoBehaviour
                 SwitchEquipped(WeaponType.Secondary);
             else if (Input.GetKeyDown(KeyCode.Alpha5) && _weaponModel.type != WeaponType.Tertiary)
                 SwitchEquipped(WeaponType.Tertiary);
-            
-            if(Input.GetMouseButtonDown(1) && _weaponModel.type!=WeaponType.Block && _weaponModel.type!=WeaponType.Melee)
+
+            if (Input.GetMouseButtonDown(1) && _weaponModel.type != WeaponType.Block &&
+                _weaponModel.type != WeaponType.Melee)
                 ToggleAim();
         }
     }
@@ -90,6 +93,13 @@ public class WeaponManager : MonoBehaviour
 
             if (_weaponModel.type != WeaponType.Block && _weaponModel.type != WeaponType.Melee)
             {
+                if (isAiming)
+                    muzzleEffects.RandomItem().Apply(muzzle =>
+                    {
+                        muzzle.SetActive(true);
+                        muzzle.GetComponent<RectTransform>().sizeDelta = Vector2.one * Random.Range(100f, 280f);
+                    });
+
                 var cameraTransform = cameraMovement.transform;
                 Ray ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
                 RaycastHit hit;
@@ -125,7 +135,7 @@ public class WeaponManager : MonoBehaviour
         if (Time.time - _lastSwitch < 0.25f)
             return;
         _lastSwitch = Time.time;
-        if(isAiming)
+        if (isAiming)
             ToggleAim();
         WeaponModel = weaponType switch
         {

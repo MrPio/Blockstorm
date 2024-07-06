@@ -116,6 +116,7 @@ public class CameraMovement : MonoBehaviour
             weaponManager.Fire();
         }
 
+        // If I am firing with a weapon
         else if (weaponManager.WeaponModel is { type: WeaponType.Primary } or { type: WeaponType.Secondary } or
                      { type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
                  Time.time - _lastFire > weaponManager.WeaponModel.Delay)
