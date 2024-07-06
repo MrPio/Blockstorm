@@ -29,7 +29,6 @@ public class WeaponManager : MonoBehaviour
     [NonSerialized] public static bool isAiming;
     [SerializeField] private Camera mainCamera, weaponCamera;
     private Transform crosshair;
-    [SerializeField] private List<GameObject> muzzleEffects;
     [SerializeField] private GameObject bodyBlood, headBlood;
     [SerializeField]private Alteruna.Avatar avatar;
 
@@ -64,7 +63,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
-        if(!avatar.IsMe)
+        if(!Player.isDebug &&!avatar.IsMe)
             return;
         isAiming = false;
         _wm = WorldManager.instance;
@@ -73,7 +72,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
-        if(!avatar.IsMe)
+        if(!Player.isDebug &&!avatar.IsMe)
             return;
         if (_weaponModel != null)
         {
@@ -104,7 +103,7 @@ public class WeaponManager : MonoBehaviour
             if (_weaponModel.type != WeaponType.Block && _weaponModel.type != WeaponType.Melee)
             {
                 if (isAiming)
-                    muzzleEffects.RandomItem().Apply(muzzle =>
+                    CanvasEffects.instance.muzzles.RandomItem().Apply(muzzle =>
                     {
                         muzzle.SetActive(true);
                         muzzle.GetComponent<RectTransform>().sizeDelta = Vector2.one * Random.Range(100f, 280f);
@@ -115,7 +114,7 @@ public class WeaponManager : MonoBehaviour
                 RaycastHit hit;
 
                 // Ground hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, ~LayerMask.NameToLayer("Ground")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1<<LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
                     {
                         var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
@@ -138,11 +137,10 @@ public class WeaponManager : MonoBehaviour
                         }
                     }
                 // Enemy hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, ~LayerMask.NameToLayer("Enemy")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1<<LayerMask.NameToLayer("Enemy")))
                     if (hit.collider != null)
                     {
-                        
-                        print(hit.transform.position.y-hit.point.y);
+                        print(hit.transform.gameObject.name);
                         Instantiate(hit.transform.gameObject.name=="HEAD"?headBlood:bodyBlood, hit.point,
                             Quaternion.FromToRotation(Vector3.up,-cameraTransform.forward));
                     }

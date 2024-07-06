@@ -51,12 +51,13 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
     <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandLeaveRoom.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
-    <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\CustomRoomInfo.cs" />
+    <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
     <Compile Include="Assets\Scripts\Managers\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Managers\IOManager.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
+    <Compile Include="Assets\CanvasEffects.cs" />
     <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandMe.cs" />
     <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandPrint.cs" />
     <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\MapDescriptions.cs" />
@@ -349,6 +350,9 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="Alteruna.TrinityEditor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Alteruna\Plugins\Alteruna.TrinityEditor.dll</HintPath>
+    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.testtools.codecoverage@1.2.5\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
@@ -357,9 +361,6 @@
     </Reference>
     <Reference Include="Alteruna.Trinity">
       <HintPath>C:\Users\MrPio\Blockstorm\Assets\Alteruna\Plugins\Alteruna.Trinity.dll</HintPath>
-    </Reference>
-    <Reference Include="Alteruna.TrinityEditor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Alteruna\Plugins\Alteruna.TrinityEditor.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>

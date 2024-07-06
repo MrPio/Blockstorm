@@ -66,7 +66,7 @@ public class CameraMovement : MonoBehaviour
 
     private void Start()
     {
-        if(!avatar.IsMe)
+        if(!Player.isDebug && !avatar.IsMe)
             return;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -76,7 +76,7 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(!avatar.IsMe)
+        if(!Player.isDebug &&!avatar.IsMe)
             return;
         // Handle camera rotation
         var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
