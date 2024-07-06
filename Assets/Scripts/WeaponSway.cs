@@ -6,9 +6,10 @@ public class WeaponSway : MonoBehaviour {
     [Header("Sway Settings")]
     [SerializeField] private float smooth=7;
     [SerializeField] private float multiplier=2.5f;
-
     private void Update()
     {
+        if(WeaponManager.isAiming)
+            return;
         // get mouse input
         var mouseX = Input.GetAxisRaw("Mouse X") * multiplier;
         var mouseY = Input.GetAxisRaw("Mouse Y") * multiplier;

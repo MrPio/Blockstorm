@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
@@ -10,7 +11,7 @@ using VoxelEngine;
 public class CameraMovement : MonoBehaviour
 {
     public const float FOV = 68;
-    [SerializeField] private Transform highlightBlock, placeBlock;
+    private Transform highlightBlock, placeBlock;
     [SerializeField] private CharacterController characterController;
     public float sensitivity;
     public Transform player;
@@ -22,12 +23,12 @@ public class CameraMovement : MonoBehaviour
     private bool _canDig, _canPlace;
     private float _lastDig, _lastPlace, _lastFire;
     public WeaponManager weaponManager;
-    [SerializeField] private ParticleSystem blockDigEffect;
+    private ParticleSystem blockDigEffect;
 
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
     [SerializeField] private AudioSource audioSource;
-
+    [SerializeField] private Alteruna.Avatar avatar;
     public bool CanDig
     {
         get => _canDig;
@@ -54,8 +55,19 @@ public class CameraMovement : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
+        highlightBlock.gameObject.SetActive(false);
+        placeBlock = GameObject.FindWithTag("PlaceBlock").transform;
+        placeBlock.gameObject.SetActive(false);
+        blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
+    }
+
     private void Start()
     {
+        if(!avatar.IsMe)
+            return;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         _wm = WorldManager.instance;
@@ -64,6 +76,8 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
+        if(!avatar.IsMe)
+            return;
         // Handle camera rotation
         var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
         var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
@@ -121,7 +135,6 @@ public class CameraMovement : MonoBehaviour
                      { type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
                  Time.time - _lastFire > weaponManager.WeaponModel.Delay)
         {
-            print("ok");
             _lastFire = Time.time;
             weaponManager.Fire();
         }

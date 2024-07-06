@@ -24,9 +24,15 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip walkGeneric, walkMetal, walkWater;
     private float _lastWalkCheck;
+    private Alteruna.Avatar _avatar;
+    [SerializeField]private GameObject playerBody;
 
     private void Start()
     {
+        _avatar = GetComponent<Alteruna.Avatar>();
+        if(!_avatar.IsMe)
+            return;
+        playerBody.SetActive(false);
         _transform = transform;
         WorldManager.instance.UpdatePlayerPos(_transform.position);
         _cameraInitialLocalPosition = cameraTransform.localPosition;
@@ -34,6 +40,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if(!_avatar.IsMe)
+            return;
+        
         _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.2f, 0.4f), Quaternion.identity,
             groundLayerMask);
         if (_isGrounded && _velocity.y < 0)

@@ -6,6 +6,15 @@ TagManager:
   tags:
   - WorldManager
   - MapGenerator
+  - WeaponBody
+  - FX
+  - Animals
+  - FxTemporaire
+  - Enemy
+  - HighlightBlock
+  - PlaceBlock
+  - Crosshair
+  - BlockDigEffect
   layers:
   - Default
   - TransparentFX
@@ -15,7 +24,7 @@ TagManager:
   - UI
   - Ground
   - WeaponCamera
-  - 
+  - Enemy
   - 
   - 
   - 

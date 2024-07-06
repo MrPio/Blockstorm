@@ -23,14 +23,15 @@ public class WeaponManager : MonoBehaviour
     public Animator animator;
     private float _lastSwitch = -99;
     [SerializeField] private CameraMovement cameraMovement;
-    [SerializeField] private Transform highlightBlock;
-    [SerializeField] private ParticleSystem blockDigEffect;
+    private ParticleSystem blockDigEffect;
     private WorldManager _wm;
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
     [NonSerialized] public static bool isAiming;
     [SerializeField] private Camera mainCamera, weaponCamera;
-    [SerializeField] private Transform crosshair;
+    private Transform crosshair;
     [SerializeField] private List<GameObject> muzzleEffects;
+    [SerializeField] private GameObject bodyBlood, headBlood;
+    [SerializeField]private Alteruna.Avatar avatar;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -55,9 +56,16 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
+        crosshair = GameObject.FindWithTag("Crosshair").transform;
+    }
 
     private void Start()
     {
+        if(!avatar.IsMe)
+            return;
         isAiming = false;
         _wm = WorldManager.instance;
         SwitchEquipped(WeaponType.Block);
@@ -65,6 +73,8 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
+        if(!avatar.IsMe)
+            return;
         if (_weaponModel != null)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1) && _weaponModel.type != WeaponType.Block)
@@ -104,6 +114,7 @@ public class WeaponManager : MonoBehaviour
                 Ray ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
                 RaycastHit hit;
 
+                // Ground hit
                 if (Physics.Raycast(ray, out hit, _weaponModel.distance, ~LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
                     {
@@ -111,7 +122,7 @@ public class WeaponManager : MonoBehaviour
                         var blockType = _wm.GetVoxel(Vector3Int.FloorToInt(pos));
                         if (blockType is { isSolid: true })
                         {
-                            blockDigEffect.transform.position = pos;
+                            blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
                             blockDigEffect.GetComponent<Renderer>().material =
                                 Resources.Load<Material>(
                                     $"Textures/texturepacks/blockade/Materials/blockade_{(blockType.topID + 1):D1}");
@@ -126,6 +137,16 @@ public class WeaponManager : MonoBehaviour
                             _wm.DamageBlock(pos, _weaponModel.damage);
                         }
                     }
+                // Enemy hit
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, ~LayerMask.NameToLayer("Enemy")))
+                    if (hit.collider != null)
+                    {
+                        
+                        print(hit.transform.position.y-hit.point.y);
+                        Instantiate(hit.transform.gameObject.name=="HEAD"?headBlood:bodyBlood, hit.point,
+                            Quaternion.FromToRotation(Vector3.up,-cameraTransform.forward));
+                    }
+
             }
         }
     }

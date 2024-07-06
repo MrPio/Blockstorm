@@ -26,7 +26,7 @@ namespace Model
         };
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24, rof: 70, distance: 36, type: WeaponType.Primary, fireAnimation:"gun",zoom:1.75f)
+            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 36, type: WeaponType.Primary, fireAnimation:"gun",zoom:1.75f)
         };
 
         public string name, audio, fireAnimation;

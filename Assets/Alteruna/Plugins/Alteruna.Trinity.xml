@@ -1,0 +1,3944 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Alteruna.Trinity</name>
+  </assembly>
+  <members>
+    <member name="T:Alteruna.AnimationSynchronizable">
+      <summary>
+            Synchronizable Animator component.
+            </summary>
+      <remarks>
+            In most cases, you should avoid synchronizing the animations as they are usually not deterministic and can be performed from actions directly.
+            For example, instead of playing walk animation, you should consider animating based on the velocity of the character locally.
+            </remarks>
+    </member>
+    <member name="F:Alteruna.AnimationSynchronizable.Animator"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.AnimatorUpdate(System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.Int32,System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.Int32,System.Int32,System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.String)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.String,System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Play(System.String,System.Int32,System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Rebind"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Reset"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetBool(System.Int32,System.Boolean)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetBool(System.String,System.Boolean)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetFloat(System.Int32,System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetFloat(System.String,System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetInteger(System.Int32,System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetInteger(System.String,System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetLookAtPosition(UnityEngine.Vector3)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetTarget(UnityEngine.AvatarTarget,System.Single)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetTrigger(System.Int32)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.SetTrigger(System.String)"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.Start"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.StartPlayback"></member>
+    <member name="M:Alteruna.AnimationSynchronizable.StopPlayback"></member>
+    <member name="T:Alteruna.AttributesSync">
+      <summary>
+             Synchronize methods and fields using attributes.
+             </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.BroadcastRemoteMethod(System.Int32,System.Object[])">
+      <summary>
+            Calls method with the <c>SynchronizableMethod</c> attribute on evey client including sender with given parameters.
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.AttributesSync.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.BroadcastRemoteMethod(System.String,System.Object[])">
+      <summary>
+            Calls method with the <c>SynchronizableMethod</c> attribute on evey client including sender with given parameters.
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.Commit">
+      <summary>
+            Send all changes to all users.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.ForceSync">
+      <summary>
+            Force all fields to be synced as if they where changed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.GetMethodAttributeId(System.String)">
+      <summary>
+            Get index of method with the <c>SynchronizableMethod</c> attribute by name.
+            </summary>
+      <param name="methodName">Name of a method with the <c>SynchronizableMethod</c> attribute.</param>
+      <returns>Index of method with the <c>SynchronizableMethod</c> attribute with target name.</returns>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.GetMethodAttributeName(System.Int32)">
+      <summary>
+            Get name of method with the <c>SynchronizableMethod</c> attribute by index.
+            </summary>
+      <param name="methodId">Index of method with the <c>SynchronizableMethod</c> attribute.</param>
+      <returns>Name of method with the <c>SynchronizableMethod</c> attribute with target Index.</returns>
+      <exception cref="T:System.IndexOutOfRangeException">methodId is out of range or less than zero.</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.Int32,Alteruna.UserId,System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target user
+            with given parameters.
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.AttributesSync.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="user">target user</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.Int32,System.Collections.Generic.List{System.UInt16},System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target users
+            with given parameters.
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.AttributesSync.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="users">target users</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.Int32,System.UInt16,System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target user
+            with given parameters.
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.AttributesSync.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="user">target user</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.String,Alteruna.UserId,System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target user
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="user">target user</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.String,System.Collections.Generic.List{System.UInt16},System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target users
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="users">target user</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.InvokeRemoteMethod(System.String,System.UInt16,System.Object[])">
+      <summary>
+            Invoke a method with the <c>SynchronizableMethod</c> attribute on target user
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="user">target user</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.AttributesSync.LateUpdate">
+      <summary>
+            Handle changes fields.
+            </summary>
+      <remarks>
+            If hidden, consider calling <c>Commit()</c> after changes
+            </remarks>
+    </member>
+    <member name="F:Alteruna.AttributesSync.LocalMethodBehavior">
+      <summary>
+            Chose how local methods behave when sending.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.Register"></member>
+    <member name="F:Alteruna.AttributesSync.Reliability">
+      <summary>
+            Chose how to send data. Reliable or Unreliable.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)">
+      <summary>
+            Write changes to a <c>ITransportStreamWriter</c> processor.
+            </summary>
+      <param name="processor"></param>
+    </member>
+    <member name="M:Alteruna.AttributesSync.UncommittedFields">
+      <summary>
+            Check if there is any uncommitted changes to any fields.
+            </summary>
+      <returns>True when at least one field have uncommitted changes.</returns>
+    </member>
+    <member name="M:Alteruna.AttributesSync.Unserialize(Alteruna.Trinity.ITransportStreamReader,System.Byte,System.UInt32)">
+      <summary>
+            Read changes from a <c>ITransportStreamReader</c> processor.
+            </summary>
+    </member>
+    <member name="T:Alteruna.AttributesSync.LocalBehavior">
+      <summary>
+            Behaviour of local invocation of remote methods.
+            </summary>
+    </member>
+    <member name="F:Alteruna.AttributesSync.LocalBehavior.Disabled">
+      <summary>
+            Block invocation on sender.
+            </summary>
+    </member>
+    <member name="F:Alteruna.AttributesSync.LocalBehavior.Invoke">
+      <summary>
+            Invoke method when invoking <c>BroadcastRemoteMethod</c> or <c>InvokeRemoteMethod</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.AttributesSync.LocalBehavior.Reply">
+      <summary>
+            Methods get called from the server. Making the sender experience the same delay as all other clients.
+            </summary>
+    </member>
+    <member name="T:Alteruna.AttributesSync.SynchronizableField">
+      <summary>
+            Synchronise target field.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.SynchronizableField.#ctor"></member>
+    <member name="T:Alteruna.AttributesSync.SynchronizableMethod">
+      <summary>
+            Synchronise target Method.
+            </summary>
+    </member>
+    <member name="M:Alteruna.AttributesSync.SynchronizableMethod.#ctor"></member>
+    <member name="T:Alteruna.Avatar">
+      <summary>
+        <c>Avatar</c> is used to represent a player in a Room.
+             </summary>
+      <remarks>
+        <c>Avatar</c> is a <c>CommunicationBridge</c> and can be used to synchronize data between clients.<br /><img src="../images/Alteruna.Avatar.png" /></remarks>
+    </member>
+    <member name="P:Alteruna.Avatar.IsMe">
+      <summary>
+            True when the <c>Avatar</c> represents the local player.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Avatar.IsOwner">
+      <summary>
+            True when the <c>Avatar</c> represents the local player.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Avatar.IsPossessed">
+      <summary>
+            True when possessed by a <c>User</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Avatar.IsPossessor">
+      <summary>
+            True when the <c>Avatar</c> represents the local player.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Avatar.OnPossessed">
+      <summary>
+            On Avatar get posses by new <c>User</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Avatar.OnUnpossessed">
+      <summary>
+            On Avatar unpossess.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Avatar.Owner">
+      <summary>
+        <c>User</c> that posses the <c>Avatar</c>.
+            Null when unprocessed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Avatar.Possessed(Alteruna.User)">
+      <summary>
+            The possessed method can be used to set owner of a avatar.
+            </summary>
+      <param name="user">User possessing the Avatar.</param>
+      <exception cref="T:System.NullReferenceException">Thrown when no Multiplayer controller was found.</exception>
+    </member>
+    <member name="M:Alteruna.Avatar.Possessed(System.Boolean,Alteruna.User)">
+      <summary>
+            The possessed method can be used to set owner of a avatar.
+            </summary>
+      <param name="isMe">Unused.</param>
+      <param name="user">User possessing the Avatar.</param>
+      <exception cref="T:System.NullReferenceException">Thrown when no Multiplayer controller was found.</exception>
+    </member>
+    <member name="P:Alteruna.Avatar.Possessor">
+      <summary>
+        <c>User</c> that posses the <c>Avatar</c>.
+            Null when unprocessed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Avatar.Serialize(Alteruna.Trinity.ITransportStreamWriter)">
+      <summary>
+            Serializes transform and synchronizables.
+            </summary>
+      <param name="processor">ITransportStreamWriter</param>
+    </member>
+    <member name="M:Alteruna.Avatar.ToString">
+      <summary>
+            Get name and index in a string.
+            Returns "Unprocessed" when IsPossessed is false.
+            </summary>
+      <returns>possessors User.ToString() when possessed, otherwise returns "Unpossessed".</returns>
+    </member>
+    <member name="M:Alteruna.Avatar.Unpossessed"></member>
+    <member name="M:Alteruna.Avatar.Unserialize(Alteruna.Trinity.ITransportStreamReader)">
+      <summary>
+            Unserialize transform and synchronizables.
+            </summary>
+      <param name="processor">ITransportStreamReader</param>
+    </member>
+    <member name="T:Alteruna.AvatarBehavior">
+      <summary>
+            Behavior for avatar spawning.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Bucket">
+      <summary>
+            Class <c>Bucket</c> is a collection of players used to define NetLOD behaviour.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Bucket.Name">
+      <summary>
+            The name of the bucket.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Bucket.NetLOD">
+      <summary>
+            The LOD level of the bucket.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Bucket.Users">
+      <summary>
+            The users currently in this bucket.
+            </summary>
+    </member>
+    <member name="T:Alteruna.BucketBehavior">
+      <summary>
+            Behavior of a LOD bucket.
+            </summary>
+    </member>
+    <member name="F:Alteruna.BucketBehavior.Frequency"></member>
+    <member name="F:Alteruna.BucketBehavior.LastUpdated"></member>
+    <member name="F:Alteruna.BucketBehavior.Name"></member>
+    <member name="F:Alteruna.BucketBehavior.NetLOD"></member>
+    <member name="F:Alteruna.BucketBehavior.Pending"></member>
+    <member name="T:Alteruna.CommunicationBridge">
+      <summary>
+            Holds references and methods for communications with active <c>Multiplayer</c> component.
+            Unlike <c>CommunicationBridgeUID</c>, this component does not have a unique identifier (UID).
+            </summary>
+    </member>
+    <member name="F:Alteruna.CommunicationBridge.Multiplayer">
+      <summary>
+            Reference to Multiplayer controller component.
+            sets in <c>OnEnable</c> unless hidden.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridge.OnEnable">
+      <summary>
+            Collects <c>Multiplayer</c> reference.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridge.Possessed(System.Boolean,Alteruna.User)">
+      <summary>
+            Called when <c>Avatar</c> is possessed by a user.
+            </summary>
+      <param name="isMe">True when user is local player.</param>
+      <param name="user">user possessing.</param>
+    </member>
+    <member name="M:Alteruna.CommunicationBridge.Reset">
+      <summary>
+            We set the <c>Multiplayer</c> reference when component is reset inorder to save performance in the spawn frame.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridge.SetMultiplayerComponent(System.Boolean)">
+      <summary>
+            If the <c>Multiplayer</c> reference is null, set it to active <c>Multiplayer</c> component.
+            <example><code language="cs">
+            void OnEnable() =&gt; SetMultiplayerComponent();
+            </code><c>SetMultiplayerComponent</c> call it in <c>OnEnable</c> unless hidden.
+            </example></summary>
+      <param name="force">When set to true, it will ignore the current value of the <c>Multiplayer</c> reference</param>
+      <returns>True when Multiplayer is not null.</returns>
+    </member>
+    <member name="M:Alteruna.CommunicationBridge.Unpossessed">
+      <summary>
+            Called when <c>Avatar</c> gets unpossessed.
+            </summary>
+    </member>
+    <member name="T:Alteruna.CommunicationBridgeUID">
+      <summary>
+            Holds references and methods for communications with active <c>Multiplayer</c> and <c>UID</c> components.
+            Can be used to as object reference when sending packages to other clients.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridgeUID.GetUID">
+      <summary>
+            Get the UniqueID of this <c>Synchronizable</c></summary>
+      <returns>The UniqueID attached to this <c>Synchronizable</c></returns>
+    </member>
+    <member name="P:Alteruna.CommunicationBridgeUID.HasOwnership">
+      <summary>
+            Describes whether we have ownership of this Synchronizable.
+            </summary>
+    </member>
+    <member name="P:Alteruna.CommunicationBridgeUID.Lockable"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.MakeUID">
+      <summary>
+            Initialize UID.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridgeUID.OnDestroy"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.OnEnable">
+      <summary>
+            Register the object to the multiplayer component.
+            </summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridgeUID.op_Implicit(Alteruna.CommunicationBridgeUID)~System.Collections.Generic.KeyValuePair{System.Guid,Alteruna.CommunicationBridgeUID}"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.op_Implicit(Alteruna.CommunicationBridgeUID)~Alteruna.Trinity.SynchronizableElement"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.OverrideUID(System.Guid,System.Boolean)">
+      <summary>
+            Override this <c>Synchronizables</c> current unique ID with a new Guid.
+            </summary>
+      <param name="newUID">The new Guid.</param>
+      <param name="deregisterOld">Should this <c>Synchronizable</c> be deregistered from the <c>SerializableManager</c> before re-registering with the new ID?</param>
+    </member>
+    <member name="M:Alteruna.CommunicationBridgeUID.Register"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.ReleaseOwnership">
+      <summary>
+            Release ownership of this <c>Synchronizable so that others can take ownership of it.</c></summary>
+    </member>
+    <member name="M:Alteruna.CommunicationBridgeUID.Reset"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.ResetUid"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.TakeOwnership(System.Boolean)">
+      <summary>
+            Attempt to take ownership of this <c>Synchronizable</c></summary>
+      <param name="singleAttempt">Attempt to take ownership once, or get put in queue for when the current owner releases their ownership.</param>
+    </member>
+    <member name="P:Alteruna.CommunicationBridgeUID.UID"></member>
+    <member name="P:Alteruna.CommunicationBridgeUID.UIDString"></member>
+    <member name="M:Alteruna.CommunicationBridgeUID.Unserialize(Alteruna.Trinity.ITransportStreamReader,System.Byte,System.UInt32)"></member>
+    <member name="T:Alteruna.EnableSynchronizable">
+      <summary>
+            A component for synchronizing the enabling or disabling of a GameObject across multiple clients in a multiplayer environment.
+            </summary>
+    </member>
+    <member name="M:Alteruna.EnableSynchronizable.Possessed(System.Boolean,Alteruna.User)">
+      <summary>
+            Called when the object is possessed. Sets the ownership status of the GameObject.
+            </summary>
+      <param name="isMe">Boolean indicating if the current user is the owner.</param>
+      <param name="user">The user who is possessing the object.</param>
+    </member>
+    <member name="M:Alteruna.EnableSynchronizable.Reset"></member>
+    <member name="T:Alteruna.Encryption"></member>
+    <member name="M:Alteruna.Encryption.ReadEncrypted``1(Alteruna.Reader)"></member>
+    <member name="M:Alteruna.Encryption.ReadEncrypted(Alteruna.Reader)"></member>
+    <member name="M:Alteruna.Encryption.WriteEncrypted(Alteruna.Writer,System.Byte[])"></member>
+    <member name="M:Alteruna.Encryption.WriteEncrypted``1(Alteruna.Writer,``0)"></member>
+    <member name="T:Alteruna.Endpoint">
+      <summary>
+            Device endpoint.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Endpoint.DeviceType"></member>
+    <member name="P:Alteruna.Endpoint.Known"></member>
+    <member name="P:Alteruna.Endpoint.Local"></member>
+    <member name="P:Alteruna.Endpoint.Name"></member>
+    <member name="T:Alteruna.IAdaptiveSerializableUniqueID">
+      <summary>
+            Combines the IAdaptiveSerializable and the IUniqueID interface.
+            </summary>
+    </member>
+    <member name="T:Alteruna.IInput">
+      <summary>
+            Alteruna Input interface.
+            Can be used to create a custom synced input system.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IInput.AddAxis(System.String)">
+      <summary>
+            Add a axis to the <c>InputSynchronizable</c></summary>
+      <param name="newAxis">string of the target axis</param>
+    </member>
+    <member name="M:Alteruna.IInput.AddAxis(System.String[])">
+      <summary>
+            Add a array of axes to the <c>InputSynchronizable</c></summary>
+      <param name="newAxes">strings of the target axes</param>
+    </member>
+    <member name="M:Alteruna.IInput.AddKey(UnityEngine.KeyCode)">
+      <summary>
+            Add a key to the <c>InputSynchronizable</c></summary>
+      <param name="keyCode">
+        <c>KeyCode</c> of the target key</param>
+    </member>
+    <member name="M:Alteruna.IInput.AddKey(UnityEngine.KeyCode[])">
+      <summary>
+            Add a array of keys to the <c>InputSynchronizable</c></summary>
+      <param name="keyCodes">Array of <c>KeyCode</c> to target</param>
+    </member>
+    <member name="P:Alteruna.IInput.AxesValues">
+      <summary>
+            Get synced axes values by index
+            </summary>
+    </member>
+    <member name="M:Alteruna.IInput.GetIndexOfAxis(System.String)">
+      <summary>
+            Get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist it returns <c>-1</c></summary>
+      <param name="targetAxis">target</param>
+      <returns>
+        <c>index</c> on success, <c>-1</c> on fail.</returns>
+    </member>
+    <member name="M:Alteruna.IInput.GetIndexOfKey(UnityEngine.KeyCode)">
+      <summary>
+            Get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist it returns <c>-1</c></summary>
+      <param name="keyCode">target</param>
+      <returns>
+        <c>index</c> on success, <c>-1</c> on fail.</returns>
+    </member>
+    <member name="P:Alteruna.IInput.KeyValues">
+      <summary>
+            Get synced button values by index
+            </summary>
+    </member>
+    <member name="P:Alteruna.IInput.OnKeyUpdate">
+      <summary>
+            Event for changes in key inputs.
+            passes <c>KeyCode</c> and state.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IInput.TryGetIndexOfAxis(System.String,System.Int32@)">
+      <summary>
+            Attempts to get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist, return <c>false</c> and <c>index</c> will be 0
+            </summary>
+      <param name="targetAxis">target</param>
+      <param name="index">Index of target registered <c>keyCode</c></param>
+      <returns>True on success</returns>
+    </member>
+    <member name="M:Alteruna.IInput.TryGetIndexOfKey(UnityEngine.KeyCode,System.Int32@)">
+      <summary>
+            Attempts to get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist, return <c>false</c> and <c>index</c> will be 0
+            </summary>
+      <param name="keyCode">target</param>
+      <param name="index">Index of target registered <c>keyCode</c></param>
+      <returns>True on success</returns>
+    </member>
+    <member name="T:Alteruna.InputSynchronizable">
+      <summary>
+            Synchronize inputs (255 buttons and 255 axis maximum)
+            The input vales will update on this and other clients simultaneously.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.InputSynchronizable.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.AddAxis(System.String)">
+      <summary>
+            Add a axis to the <c>InputSynchronizable</c></summary>
+      <param name="newAxis">string of the target axis</param>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.AddAxis(System.String[])">
+      <summary>
+            Add a array of axes to the <c>InputSynchronizable</c></summary>
+      <param name="newAxes">strings of the target axes</param>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.AddKey(UnityEngine.KeyCode)">
+      <summary>
+            Add a key to the <c>InputSynchronizable</c></summary>
+      <param name="keyCode">
+        <c>KeyCode</c> of the target key</param>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.AddKey(UnityEngine.KeyCode[])">
+      <summary>
+            Add a array of keys to the <c>InputSynchronizable</c></summary>
+      <param name="keyCodes">Array of <c>KeyCode</c> to target</param>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.Awake"></member>
+    <member name="P:Alteruna.InputSynchronizable.AxesValues">
+      <summary>
+            Get synced axes values by index
+            </summary>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.GetIndexOfAxis(System.String)">
+      <summary>
+            Get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist it returns <c>-1</c></summary>
+      <param name="targetAxis">target</param>
+      <returns>
+        <c>index</c> on success, <c>-1</c> on fail.</returns>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.GetIndexOfKey(UnityEngine.KeyCode)">
+      <summary>
+            Get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist it returns <c>-1</c></summary>
+      <param name="keyCode">target</param>
+      <returns>
+        <c>index</c> on success, <c>-1</c> on fail.</returns>
+    </member>
+    <member name="P:Alteruna.InputSynchronizable.KeyValues">
+      <summary>
+            Get synced button values by index
+            </summary>
+    </member>
+    <member name="P:Alteruna.InputSynchronizable.OnKeyUpdate">
+      <summary>
+            Event for changes in key inputs.
+            passes <c>KeyCode</c> and state.
+            </summary>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="M:Alteruna.InputSynchronizable.TryGetIndexOfAxis(System.String,System.Int32@)">
+      <summary>
+            Attempts to get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist, return <c>false</c> and <c>index</c> will be 0
+            </summary>
+      <param name="targetAxis">target</param>
+      <param name="index">Index of target registered <c>keyCode</c></param>
+      <returns>True on success</returns>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.TryGetIndexOfKey(UnityEngine.KeyCode,System.Int32@)">
+      <summary>
+            Attempts to get index of a registered <c>keyCode</c>.
+            If the target <c>keyCode</c> dos not exist, return <c>false</c> and <c>index</c> will be 0
+            </summary>
+      <param name="keyCode">target</param>
+      <param name="index">Index of target registered <c>keyCode</c></param>
+      <returns>True on success</returns>
+    </member>
+    <member name="M:Alteruna.InputSynchronizable.Unpossessed"></member>
+    <member name="M:Alteruna.InputSynchronizable.Update"></member>
+    <member name="F:Alteruna.InputSynchronizable.UseLocalInput">
+      <summary>
+            Whether to use local input or use reply as input.
+            When false, all clients including the sender will receive inputs simultaneously. (assuming identical connection)
+            </summary>
+    </member>
+    <member name="T:Alteruna.InterpolationTransformSynchronizable"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.Awake"></member>
+    <member name="F:Alteruna.InterpolationTransformSynchronizable.ClientPrediction"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.FixedUpdate"></member>
+    <member name="F:Alteruna.InterpolationTransformSynchronizable.InterpolationMethod"></member>
+    <member name="F:Alteruna.InterpolationTransformSynchronizable.LocalBehaviour"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.MovePosition(UnityEngine.Vector3)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.MoveRotation(UnityEngine.Quaternion)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.MoveRotation(UnityEngine.Vector3)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.OnValidate"></member>
+    <member name="P:Alteruna.InterpolationTransformSynchronizable.position"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.Reset"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.SetInterpolationMethod(Alteruna.InterpolationTransformSynchronizable.InterpolationMethodType)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.SetLocalBehaviour(Alteruna.InterpolationTransformSynchronizable.LocalBehaviourType)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.SetPosition(UnityEngine.Vector3)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.SetRotation(UnityEngine.Quaternion)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.SetRotation(UnityEngine.Vector3)"></member>
+    <member name="M:Alteruna.InterpolationTransformSynchronizable.Update"></member>
+    <member name="T:Alteruna.InterpolationTransformSynchronizable.InterpolationMethodType"></member>
+    <member name="T:Alteruna.InterpolationTransformSynchronizable.LocalBehaviourType"></member>
+    <member name="T:Alteruna.IServiceListener">
+      <summary>
+            Service event listener interface.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IServiceListener.OnEndpointConnected(Alteruna.Service,Alteruna.Endpoint)"></member>
+    <member name="M:Alteruna.IServiceListener.OnEndpointDisconnected(Alteruna.Service,Alteruna.Endpoint,Alteruna.Trinity.ConnectionStatus)"></member>
+    <member name="M:Alteruna.IServiceListener.OnLatencyUpdate(System.UInt16,System.Single)"></member>
+    <member name="M:Alteruna.IServiceListener.OnNetworkError(Alteruna.Service,Alteruna.Endpoint,System.Int32)"></member>
+    <member name="M:Alteruna.IServiceListener.OnOtherUserJoined(Alteruna.Service,Alteruna.User)"></member>
+    <member name="M:Alteruna.IServiceListener.OnOtherUserLeft(Alteruna.Service,Alteruna.User)"></member>
+    <member name="M:Alteruna.IServiceListener.OnRoomCreated(Alteruna.Service,System.Boolean,Alteruna.Room,System.UInt16)"></member>
+    <member name="M:Alteruna.IServiceListener.OnRoomJoined(Alteruna.Service,Alteruna.Room,Alteruna.User)"></member>
+    <member name="M:Alteruna.IServiceListener.OnRoomJoinRejected(System.UInt32,System.String,System.String)"></member>
+    <member name="M:Alteruna.IServiceListener.OnRoomLeft(Alteruna.Service)"></member>
+    <member name="M:Alteruna.IServiceListener.OnRoomListUpdated(Alteruna.Service)"></member>
+    <member name="M:Alteruna.IServiceListener.OnSessionsReply(Alteruna.Service)"></member>
+    <member name="T:Alteruna.IServiceStateListener">
+      <summary>
+            Service state event listener interface.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.GetAllSynchronizables(System.Collections.Generic.List{Alteruna.Trinity.SynchronizableElement})">
+      <summary>
+            Get a list of all currently registered Synchronizables.
+            </summary>
+      <param name="synchronizables">The list to be appended with all Synchronizables.</param>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.GetSynchronizable(System.Guid)">
+      <summary>
+            Get a Synchronizable through its UniqueID.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to get.</param>
+      <returns>The Synchronizable or null.</returns>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.HasSynchroniable(System.Guid)">
+      <summary>
+            Whether Alteruna Multiplayer currently has a Synchronizable with the specified UniqueID registered.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to look up.</param>
+      <returns>True if the Synchronizable exists, else false.</returns>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.OnForceSync(Alteruna.ServiceState,System.UInt16)">
+      <summary>
+            Called before data is synced for a force sync packet.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.OnForceSynced(Alteruna.ServiceState,System.UInt16)">
+      <summary>
+            Called after data is serialized for a force sync packet.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IServiceStateListener.OnForceSyncReply(System.UInt16)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnLockAcquired(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnLockDenied(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnLockRequested(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnPacketRouted(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnPacketSent(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnRpcReceived(System.String,System.UInt16)"></member>
+    <member name="M:Alteruna.IServiceStateListener.OnUnlocked(Alteruna.ServiceState,System.Guid)"></member>
+    <member name="M:Alteruna.IServiceStateListener.TryGetSynchronizable(System.Guid,Alteruna.Trinity.IAdaptiveSerializable@)">
+      <summary>
+            Get a IAdaptiveSerializable through its UniqueID.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to get.</param>
+      <param name="synchronizable">The Synchronizable or null.</param>
+      <returns>True if the Synchronizable was found, else false.</returns>
+    </member>
+    <member name="T:Alteruna.IUniqueID">
+      <summary>
+            Class <c>UniqueID</c> defines an application-wide unique ID for identifying objects deciding where to rout data in a Room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.IUniqueID.MakeUID">
+      <summary>
+            Initialize the UID.
+            </summary>
+    </member>
+    <member name="P:Alteruna.IUniqueID.UID">
+      <summary>
+            Get or set the Guid of the UID.
+            </summary>
+    </member>
+    <member name="P:Alteruna.IUniqueID.UIDString">
+      <summary>
+            Get or set the Guid of the UID as strong
+            </summary>
+    </member>
+    <member name="T:Alteruna.Multiplayer">
+      <summary>
+            The component <c>Multiplayer</c> gives access to all functionality and communication for Alteruna Multiplayer.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.Multiplayer.png" />
+      </remarks>
+    </member>
+    <member name="P:Alteruna.Multiplayer.AvailableRooms">
+      <summary>
+            A list of all the currently available Rooms on the server.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.AvatarPrefab">
+      <summary>
+            The prefab to spawn as an Avatar if SpawnAvatarOnJoin is true.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.AvatarSpawning">
+      <summary>
+            Avatar spawning behavior.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.AvatarSpawnLocation">
+      <summary>
+            The location at which to spawn Avatars.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.AvatarSpawnLocations">
+      <summary>
+            An indexed list of the locations at which to spawn Avatars.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.Buckets">
+      <summary>
+            A list containing all of the existing Buckets in the application.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Connect">
+      <summary>
+            Connect to the Alteruna service manually when the config ConnectOnStart is disabled.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.CreatePrivateRoom(System.String,System.UInt16,System.Boolean,System.Boolean)">
+      <summary>
+            Create a new private room.
+            </summary>
+      <param name="displayName">name of the room.</param>
+      <param name="maxUsers">Maximum number of users in the room.</param>
+      <param name="onDemand">Close room when lats client leaves.</param>
+      <param name="joinRoom">Join room when creating it.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.CreateRoom(System.String,System.Boolean,System.UInt16,System.Boolean,System.Boolean,System.UInt16)">
+      <summary>
+            Create a new room.
+            </summary>
+      <param name="displayName">name of the room.</param>
+      <param name="inviteOnly">Prevent room from appearing in room lists. Also known as private room.</param>
+      <param name="pin">Pin code. Zero mens no pin code.</param>
+      <param name="onDemand">Close room when lats client leaves.</param>
+      <param name="joinRoom">Join room when creating it.</param>
+      <param name="maxUsers">Maximum number of users in the room.</param>
+    </member>
+    <member name="P:Alteruna.Multiplayer.CurrentRoom">
+      <summary>
+            The Room we are currently connected to.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.DeregisterCodec(System.Guid)">
+      <summary>
+            Deregister a Synchronizable from Alteruna Multiplayer, so that it is no longer being synchronized.
+            </summary>
+      <param name="id"></param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAllSynchronizables">
+      <summary>
+            Get a list of all currently registered Synchronizables.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAllSynchronizables(System.Collections.Generic.List{Alteruna.Trinity.SynchronizableElement})">
+      <summary>
+            Get a list of all currently registered Synchronizables.
+            </summary>
+      <param name="synchronizables">The list to be appended with all Synchronizables.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAvatar">
+      <summary>
+            Get locally spawned Avatar.
+            </summary>
+      <returns>Avatar or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAvatar(System.String)">
+      <summary>
+            Get Avatar by name.
+            </summary>
+      <param name="userName">name of the Avatar's possessor.</param>
+      <returns>Avatar or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAvatar(System.UInt16)">
+      <summary>
+            Get Avatar by index.
+            </summary>
+      <param name="userIndex">Index of the Avatar's possessor.</param>
+      <returns>Avatar or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetAvatars">
+      <summary>
+            Get all Users from current room.
+            </summary>
+      <returns>Avatar list</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetComponentById(Alteruna.IUniqueID)">
+      <summary>
+            Get a Unity Component through its UID.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetComponentById(System.Guid)">
+      <summary>
+            Get a Unity Component through its UID.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetDebuggingInfo(System.Boolean,System.Boolean)">
+      <summary>
+            Get debugging info.
+            Includes settings, device info, etc.
+            </summary>
+      <param name="includeQuarryData">The quarry data can contain important information about your application.</param>
+      <param name="includeAppID">Application id can be sensitive. When false consider also having <c>includeQuarryData</c> as false as well.</param>
+      <returns>Debuting information</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetGameObjectById(Alteruna.IUniqueID)">
+      <summary>
+            Get a Unity GameObject through its UniqueID.
+            </summary>
+      <param name="id">Specified IUniqueID object to get the UID from.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetGameObjectById(System.Guid)">
+      <summary>
+            Get a Unity GameObject through its UID.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetLastBlockResponse">
+      <summary>
+            Get reason for connection block.
+            </summary>
+      <returns>Empty string or reason.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetObjectById``1(Alteruna.IUniqueID)">
+      <summary>
+            Get a object inheriting from IAdaptiveSerializableUniqueID through its UID.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetObjectById``1(System.Guid)">
+      <summary>
+            Get a object inheriting from IAdaptiveSerializableUniqueID through its UID.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>GameObject or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetSynchronizable(System.Guid)">
+      <summary>
+            Get a Synchronizable through its UniqueID.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to get.</param>
+      <returns>The Synchronizable or null.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetUser">
+      <summary>
+            Get your own User.
+            </summary>
+      <returns>User or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetUser(System.Int32)">
+      <summary>
+            Get User by index.
+            </summary>
+      <param name="userIndex">Index of user.</param>
+      <returns>User or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetUser(System.String)">
+      <summary>
+            Get User by name.
+            </summary>
+      <param name="userName">name of user.</param>
+      <returns>User or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetUser(System.UInt16)">
+      <summary>
+            Get User by index.
+            </summary>
+      <param name="userIndex">Index of user.</param>
+      <returns>User or null</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.GetUsers">
+      <summary>
+            Get all Users from current room.
+            </summary>
+      <returns>User list</returns>
+    </member>
+    <member name="P:Alteruna.Multiplayer.InRoom">
+      <summary>
+            Whether currently connected to a Room.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Multiplayer.Instance">
+      <summary>
+            Static singleton instance of the <c>Multiplayer</c> component.
+            Note that this feature may not work as intended when used in combination with the multi-client tool.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.InvokeRemoteProcedure(System.String,Alteruna.UserId,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC).
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUserID">The UserID of the User on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">Alternative to the parameters.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">RPC replay callback.</param>
+      <returns>The callID of the RPC.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.InvokeRemoteProcedure(System.String,System.UInt16,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC).
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUserID">The UserID of the User on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">The user data to be sent to the RPC.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">The callback gotten from the RPC.</param>
+    </member>
+    <member name="P:Alteruna.Multiplayer.IsConnected">
+      <summary>
+            Whether currently connected to a server.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.IsRegistered(Alteruna.IUniqueID)">
+      <summary>
+            Check is specified the UniqueID registered.
+            </summary>
+      <param name="id">Specified IUniqueID object to get the UID from.</param>
+      <returns>True if specified UID is registered.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.IsRegistered(System.Guid)">
+      <summary>
+            Check is specified UID registered.
+            </summary>
+      <param name="id">Specified UID.</param>
+      <returns>True if specified UID is registered.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinFirstAvailable(System.Boolean)">
+      <summary>
+            Join any available room.
+            Only join rooms that is not full, does not have pin code, and is not invite only.
+            </summary>
+      <param name="onlyJoinDemandRooms"></param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinMatchmaking">
+      <summary>
+            Join a Room through matchmaking.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinMatchmaking(System.UInt16)">
+      <summary>
+            Join a Room through matchmaking using a pin.
+            </summary>
+      <param name="pin">The pin to join the Room with.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinOnDemandRoom">
+      <summary>
+            Create and Join a Room.
+            The Room will close when the last player leaves the room.
+            Use <c>CreateRoom</c> for more control.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinOnDemandRoom(System.UInt32)">
+      <summary>
+            Join Room by id.
+            The Room will close when the last player leaves the room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinRoom(Alteruna.Room)">
+      <summary>
+            Join an available Room.
+            </summary>
+      <param name="room">The Room to join.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinRoom(Alteruna.Room,System.UInt16)">
+      <summary>
+            Join an available Room using a pin.
+            </summary>
+      <param name="room">The Room to join.</param>
+      <param name="pin">The pin to join the Room with.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.JoinWithInviteCode(System.String)">
+      <summary>
+            Join a room using an invite code.
+            </summary>
+      <param name="code">Invite code.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.LoadScene(System.Int32,System.Boolean)">
+      <summary>
+            Load a scene by index and move Multiplayer object and all Avatars to the new scene.
+            </summary>
+      <param name="sceneId">Build index of target scene.</param>
+      <param name="spawnAvatarOnLoad">Spawns your <see cref="T:Alteruna.Avatar" /> after scene is loaded if true.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.LoadScene(System.String,System.Boolean)">
+      <summary>
+            Load a scene by name and move Multiplayer object and all Avatars to the new scene.
+            </summary>
+      <param name="sceneName">Name of target scene.</param>
+      <param name="spawnAvatarOnLoad">Spawns your <see cref="T:Alteruna.Avatar" /> after scene is loaded if true.</param>
+    </member>
+    <member name="P:Alteruna.Multiplayer.Lockable"></member>
+    <member name="M:Alteruna.Multiplayer.LockRoom">
+      <summary>
+            Lock current room. 
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.LogLevel">
+      <summary>
+            The lowest level of logs to print to the console.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Multiplayer.LowestUserIndex">
+      <summary>
+            The index of the user with the lowest index.
+            Updates after the other joined and room joined events.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.MakeUID"></member>
+    <member name="P:Alteruna.Multiplayer.MaxPlayers">
+      <summary>
+            The global maximum amount of players allowed in a single Room.
+            Rooms can be created with a lower player limit, but not higher.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Multiplayer.Me">
+      <summary>
+            The User representing the local player.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.MulticastRemoteProcedure(System.String,System.Collections.Generic.List{System.UInt16},Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC) for multiple Users.
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUsers">The UserIDs of the Users on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">The user data to be sent to the RPC.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">RPC replay callback.</param>
+      <returns>The callID of the RPC.</returns>
+    </member>
+    <member name="F:Alteruna.Multiplayer.NetworkPrefs">
+      <summary>
+            Similar to Unity's PlayerPrefs, but stores data in the cloud.
+            It is recommended to use its asynchronous methods.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Multiplayer.NetworkStatistics">
+      <summary>
+            Statistic on network data send and received in Kilobytes unless defined.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnConnected">
+      <summary>
+            Event invoked after successfully connecting to a server.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnDisconnected">
+      <summary>
+            Event invoked after disconnecting from a server.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnForceSync">
+      <summary>
+            Called before data is synced for a force sync packet.
+            </summary>
+      <remarks>
+            In most cases, <see cref="F:Alteruna.Multiplayer.OnRoomJoined">OnRoomJoined</see> is preferred over OnForceSync.
+            </remarks>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnForceSynced">
+      <summary>
+            On client request a force sync package.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnForceSyncReply">
+      <summary>
+            Invoked when received force sync data from other player.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnJoinRejected">
+      <summary>
+            Event invoked on join event rejected with a rejection reason.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnLockAcquired">
+      <summary>
+            Event invoked when successfully receives ownership for any object.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnLockDenied">
+      <summary>
+            Event invoked when an attempt to gain ownership over a object is denied.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnLockRequested">
+      <summary>
+            Event invoked on ownership requests.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnLockUnlocked">
+      <summary>
+            Event invoked when a object releases its ownership.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnNetworkError">
+      <summary>
+            Event invoked if any network related errors occur.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnOtherUserJoined">
+      <summary>
+            Event invoked when other User joined the Room.
+            When joining a room, this event will be invoked for every User already in the Room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnOtherUserLeft">
+      <summary>
+            Event invoked after another User left the Room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnPacketReceived">
+      <summary>
+            Receive packet event.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnPacketSent">
+      <summary>
+            Send packet event.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRoomCreated">
+      <summary>
+            Event invoked after successfully joining a Room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRoomJoined">
+      <summary>
+            Event invoked after successfully joining a Room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRoomLeft">
+      <summary>
+            Event invoked on successfully leaving a room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRoomListUpdated">
+      <summary>
+            Event invoked when the AvailableRooms list is modified.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRpcReceived">
+      <summary>
+            On remote procedure call received.
+            Multiplayer, name, sender
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRpcRegistered">
+      <summary>
+            On remote procedure call registered.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Multiplayer.OnRpcSent">
+      <summary>
+            On remote procedure call sent.
+            Multiplayer, name, target, isMulticast
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.RefreshRoomList">
+      <summary>
+            Refresh the AvailableRooms list containing the currently available Rooms on the server.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.RegisterRemoteProcedure(System.String,Alteruna.RemoteProcedure)">
+      <summary>
+            Register a Remote Procedure.
+            </summary>
+      <param name="procedureName">The name of the procedure.</param>
+      <param name="callback">The function to call through the procedure.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.RegisterSynchronizable(Alteruna.IAdaptiveSerializableUniqueID)">
+      <summary>
+            Register a Synchronizable to be synchronized through Alteruna Multiplayer.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable.</param>
+      <param name="synchronizable">The Synchronizable to be registered.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.ReplyRemoteProcedure(System.UInt32,System.UInt16,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable)">
+      <summary>
+            Reply to a Remote Procedure Called by another User.
+            </summary>
+      <param name="callID">The callID of the RPC to reply to.</param>
+      <param name="result">The result of the procedure.</param>
+      <param name="parameters">The parameters to be sent with the reply.</param>
+      <param name="userData">Alternative to parameters.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SendToBucket(Alteruna.CommunicationBridgeUID,System.Int32,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific CommunicationBridgeUID to all Users within a specific bucket.
+            </summary>
+      <param name="communicationBridgeUid">Class inherent from CommunicationBridgeUID.</param>
+      <param name="bucketIndex">The index of the bucket to synchronize the Synchronizable in.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SendToBucket(Alteruna.IAdaptiveSerializableUniqueID,System.Int32,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific object implementing IAdaptiveSerializableUniqueID to all Users within a specific bucket.
+            </summary>
+      <param name="adaptiveSerializableUniqueID">Object implementing the IAdaptiveSerializableUniqueID interface.</param>
+      <param name="bucketIndex">The index of the bucket to synchronize the Synchronizable in.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SendToBucket(Alteruna.IUniqueID,System.Int32,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific object implementing IUniqueID to all Users within a specific bucket.
+            </summary>
+      <param name="uniqueId">Object implementing the IUniqueID interface.</param>
+      <param name="bucketIndex">The index of the bucket to synchronize the Synchronizable in.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SendToBucket(System.Guid,System.Int32)">
+      <summary>
+            Synchronize a specific UID to all Users within a specific bucket.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to synchronize.</param>
+      <param name="bucketIndex">The index of the bucket to synchronize the Synchronizable in.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)"></member>
+    <member name="M:Alteruna.Multiplayer.SetRoomName(System.String)">
+      <summary>
+            Rename currently joined room.
+            </summary>
+      <param name="roomName">New room name.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SetUsername(System.String)">
+      <summary>
+            Sets new username if the user is not in a room.
+            </summary>
+      <param name="name">new username</param>
+      <returns>True on success.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SoftReset">
+      <summary>
+            Reset some internal fields regrading connection to their default values.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SpawnAvatar">
+      <summary>
+            Spawn your avatar.
+            </summary>
+      <returns>Spawned Avatar.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SpawnAvatar(UnityEngine.Transform)">
+      <summary>
+            Spawn Avatar at the position and oration of a transform.
+            </summary>
+      <param name="transform">Target Transform.</param>
+      <returns>Spawned Avatar.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SpawnAvatar(UnityEngine.Vector3,UnityEngine.Quaternion)">
+      <summary>
+            Spawn Avatar using position and rotation.
+            </summary>
+      <param name="pos">Position</param>
+      <param name="rot">Rotation</param>
+      <returns>Spawned Avatar.</returns>
+    </member>
+    <member name="M:Alteruna.Multiplayer.SpawnAvatar(UnityEngine.Vector3,UnityEngine.Vector3)">
+      <summary>
+            Spawn Avatar using position and rotation.
+            </summary>
+      <param name="pos">Position</param>
+      <param name="rot">Rotation</param>
+      <returns>Spawned Avatar.</returns>
+    </member>
+    <member name="F:Alteruna.Multiplayer.SpawnAvatarPerIndex">
+      <summary>
+            Weather Avatars should be spawned in different locations based on their index in the Room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(Alteruna.CommunicationBridgeUID,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="communicationBridgeUid">Class inherent from CommunicationBridgeUID.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(Alteruna.CommunicationBridgeUID,System.Collections.Generic.List{System.UInt16},Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="communicationBridgeUid">Class inherent from CommunicationBridgeUID.</param>
+      <param name="users">The Users to synchronize the Synchronizable to.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(Alteruna.IAdaptiveSerializableUniqueID,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="adaptiveSerializableUniqueId">Object implementing the IAdaptiveSerializableUniqueID interface.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(Alteruna.IUniqueID,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="uniqueId">Object implementing the IUniqueID interface.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(System.Guid,Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="uid">The UniqueID of the Synchronizable to synchronize.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Sync(System.Guid,System.Collections.Generic.List{System.UInt16},Alteruna.Trinity.Reliability)">
+      <summary>
+            Synchronize a specific Synchronizable through Alteruna Multiplayer.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to synchronize.</param>
+      <param name="users">The Users to synchronize the Synchronizable to.</param>
+      <param name="reliability">The reliability of the packet.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.TryGetSynchronizable(System.Guid,Alteruna.Trinity.IAdaptiveSerializable@)">
+      <summary>
+            Get a Synchronizable through its UniqueID.
+            </summary>
+      <param name="id">The UniqueID of the Synchronizable to get.</param>
+      <param name="synchronizable">The Synchronizable or null.</param>
+      <returns>True if the Synchronizable was found, else false.</returns>
+    </member>
+    <member name="P:Alteruna.Multiplayer.UID"></member>
+    <member name="P:Alteruna.Multiplayer.UIDString"></member>
+    <member name="M:Alteruna.Multiplayer.UnlockRoom(System.Boolean)">
+      <summary>
+            Unlock current room.
+            </summary>
+      <param name="matchmaking">Set state for matchmaking.</param>
+    </member>
+    <member name="M:Alteruna.Multiplayer.Unserialize(Alteruna.Trinity.ITransportStreamReader,System.Byte,System.UInt32)"></member>
+    <member name="T:Alteruna.NameGenerator">
+      <summary>
+            Class <c>NameGenerator</c> generates names from a random animal and adjective.
+            </summary>
+    </member>
+    <member name="F:Alteruna.NameGenerator.Adjectives"></member>
+    <member name="M:Alteruna.NameGenerator.Generate">
+      <summary>
+            Generate a new name from <c>Adjectives</c> and <c>Nouns</c> and store the result in <c>Name</c>.
+            </summary>
+      <returns>New random name.</returns>
+    </member>
+    <member name="M:Alteruna.NameGenerator.GenerateStatic">
+      <summary>
+            Generate using static method and default values.
+            </summary>
+      <returns>New random name.</returns>
+    </member>
+    <member name="F:Alteruna.NameGenerator.Name">
+      <summary>
+            Last name generated by the Generate() method.
+            </summary>
+    </member>
+    <member name="F:Alteruna.NameGenerator.Nouns"></member>
+    <member name="T:Alteruna.ProcedureParameters">
+      <summary>
+            Parameters containing data to be sent together with Remote Procedure Calls.
+            </summary>
+    </member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Boolean)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Boolean@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Byte)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Byte@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Byte[])"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Byte[]@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Int16)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Int16@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Int32)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Int32@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Single)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.Single@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.String)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.String@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.UInt16)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.UInt16@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.UInt32)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Get(System.String,System.UInt32@)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Serialize(Alteruna.Trinity.ITransportStreamWriter)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Boolean)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Byte)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Byte[])"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Int16)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Int32)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.Single)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.String)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.UInt16)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Set(System.String,System.UInt32)"></member>
+    <member name="M:Alteruna.ProcedureParameters.Unserialize(Alteruna.Trinity.ITransportStreamReader)"></member>
+    <member name="T:Alteruna.Reader">
+      <summary>
+            Class <c>Writer</c> is used to write data to be sent to other Users through a <c>Synchronizable</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Reader.Decompress(Alteruna.Trinity.PacketProcessing.CompressionMethod)">
+      <summary>
+            Compresses the data already written to the writer.
+            If StartCompress has not been called, the data will be compressed from the start of the writer.
+            </summary>
+      <param name="method">Compression method used.</param>
+    </member>
+    <member name="M:Alteruna.Reader.DeserializePackedString``1(System.String)">
+      <summary>
+            Unpacks a string that has been packed using <see cref="M:Alteruna.Writer.SerializeAndPackString``1(``0)" />.
+            </summary>
+      <param name="data">string data.</param>
+      <typeparam name="T">type</typeparam>
+      <returns>Object of given type.</returns>
+    </member>
+    <member name="M:Alteruna.Reader.ReadBool"></member>
+    <member name="M:Alteruna.Reader.ReadByte"></member>
+    <member name="M:Alteruna.Reader.ReadByteArray"></member>
+    <member name="M:Alteruna.Reader.ReadFloat"></member>
+    <member name="M:Alteruna.Reader.ReadGeneric``1"></member>
+    <member name="M:Alteruna.Reader.ReadGuid"></member>
+    <member name="M:Alteruna.Reader.ReadInt"></member>
+    <member name="M:Alteruna.Reader.ReadObject"></member>
+    <member name="M:Alteruna.Reader.ReadObject``1"></member>
+    <member name="M:Alteruna.Reader.ReadObject(System.Type)"></member>
+    <member name="M:Alteruna.Reader.ReadShort"></member>
+    <member name="M:Alteruna.Reader.ReadString"></member>
+    <member name="M:Alteruna.Reader.ReadUint"></member>
+    <member name="M:Alteruna.Reader.ReadUshort"></member>
+    <member name="T:Alteruna.RemoteProcedure">
+      <summary>
+            RPC delegate.
+            </summary>
+    </member>
+    <member name="T:Alteruna.RemoteProcedureAck">
+      <summary>
+            RPC ack delegate.
+            </summary>
+    </member>
+    <member name="T:Alteruna.RemoteProcedureReply">
+      <summary>
+            RPC reply delegate.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Rigidbody2DSynchronizable">
+      <summary>
+        <c>Rigidbody2DSynchronizable</c> is a <c>Synchronizable</c> that synchronizes the state of a <c>Rigidbody2D</c> component.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.AddForce(System.Single,System.Single,UnityEngine.ForceMode)">
+      <summary>
+            Adds a force to the Rigidbody.
+            </summary>
+      <param name="x">Size of force along the world x-axis.</param>
+      <param name="y">Size of force along the world y-axis.</param>
+      <param name="mode">	Type of force to apply.</param>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.AddForce(UnityEngine.Vector2,UnityEngine.ForceMode)">
+      <summary>
+            Adds a force to the Rigidbody.
+            </summary>
+      <param name="force">Force vector in world coordinates.</param>
+      <param name="mode">	Type of force to apply.</param>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.AddTorque(System.Single,UnityEngine.ForceMode)">
+      <summary>
+            Adds a torque to the rigidbody.
+            </summary>
+      <param name="torque">Torque vector in world coordinates.</param>
+      <param name="mode">	The type of torque to apply.</param>
+    </member>
+    <member name="P:Alteruna.Rigidbody2DSynchronizable.angularVelocity">
+      <summary>
+        <para>Angular velocity in degrees per second.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.Awake"></member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="P:Alteruna.Rigidbody2DSynchronizable.isKinematic">
+      <summary>
+        <para>Controls whether physics affects the rigidbody.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.IsSleeping">
+      <summary>
+            Is the rigidbody sleeping?
+            </summary>
+      <returns>true when rigidbody is sleeping.</returns>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.MovePosition(UnityEngine.Vector2)">
+      <summary>
+        <para>Moves the rigidbody to position.</para>
+      </summary>
+      <param name="position">The new position for the Rigidbody object.</param>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.MoveRotation(System.Single)">
+      <summary>
+        <para>Rotates the Rigidbody to angle (given in degrees).</para>
+      </summary>
+      <param name="angle">The new rotation angle for the Rigidbody object.</param>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.OnCollisionEnter2D(UnityEngine.Collision2D)"></member>
+    <member name="P:Alteruna.Rigidbody2DSynchronizable.position">
+      <summary>
+        <para>The position of the rigidbody.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.Reset"></member>
+    <member name="F:Alteruna.Rigidbody2DSynchronizable.Rigidbody">
+      <summary>
+            Rigidbody to synchronize.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Rigidbody2DSynchronizable.rotation">
+      <summary>
+        <para>The rotation of the rigidbody.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.SetRotation(System.Single)">
+      <summary>
+        <para>Sets the rotation of the Rigidbody2D to angle (given in degrees).</para>
+      </summary>
+      <param name="angle">The rotation of the Rigidbody (in degrees).</param>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.Sleep">
+      <summary>
+            Forces a rigidbody to sleep at least one frame.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Rigidbody2DSynchronizable.velocity">
+      <summary>
+        <para>Linear velocity of the Rigidbody in units per second.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.Rigidbody2DSynchronizable.WakeUp">
+      <summary>
+            Forces a rigidbody to wake up.
+            </summary>
+    </member>
+    <member name="T:Alteruna.RigidbodySynchronizable">
+      <summary>
+            Control and synchronizes an object's position through physics simulation.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.RigidbodySynchronizable.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.AddForce(System.Single,System.Single,System.Single,UnityEngine.ForceMode)">
+      <summary>
+            Adds a force to the Rigidbody.
+            </summary>
+      <param name="x">Size of force along the world x-axis.</param>
+      <param name="y">Size of force along the world y-axis.</param>
+      <param name="z">Size of force along the world z-axis.</param>
+      <param name="mode">	Type of force to apply.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.AddForce(UnityEngine.Vector3,UnityEngine.ForceMode)">
+      <summary>
+            Adds a force to the Rigidbody.
+            </summary>
+      <param name="force">Force vector in world coordinates.</param>
+      <param name="mode">	Type of force to apply.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.AddTorque(System.Single,System.Single,System.Single,UnityEngine.ForceMode)">
+      <summary>
+            Adds a torque to the rigidbody.
+            </summary>
+      <param name="x">Size of torque along the world x-axis.</param>
+      <param name="y">Size of torque along the world y-axis.</param>
+      <param name="z">Size of torque along the world z-axis.</param>
+      <param name="mode">The type of torque to apply.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.AddTorque(UnityEngine.Vector3,UnityEngine.ForceMode)">
+      <summary>
+            Adds a torque to the rigidbody.
+            </summary>
+      <param name="torque">Torque vector in world coordinates.</param>
+      <param name="mode">	The type of torque to apply.</param>
+    </member>
+    <member name="P:Alteruna.RigidbodySynchronizable.angularVelocity">
+      <summary>
+        <para>The angular velocity vector of the rigidbody measured in radians per second.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.RigidbodySynchronizable.Awake"></member>
+    <member name="M:Alteruna.RigidbodySynchronizable.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="P:Alteruna.RigidbodySynchronizable.isKinematic">
+      <summary>
+            Controls whether physics affects the rigidbody.
+            </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.IsSleeping">
+      <summary>
+            Is the rigidbody sleeping?
+            </summary>
+      <returns>true when rigidbody is sleeping.</returns>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.MovePosition(UnityEngine.Vector3)">
+      <summary>
+        <para>Moves the kinematic Rigidbody towards position.</para>
+      </summary>
+      <param name="position">Provides the new position for the Rigidbody object.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.MoveRotation(UnityEngine.Quaternion)">
+      <summary>
+        <para>Rotates the rigidbody to rotation.</para>
+      </summary>
+      <param name="rot">The new rotation for the Rigidbody.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.OnCollisionEnter(UnityEngine.Collision)"></member>
+    <member name="P:Alteruna.RigidbodySynchronizable.position">
+      <summary>
+        <para>The position of the rigidbody.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.Reset"></member>
+    <member name="F:Alteruna.RigidbodySynchronizable.Rigidbody">
+      <summary>
+            Rigidbody to synchronize.
+            </summary>
+    </member>
+    <member name="P:Alteruna.RigidbodySynchronizable.rotation">
+      <summary>
+        <para>The rotation of the Rigidbody.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.SetPosition(UnityEngine.Vector3)">
+      <summary>
+        <para>Moves the kinematic Rigidbody to a new position.</para>
+      </summary>
+      <param name="position">Provides the new position for the Rigidbody object.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.SetRotation(UnityEngine.Quaternion)">
+      <summary>
+        <para>Set the rotation of the rigidbody to new rotation.</para>
+      </summary>
+      <param name="rot">The new rotation for the Rigidbody.</param>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.Sleep">
+      <summary>
+            Forces a rigidbody to sleep at least one frame.
+            </summary>
+    </member>
+    <member name="P:Alteruna.RigidbodySynchronizable.velocity">
+      <summary>
+        <para>The velocity vector of the rigidbody. It represents the rate of change of Rigidbody position.</para>
+      </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizable.WakeUp">
+      <summary>
+            Forces a rigidbody to wake up.
+            </summary>
+    </member>
+    <member name="T:Alteruna.RigidbodySynchronizableCommon">
+      <summary>
+            Common Rigidbody synchronizable methods and.
+            </summary>
+    </member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.AllowCollisionToAssumeOwner">
+      <summary>
+            When false, collisions will not cause the object to switch which client is simulated on.
+            </summary>
+    </member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.ApplyAsTransform">
+      <summary>
+            When true, the object will be moved and rotated using its transform directly instead of using the physics engine.
+            This is not recommended, but may resolve some issues where it doesn't sync correctly.
+            </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.Awake"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.FixedUpdate"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.ForceUpdate(System.Boolean)">
+      <summary>
+            Forces a sync even if not owned.
+            </summary>
+      <param name="fullSync">Sync absolute data in addition to velocity.</param>
+    </member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.FullSyncEveryNSync">
+      <summary>
+            Sync velocity and position every Nth sync.
+            </summary>
+    </member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.IgnoredLayers">
+      <summary>
+            Ignored layers will not cause the object trigger sync on collision.
+            </summary>
+    </member>
+    <member name="P:Alteruna.RigidbodySynchronizableCommon.isKinematic">
+      <summary>
+            Controls whether physics affects the rigidbody.
+            </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.IsSleeping">
+      <summary>
+            Is the rigidbody sleeping?
+            </summary>
+      <returns>true when rigidbody is sleeping.</returns>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.OnCollisionEnter(UnityEngine.Collision)"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.OnCollisionEnter2D(UnityEngine.Collision2D)"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.OnEnable"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.Reset"></member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.SendData">
+      <summary>
+            When true, this client will sync the object will to all other clients.
+            </summary>
+      <remarks>
+            Only one client can control the object at a time.
+            Enabling this will disable it on all other clients.
+            </remarks>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)"></member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.Sleep">
+      <summary>
+            Forces a rigidbody to sleep at least one frame.
+            </summary>
+    </member>
+    <member name="F:Alteruna.RigidbodySynchronizableCommon.SyncEveryNUpdates">
+      <summary>
+            How often to automatically sync data in skips of FixedUpdate.
+            </summary>
+      <remarks>
+            Only for automatic updates. Changes to velocity, position, etc. will trigger more frequent updates.
+            </remarks>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.SyncSettings">
+      <summary>
+            Syncs settings to all clients.
+            Required for changing settings during runtime.
+            </summary>
+    </member>
+    <member name="M:Alteruna.RigidbodySynchronizableCommon.WakeUp">
+      <summary>
+            Forces a rigidbody to wake up.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Room">
+      <summary>
+            The <c>Room</c> class defines a room in the network.
+            Users can join and leave rooms and send data to all other users in the same room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.Destroy">
+      <summary>
+            Destroy room from server.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.Equals(System.Object)"></member>
+    <member name="M:Alteruna.Room.GetUserCount">
+      <summary>
+            Amount of users in this <c>Room</c>.
+            </summary>
+      <returns>User count.</returns>
+    </member>
+    <member name="P:Alteruna.Room.ID">
+      <summary>
+            The ID of this <c>Room</c>.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.InviteOnly">
+      <summary>
+            Defines if this <c>Room</c> should appear in room lists.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.IsLocked">
+      <summary>
+            Get if this <c>Room</c> is locked.
+            True when the room state is busy.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.Join">
+      <summary>
+            Attempt to join this <c>Room</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.Join(System.UInt16)">
+      <summary>
+            Attempt to join this <c>Room</c> using a pin.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.KickUser(System.UInt16)">
+      <summary>
+            Kick user from current room.
+            </summary>
+      <param name="userId">User index.</param>
+      <exception cref="T:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException">Thrown when given user index was not found.</exception>
+      <exception cref="T:Alteruna.Trinity.Exceptions.NotInRoomException">Thrown when not in room.</exception>
+    </member>
+    <member name="M:Alteruna.Room.Leave">
+      <summary>
+            Send to leave request to current <c>Room</c>.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.Local">
+      <summary>
+            Defines if this <c>Room</c> is hosted locally.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.MaxUsers">
+      <summary>
+            The maximum allowed number of Users within this <c>Room</c></summary>
+    </member>
+    <member name="P:Alteruna.Room.Name">
+      <summary>
+            The name of this <c>Room</c>.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.OnDemand">
+      <summary>
+            Defines if this <c>Room</c> will automatically close when empty.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Room.op_Equality(Alteruna.Room,Alteruna.Room)"></member>
+    <member name="M:Alteruna.Room.op_Inequality(Alteruna.Room,Alteruna.Room)"></member>
+    <member name="P:Alteruna.Room.Pincode">
+      <summary>
+            Defines if this <c>Room</c> requires a pin to enter.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Room.Users">
+      <summary>
+            The Users currently in this <c>Room</c>.
+            Only gets populated if in the same <c>Room</c>.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Service">
+      <summary>
+            Alteruna service class.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Service.ApplicationID"></member>
+    <member name="P:Alteruna.Service.AvailableRooms"></member>
+    <member name="F:Alteruna.Service.ClientName"></member>
+    <member name="M:Alteruna.Service.CreateRoom(System.String,System.Boolean,System.UInt16,System.Boolean,System.Boolean,System.UInt16)">
+      <summary>
+            Create a new room.
+            </summary>
+      <param name="displayName">name of the room.</param>
+      <param name="inviteOnly">Prevent room from appearing in room lists.</param>
+      <param name="pin">Pin code. Zero mens no pin code.</param>
+      <param name="onDemand">Close room when lats client leaves.</param>
+      <param name="joinRoom">Join room when creating it.</param>
+      <param name="maxUsers">Maximum number of users in the room.</param>
+    </member>
+    <member name="P:Alteruna.Service.CurrentRoom"></member>
+    <member name="M:Alteruna.Service.DestroyRoom(Alteruna.Room)"></member>
+    <member name="M:Alteruna.Service.DestroyRoom(System.UInt32)"></member>
+    <member name="F:Alteruna.Service.DeviceType"></member>
+    <member name="M:Alteruna.Service.GetLastBlockResponse"></member>
+    <member name="P:Alteruna.Service.InRoom"></member>
+    <member name="P:Alteruna.Service.IsConnected"></member>
+    <member name="M:Alteruna.Service.JoinMatchmaking">
+      <summary>
+            Join a Room through matchmaking.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Service.JoinMatchmaking(System.UInt16)">
+      <summary>
+            Join a Room through matchmaking using a pin.
+            </summary>
+      <param name="pin">The pin to join the Room with.</param>
+    </member>
+    <member name="M:Alteruna.Service.JoinOnDemandRoom">
+      <summary>
+            Create and Join a Room.
+            The Room will close when the last player leaves the room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Service.JoinOnDemandRoom(System.UInt32)">
+      <summary>
+            Join Room by id.
+            The Room will close when the last player leaves the room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Service.JoinRoom(Alteruna.Room)"></member>
+    <member name="M:Alteruna.Service.JoinRoom(Alteruna.Room,System.UInt16)"></member>
+    <member name="M:Alteruna.Service.KickUser(System.UInt16)">
+      <summary>
+            Kick user from current room.
+            </summary>
+      <param name="userId">User index.</param>
+      <exception cref="T:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException">Thrown when given user index was not found.</exception>
+      <exception cref="T:Alteruna.Trinity.Exceptions.NotInRoomException">Thrown when not in room.</exception>
+    </member>
+    <member name="M:Alteruna.Service.LeaveCurrentRoom">
+      <summary>
+            Send to leave request to current room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Service.LockRoom">
+      <summary>
+            Lock current room. 
+            </summary>
+    </member>
+    <member name="F:Alteruna.Service.LogLevel"></member>
+    <member name="M:Alteruna.Service.OnSessionCreated(System.Boolean,Alteruna.Room,System.UInt16)"></member>
+    <member name="M:Alteruna.Service.RefreshAvailableRooms">
+      <summary>
+            Refresh the AvailableRooms list containing the currently available Rooms on the server.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Service.SetRoomName(System.String)">
+      <summary>
+            Rename currently joined room.
+            </summary>
+      <param name="name">New room name.</param>
+      <exception cref="T:Alteruna.Trinity.Exceptions.NotInRoomException">Thrown when not in room.</exception>
+    </member>
+    <member name="M:Alteruna.Service.Start(Alteruna.IServiceListener,Alteruna.IServiceStateListener,System.String,Alteruna.Trinity.LogBase,System.UInt16,Alteruna.Trinity.Transport.TransportType)"></member>
+    <member name="F:Alteruna.Service.Statistics"></member>
+    <member name="M:Alteruna.Service.UnlockRoom(System.Boolean)">
+      <summary>
+            Unlock current room.
+            </summary>
+      <param name="matchmaking">Set state for matchmaking.</param>
+    </member>
+    <member name="M:Alteruna.Service.Update"></member>
+    <member name="P:Alteruna.Service.UserInfo"></member>
+    <member name="M:Alteruna.Service.VerifyApplicationID(System.Guid,Alteruna.Trinity.LogBase)"></member>
+    <member name="M:Alteruna.Service.VerifyApplicationID(System.String,Alteruna.Trinity.LogBase)"></member>
+    <member name="T:Alteruna.ServiceState">
+      <summary>
+            Handle states and events for alternate service.
+            </summary>
+    </member>
+    <member name="M:Alteruna.ServiceState.GetCodecForId(System.Guid)">
+      <summary>
+            Get <c>AdaptiveSerializable</c> for a given codec id.
+            </summary>
+      <param name="codecId">id</param>
+      <returns>Adaptive serializable</returns>
+    </member>
+    <member name="M:Alteruna.ServiceState.InvokeRemoteProcedure(System.String,Alteruna.UserId,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC).
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUserID">The UserID of the User on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">Alternative to the parameters.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">RPC replay callback.</param>
+      <returns>RPC call id of the RPC. Default is 0.</returns>
+    </member>
+    <member name="M:Alteruna.ServiceState.InvokeRemoteProcedure(System.String,System.UInt16,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC).
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUserID">The UserID of the User on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">Alternative to the parameters.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">RPC replay callback.</param>
+      <returns>RPC call id of the RPC. Default is 0.</returns>
+    </member>
+    <member name="F:Alteruna.ServiceState.MAX_LOD"></member>
+    <member name="F:Alteruna.ServiceState.MIN_LOD"></member>
+    <member name="M:Alteruna.ServiceState.MulticastRemoteProcedure(System.String,System.Collections.Generic.List{System.UInt16},Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable,Alteruna.Trinity.Reliability,Alteruna.RemoteProcedureReply,Alteruna.RemoteProcedureAck)">
+      <summary>
+            Invoke a Remote Procedure Call (RPC) for multiple Users.
+            </summary>
+      <param name="name">The name of the RPC to invoke.</param>
+      <param name="toUsers">The UserIDs of the Users on which to call the procedure.</param>
+      <param name="parameters">The parameters to be sent to the RPC.</param>
+      <param name="userData">The user data to be sent to the RPC.</param>
+      <param name="reliability">The reliability at which to invoke the RPC.</param>
+      <param name="replyCallback">RPC replay callback.</param>
+      <returns>The callID of the RPC.</returns>
+    </member>
+    <member name="M:Alteruna.ServiceState.RegisterRemoteProcedure(System.String,Alteruna.RemoteProcedure)">
+      <summary>
+            Register a Remote Procedure.
+            </summary>
+      <param name="name">The name of the procedure.</param>
+      <param name="callback">The function to call through the procedure.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.ReplyRemoteProcedure(System.UInt32,System.UInt16,Alteruna.ProcedureParameters,Alteruna.Trinity.ISerializable)">
+      <summary>
+            Reply to a Remote Procedure Called by another User.
+            </summary>
+      <param name="callID">The callID of the RPC to reply to.</param>
+      <param name="result">The result of the procedure.</param>
+      <param name="parameters">The parameters to be sent with the reply.</param>
+      <param name="userData">Alternative to parameters.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.Sync(Alteruna.Trinity.SynchronizableElement,Alteruna.Trinity.Reliability)">
+      <summary>
+            Serialize and route a package.
+            </summary>
+      <param name="synchronizableElement">Content.</param>
+      <param name="reliability">Reliability used for routing.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.Sync(Alteruna.Trinity.SynchronizableElement,System.Collections.Generic.List{System.UInt16},Alteruna.Trinity.Reliability)">
+      <summary>
+            Serialize and route a package.
+            </summary>
+      <param name="synchronizableElement">Content.</param>
+      <param name="users">Target users.</param>
+      <param name="reliability">Reliability used for routing.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.Sync(System.Guid,Alteruna.Trinity.IAdaptiveSerializable,Alteruna.Trinity.Reliability)">
+      <summary>
+            Serialize and route a package.
+            </summary>
+      <param name="id">UID of a registered target.</param>
+      <param name="serializable">Handler of data read and write.</param>
+      <param name="reliability">Reliability used for routing.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.Sync(System.Guid,Alteruna.Trinity.IAdaptiveSerializable,System.Collections.Generic.List{System.UInt16},Alteruna.Trinity.Reliability)">
+      <summary>
+            Serialize and route a package.
+            </summary>
+      <param name="id">UID of a registered target.</param>
+      <param name="serializable">Handler of data read and write.</param>
+      <param name="users">Target users.</param>
+      <param name="reliability">Reliability used for routing.</param>
+    </member>
+    <member name="M:Alteruna.ServiceState.TryGetCodecForId(System.Guid,Alteruna.Trinity.IAdaptiveSerializable@)">
+      <summary>
+            Get a <c>AdaptiveSerializable</c> for a given codec id.
+            </summary>
+      <param name="codecId">id</param>
+      <param name="codec">The IAdaptiveSerializable or null.</param>
+      <returns>True if the IAdaptiveSerializable was found, else false.</returns>
+    </member>
+    <member name="T:Alteruna.Spawner">
+      <summary>
+            Class <c>Spawner</c> defines a component which can instantiate and destroy objects on all clients in the Room simultaneously.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.Spawner.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.Spawner.Despawn(UnityEngine.GameObject)">
+      <summary>
+            Invoked when a <c>GameObject</c> has been spawned by a <c>User</c> in the Room.
+            </summary>
+      <param name="spawnedObject">The spawned <c>GameObject</c> to despawn.</param>
+    </member>
+    <member name="F:Alteruna.Spawner.ForceSync">
+      <summary>
+            When true, spawn previously spawned objects on joining client(s).
+            </summary>
+    </member>
+    <member name="F:Alteruna.Spawner.OnObjectDespawn">
+      <summary>
+            Invoked before <c>GameObject</c> gets despawned by a <c>User</c> in the Room.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Spawner.OnObjectSpawn">
+      <summary>
+            Invoked after <c>GameObject</c> has been spawned by a <c>User</c> in the Room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32)">
+      <summary>
+            Spawn an new game object from index for all <c>Users</c> in the Room.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new game object from index for all <c>Users</c> in the Room with position.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32,UnityEngine.Vector3,UnityEngine.Quaternion)">
+      <summary>
+            Spawn an new game object from index for all <c>Users</c> in the Room using position and rotation.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new object for all <c>Users</c> in the Room using position, rotation, and scale.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+      <param name="scale">The scale which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32,UnityEngine.Vector3,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new game object from index for all <c>Users</c> in the Room using position and rotation.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.Int32,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new game object from index for all <c>Users</c> in the Room using position, rotation, and scale.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+      <param name="scale">The scale which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room with position.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String,UnityEngine.Vector3,UnityEngine.Quaternion)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room using position and rotation.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String,UnityEngine.Vector3,UnityEngine.Quaternion,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room using position, rotation, and scale.
+            </summary>
+      <param name="name">name or Asset path.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+      <param name="scale">The scale which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String,UnityEngine.Vector3,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room using position and rotation.
+            </summary>
+      <param name="index">The index of the SpawnableObject to spawn.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="M:Alteruna.Spawner.Spawn(System.String,UnityEngine.Vector3,UnityEngine.Vector3,UnityEngine.Vector3)">
+      <summary>
+            Spawn an new object from name for all <c>Users</c> in the Room using position, rotation, and scale.
+            </summary>
+      <param name="name">name or Asset path.</param>
+      <param name="position">The position which the <c>GameObject</c> will be spawned with.</param>
+      <param name="rotation">The rotation which the <c>GameObject</c> will be spawned with.</param>
+      <param name="scale">The scale which the <c>GameObject</c> will be spawned with.</param>
+    </member>
+    <member name="F:Alteruna.Spawner.SpawnableObjects">
+      <summary>
+            List of <c>GameObjects</c> which can be spawned during the game.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Spawner.SpawnedObjects">
+      <summary>
+            List of all currently spawned <c>GameObjects</c> in the Room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Spawner.Start"></member>
+    <member name="T:Alteruna.SpawnPointer">
+      <summary>
+            This class serves as a reference for spawnpoints for when you switch scenes with <see cref="T:Alteruna.Multiplayer" />
+            and want custom spawn points from that scene.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SpawnPointer.SpawnAvatar">
+      <summary>
+            Spawns your Avatar based on <see cref="F:Alteruna.SpawnPointer.SpawnPoints" /></summary>
+    </member>
+    <member name="F:Alteruna.SpawnPointer.SpawnPoints"></member>
+    <member name="T:Alteruna.SyncedAxis">
+      <summary>
+             Alternative way of implementing <c>InputSynchronizable</c>.
+             </summary>
+    </member>
+    <member name="P:Alteruna.SyncedAxis.Axis">
+      <summary>
+            Target axis.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedAxis.Deregister">
+      <summary>
+            Deregister from <c>IInput</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedAxis.InputManager">
+      <summary>
+            Connected <c>IInput</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedAxis.op_Implicit(Alteruna.SyncedAxis)~System.Boolean"></member>
+    <member name="M:Alteruna.SyncedAxis.op_Implicit(Alteruna.SyncedAxis)~System.Int32"></member>
+    <member name="M:Alteruna.SyncedAxis.op_Implicit(Alteruna.SyncedAxis)~System.Single"></member>
+    <member name="M:Alteruna.SyncedAxis.Register">
+      <summary>
+            Register key to target <c>IInput</c>.
+            </summary>
+      <param name="inputManager">Target IInput.</param>
+    </member>
+    <member name="M:Alteruna.SyncedAxis.Register(Alteruna.IInput)">
+      <summary>
+            Register key on target <c>IInput</c>.
+            </summary>
+      <param name="inputManager">Target IInput.</param>
+    </member>
+    <member name="M:Alteruna.SyncedAxis.Register(Alteruna.IInput,System.String)">
+      <summary>
+            Register key to target <c>IInput</c>.
+            </summary>
+      <param name="inputManager">Target IInput.</param>
+    </member>
+    <member name="P:Alteruna.SyncedAxis.Value">
+      <summary>
+            Raw value of axis.
+            </summary>
+    </member>
+    <member name="T:Alteruna.SyncedEventBase`1">
+      <summary>
+            Base class for syncronizing events with any type of argument.
+            </summary>
+      <typeparam name="T">Type of the argument that is passed in the event.</typeparam>
+      <remarks>
+            Cannot be used as a compoment but can be inherited to create any type of SyncedEvent.
+            To sync an event with no arguments, <see cref="T:Alteruna.SyncedEvent.SyncedEventVoid">Synced Event &lt;Void&gt;</see>.
+            </remarks>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.SyncedEventBase`1.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="P:Alteruna.SyncedEventBase`1.HaveBeenInvoked">
+      <summary>
+            True if the event has been invoked previously.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.Invoke">
+      <summary>
+            Invoke the event with the last used argument.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.Invoke(`0)">
+      <summary>
+            Invoke the event with the given argument.
+            </summary>
+      <param name="arg">passed object</param>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.InvokeSilent">
+      <summary>
+            Invoke without triggering local event with the last used argument.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.InvokeSilent(`0)">
+      <summary>
+            Invoke without triggering local event with the given argument.
+            </summary>
+      <param name="arg">passed object</param>
+    </member>
+    <member name="P:Alteruna.SyncedEventBase`1.LastValue">
+      <summary>
+            Last value used in the event.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedEventBase`1.OnEvent">
+      <summary>
+            Event to be invoked.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.Reset"></member>
+    <member name="F:Alteruna.SyncedEventBase`1.Value">
+      <summary>
+            Last value used in the event.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedEventBase`1.ValueToString">
+      <summary>
+            Get the last used argument as string.
+            </summary>
+    </member>
+    <member name="T:Alteruna.SyncedKey">
+      <summary>
+            Alternative way of implementing <c>InputSynchronizable</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.Deregister">
+      <summary>
+            Deregister from <c>IInput</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.DoubleTapTime">
+      <summary>
+            Max time between taps for a valid double tap for the key mode doubleTap
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.InputManager">
+      <summary>
+            Connected <c>IInput</c>.
+            </summary>
+    </member>
+    <member name="P:Alteruna.SyncedKey.Key">
+      <summary>
+            Registered Keycode input.
+            On set, reregister if already registered.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyState">
+      <summary>
+            The raw value of target key unaffected by mode.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.mode">
+      <summary>
+            key mode.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.OnInputChanged">
+      <summary>
+            Invokes when value get changed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.op_Implicit(Alteruna.SyncedKey)~System.Boolean">
+      <summary>
+            Get value of key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.op_Implicit(Alteruna.SyncedKey)~System.Int32">
+      <summary>
+            Get value of key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.op_Implicit(Alteruna.SyncedKey)~System.Single">
+      <summary>
+            Get value of key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.Register">
+      <summary>
+            Register key to a previously set <c>IInput</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.SyncedKey.Register(Alteruna.IInput)">
+      <summary>
+            Register key to target <c>IInput</c>.
+            </summary>
+      <param name="inputManager">Target IInput.</param>
+    </member>
+    <member name="M:Alteruna.SyncedKey.Register(Alteruna.IInput,UnityEngine.KeyCode)">
+      <summary>
+            Register key to target <c>IInput</c>.
+            </summary>
+      <param name="inputManager">Target IInput.</param>
+    </member>
+    <member name="P:Alteruna.SyncedKey.Value">
+      <summary>
+            Value of target input key.
+            </summary>
+    </member>
+    <member name="T:Alteruna.SyncedKey.KeyMode">
+      <summary>
+            Key behavior mode
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.DoubleTap">
+      <summary>
+            True during the frame the user pressing down the key for the second time withing time defined in <c>DoubleTapTime</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.KeyDown">
+      <summary>
+            True during the frame the user starts pressing down the key.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.KeyPress">
+      <summary>
+            True while the user holds down the key.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.KeyUp">
+      <summary>
+            True during the frame the user releases the key.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.ToggleDoubleTap">
+      <summary>
+            True during the frame the user pressing down the key for the second time withing time defined in <c>DoubleTapTime</c>.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.ToggleKeyDown">
+      <summary>
+            Toggles the value when user starts pressing down the key.
+            </summary>
+    </member>
+    <member name="F:Alteruna.SyncedKey.KeyMode.ToggleKeyUp">
+      <summary>
+            Toggles the value when user releases the key.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Synchronizable">
+      <summary>
+             Class <c>Synchronizable</c> defines a base containing data to be synchronized with other clients in the Room.
+             Synchronizable also support attributes, but unlike <c>AttributesSync</c>, it does not auto commit changes in fields marked with the <c>SynchronizableField</c> attribute.
+             </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.AssembleData(Alteruna.Writer,System.Byte)">
+      <summary>
+            Called by the <c>SynchronizableManager</c> after Commit() to collect the data to be synced before sending it.
+            </summary>
+      <param name="writer">Used to write the data we want to be synchronized.</param>
+      <param name="LOD">Defines with what NetLOD to send the data.</param>
+    </member>
+    <member name="M:Alteruna.Synchronizable.BroadcastRemoteMethod(System.Int32,System.Object[])">
+      <summary>
+            Commits method with the <c>SynchronizableMethod</c> attribute on evey client including sender with given parameters.
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.Synchronizable.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.Synchronizable.BroadcastRemoteMethod(System.String,System.Object[])">
+      <summary>
+            Commits method with the <c>SynchronizableMethod</c> attribute on evey client including sender with given parameters.
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="F:Alteruna.Synchronizable.BucketBehaviors">
+      <summary>
+            A list of Bucket Behaviors describing how this Synchronizable is syncrhonized depending on which Bucket it is being sent to.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.Commit">
+      <summary>
+            This method informs the <c>SynchronizableManager</c> that this synchronizable has new data that needs to be synced.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.DisassembleData(Alteruna.Reader,System.Byte)">
+      <summary>
+            Called by the <c>SynchronizableManager</c> after recieving new data to be synced with this <c>Synchronizable</c>.
+            </summary>
+      <param name="reader">Contains the received data.</param>
+      <param name="LOD">Describes at which NetLOD the data was sent.</param>
+    </member>
+    <member name="M:Alteruna.Synchronizable.GetMethodAttributeId(System.String)">
+      <summary>
+            Get id of method with the <c>SynchronizableMethod</c> attribute by name.
+            </summary>
+      <param name="methodName">Name of a method with the <c>SynchronizableMethod</c> attribute.</param>
+      <returns>Id of method with the <c>SynchronizableMethod</c> attribute with target name.</returns>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+    </member>
+    <member name="M:Alteruna.Synchronizable.GetMethodAttributeName(System.Int32)">
+      <summary>
+            Get name of method with the <c>SynchronizableMethod</c> attribute by index.
+            </summary>
+      <param name="methodId">Index of method with the <c>SynchronizableMethod</c> attribute.</param>
+      <returns>Name of method with the <c>SynchronizableMethod</c> attribute with target Index.</returns>
+      <exception cref="T:System.IndexOutOfRangeException">methodId is out of range or less than zero.</exception>
+    </member>
+    <member name="M:Alteruna.Synchronizable.InvokeRemoteMethod(System.Int32,System.Object[])">
+      <summary>
+            Commits method with the <c>SynchronizableMethod</c> attribute on evey client excluding sender with given parameters.
+            
+            </summary>
+      <param name="id">Id of method. Get the id by calling <see cref="M:Alteruna.Synchronizable.GetMethodAttributeId(System.String)">GetMethodAttributeId(string)</see>.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown when id is grater or equal to the amount of registered methods</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="M:Alteruna.Synchronizable.InvokeRemoteMethod(System.String,System.Object[])">
+      <summary>
+            Commits method with the <c>SynchronizableMethod</c> attribute on evey client excluding sender with given parameters.
+            with given parameters.
+            </summary>
+      <param name="methodName">Name of target method.</param>
+      <param name="parameters">Argument(s) of a target method</param>
+      <remarks>
+            For a more optimized call method use InvokeRemoteMethod(int, params ... )
+            </remarks>
+      <exception cref="T:System.ArgumentException">Thrown when methodName does not mach a name of a registered method.</exception>
+      <exception cref="T:System.ArgumentException">Thrown when parameters count of target method does not match count of given parameters</exception>
+    </member>
+    <member name="F:Alteruna.Synchronizable.MAX_LOD">
+      <summary>
+            The highest NetLOD value a Synchronizable can have.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.Register"></member>
+    <member name="F:Alteruna.Synchronizable.Reliability">
+      <summary>
+            Reliability of the Synchronizable.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.Reset"></member>
+    <member name="M:Alteruna.Synchronizable.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)">
+      <summary>
+            Serialize Synchronizable.
+            </summary>
+      <param name="processor">Writer processor.</param>
+      <param name="LOD">Defines with what NetLOD to send the data.</param>
+    </member>
+    <member name="M:Alteruna.Synchronizable.SyncUpdate">
+      <summary>
+            Update the internals of the <c>Synchronizable</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Synchronizable.Unserialize(Alteruna.Trinity.ITransportStreamReader,System.Byte,System.UInt32)">
+      <summary>
+            Unserialize Synchronizable.
+            </summary>
+      <param name="processor">Reader processor.</param>
+      <param name="LOD">Describes at which NetLOD the data was sent.</param>
+      <param name="length"></param>
+    </member>
+    <member name="T:Alteruna.Synchronizable.SynchronizableField">
+      <summary>
+            Synchronise target field.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Synchronizable.SynchronizableMethod">
+      <summary>
+            Synchronise target Method.
+            </summary>
+    </member>
+    <member name="T:Alteruna.TransformSynchronizable">
+      <summary>
+            Class <c>TransformSynchronizable</c> defines a component which synchronizes its game objects transform with other clients in the Playroom.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.TransformSynchronizable.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizable.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizable.Awake"></member>
+    <member name="M:Alteruna.TransformSynchronizable.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizable.Reset"></member>
+    <member name="M:Alteruna.TransformSynchronizable.Start"></member>
+    <member name="M:Alteruna.TransformSynchronizable.Update"></member>
+    <member name="T:Alteruna.TransformSynchronizable2D">
+      <summary>
+            Class <c>TransformSynchronizable2D</c> defines a component which synchronizes its game objects transform with other clients in the Playroom.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.Transform2DSynchronizable.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizable2D.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizable2D.Awake"></member>
+    <member name="M:Alteruna.TransformSynchronizable2D.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizable2D.Reset"></member>
+    <member name="M:Alteruna.TransformSynchronizable2D.Start"></member>
+    <member name="M:Alteruna.TransformSynchronizable2D.Update"></member>
+    <member name="T:Alteruna.TransformSynchronizableCommon">
+      <summary>
+            Common Transform Synchronizable methods.
+            </summary>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Awake"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.CanSync"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.OnValidate"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="P:Alteruna.TransformSynchronizableCommon.RefreshRate">
+      <summary>
+            Set How often to automatically sync data.
+            Can be set between once every hour and 120 times per second.
+            </summary>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Reset"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Serialize(Alteruna.Trinity.ITransportStreamWriter,System.Byte,System.Boolean)"></member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Teleport(UnityEngine.Vector2)">
+      <summary>
+            Set position of transform and sync it to all clients.
+            </summary>
+      <param name="pos">new position</param>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Teleport(UnityEngine.Vector3)">
+      <summary>
+            Set position of transform and sync it to all clients.
+            </summary>
+      <param name="pos">new position</param>
+    </member>
+    <member name="M:Alteruna.TransformSynchronizableCommon.Unpossessed"></member>
+    <member name="F:Alteruna.TransformSynchronizableCommon.UseGlobalPosition">
+      <summary>
+            Sync global position and rotation, otherwise use local.
+            </summary>
+    </member>
+    <member name="T:Alteruna.TransformSynchronizableCommon.Transform2DAxes">
+      <summary>
+            Flags for setting what axis to sync.
+            </summary>
+    </member>
+    <member name="T:Alteruna.TransformSynchronizableCommon.TransformSyncConstraint">
+      <summary>
+            Flags for setting what axis to sync.
+            </summary>
+    </member>
+    <member name="T:Alteruna.UniqueAvatarChild">
+      <summary>
+            Instantiate a prefab as a child from a array.
+            If avatar index goes beyond the length of the array, it will loop.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.UniqueAvatarChild.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.GetAvatarChild">
+      <summary>
+            Get current avatar child object.
+            </summary>
+      <returns>avatar child game object</returns>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.OverwritePrefab(UnityEngine.GameObject)">
+      <summary>
+            Instantiate a new child prefab and destroy exising object.
+            </summary>
+      <param name="obj">prefab or object ti use as new child</param>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="F:Alteruna.UniqueAvatarChild.Prefabs">
+      <summary>
+            The array of prefabs to spawn as children.
+            When index exceeds the length, loop.
+            </summary>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.SetPrefab(Alteruna.User)">
+      <summary>
+            Set child prefab to target user's index. Wraps around if <c>Prefabs</c> is less than id.
+            If child prefab already is set, replace it.
+            </summary>
+      <param name="user">target index</param>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.SetPrefab(System.UInt16)">
+      <summary>
+            Set child prefab to target id. Wraps around if <c>Prefabs</c> is less than id.
+            If child prefab already is set, replace it.
+            </summary>
+      <param name="id"></param>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarChild.TryGetAvatarChild(UnityEngine.GameObject@)">
+      <summary>
+            Attempt to get current avatar child object.
+            </summary>
+      <param name="avatarChild">avatar child game object</param>
+      <returns>true when avatar child exists</returns>
+    </member>
+    <member name="T:Alteruna.UniqueAvatarColor">
+      <summary>
+            Change Hue to a unique color based on avatar index.
+            </summary>
+      <remarks>
+        <img src="../images/Alteruna.UniqueAvatarColor.png" />
+      </remarks>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.HueFromId(UnityEngine.Color,System.Int32)">
+      <summary>
+            Set hue of a color based on ID.
+            </summary>
+      <param name="color">Base color.</param>
+      <param name="id">Color ID.</param>
+      <returns>Color with new hue.</returns>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.HueFromId(UnityEngine.Color,System.Int32,System.Single)">
+      <summary>
+            Set hue of a color based on ID.
+            </summary>
+      <param name="color">Base color.</param>
+      <param name="id">Color ID.</param>
+      <param name="saturation">Saturation of returned color.</param>
+      <returns>Color with new hue with given saturation and value.</returns>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.HueFromId(UnityEngine.Color,System.Int32,System.Single,System.Single)">
+      <summary>
+            Set hue of a color based on ID.
+            </summary>
+      <param name="color">Base color.</param>
+      <param name="id">Color ID.</param>
+      <param name="saturation">Saturation of returned color.</param>
+      <param name="value">Value of returned color.</param>
+      <returns>Color with new hue with given saturation and value.</returns>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.HueToId(UnityEngine.Color,System.Int32)"></member>
+    <member name="M:Alteruna.UniqueAvatarColor.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="F:Alteruna.UniqueAvatarColor.Renderers">
+      <summary>
+            References to mesh renderers to be affected by hue changes.
+            </summary>
+    </member>
+    <member name="F:Alteruna.UniqueAvatarColor.Saturation">
+      <summary>
+            Saturation of generated color.
+            </summary>
+    </member>
+    <member name="F:Alteruna.UniqueAvatarColor.Sprites">
+      <summary>
+            References to sprite renderers to be affected by hue changes.
+            </summary>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.UpdateHue">
+      <summary>
+            Manually update color of objects referenced inside the <c>UniqueAvatarColor</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.UniqueAvatarColor.UpdateHue(System.UInt16)">
+      <summary>
+            Manually set color of objects referenced inside the <c>UniqueAvatarColor</c>.
+            </summary>
+      <param name="index">User index</param>
+    </member>
+    <member name="T:Alteruna.UnityLog">
+      <summary>
+            Class <c>UnityLog</c> is responsible for logging internal messages and events. 
+            </summary>
+    </member>
+    <member name="M:Alteruna.UnityLog.Present(Alteruna.Trinity.LogBase.Severity,System.String)"></member>
+    <member name="T:Alteruna.UnityReader">
+      <summary>
+            Class <c>UnityReader</c> is used to write Unity types to a <c>Reader</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadBounds(Alteruna.Reader)">
+      <summary>
+            Read Bounds from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Bounds</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadBoundsInt(Alteruna.Reader)">
+      <summary>
+            Read BoundsInt from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>BoundsInt</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadColor(Alteruna.Reader)">
+      <summary>
+            Read Color from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Color</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadColor32(Alteruna.Reader)">
+      <summary>
+            Read Color32 from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Color32</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadPlane(Alteruna.Reader)">
+      <summary>
+            Read Plane from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Plane</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadPose(Alteruna.Reader)">
+      <summary>
+            Read Pose from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Pose</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadQuaternion(Alteruna.Reader)">
+      <summary>
+            Read Quaternion from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Quaternion</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadRay(Alteruna.Reader)">
+      <summary>
+            Read Ray from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Ray</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadRay2D(Alteruna.Reader)">
+      <summary>
+            Read Ray2D from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Ray2D</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadRect(Alteruna.Reader)">
+      <summary>
+            Read Rect from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Rect</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadRectInt(Alteruna.Reader)">
+      <summary>
+            Read RectInt from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>RectInt</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadVector2(Alteruna.Reader)">
+      <summary>
+            Read Vector2 from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Vector2</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadVector2Int(Alteruna.Reader)">
+      <summary>
+            Read Vector2Int from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Vector2Int</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadVector3(Alteruna.Reader)">
+      <summary>
+            Read Vector3 from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Vector3</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadVector3Int(Alteruna.Reader)">
+      <summary>
+            Read Vector3Int from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Vector3Int</returns>
+    </member>
+    <member name="M:Alteruna.UnityReader.ReadVector4(Alteruna.Reader)">
+      <summary>
+            Read Vector4 from a Reader.
+            </summary>
+      <param name="reader">Reader</param>
+      <returns>Vector4</returns>
+    </member>
+    <member name="T:Alteruna.UnityWebRequestExtension"></member>
+    <member name="M:Alteruna.UnityWebRequestExtension.GetAwaiter(UnityEngine.Networking.UnityWebRequestAsyncOperation)"></member>
+    <member name="T:Alteruna.UnityWriter">
+      <summary>
+            Class <c>UnityWriter</c> is used to write Unity types to a <c>Writer</c>.
+            </summary>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Bounds)">
+      <summary>
+            Write a Bounds to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="bounds">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.BoundsInt)">
+      <summary>
+            Write a BoundsInt to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="bounds">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Color)">
+      <summary>
+            Write a Color (RGBA) to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="color">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Color32)">
+      <summary>
+            Write a Color32 (RGBA) to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="color">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Plane)">
+      <summary>
+            Write a Plane to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="plane">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Pose)">
+      <summary>
+            Write a Pose to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="pose">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Quaternion)">
+      <summary>
+            Write a Quaternion to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="quaternion">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Ray)">
+      <summary>
+            Write a Ray to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="ray">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Ray2D)">
+      <summary>
+            Write a Ray2D to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="ray">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Rect)">
+      <summary>
+            Write a Rect to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="rect">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.RectInt)">
+      <summary>
+            Write a RectInt to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="rect">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Vector2)">
+      <summary>
+            Write a Vector2 to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="vector">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Vector2Int)">
+      <summary>
+            Write a Vector2Int to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="vector">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Vector3)">
+      <summary>
+            Write a Vector3 to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="vector">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Vector3Int)">
+      <summary>
+            Write a Vector3Int to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="vector">Value</param>
+    </member>
+    <member name="M:Alteruna.UnityWriter.Write(Alteruna.Writer,UnityEngine.Vector4)">
+      <summary>
+            Write a Vector4 to a Writer.
+            </summary>
+      <param name="writer">Writer</param>
+      <param name="vector">Value</param>
+    </member>
+    <member name="T:Alteruna.User">
+      <summary>
+            User class containing index and name.
+            </summary>
+    </member>
+    <member name="M:Alteruna.User.Equals(System.Object)"></member>
+    <member name="M:Alteruna.User.GetHashCode"></member>
+    <member name="P:Alteruna.User.Index">
+      <summary>
+            Index of user
+            </summary>
+    </member>
+    <member name="P:Alteruna.User.IsHost">
+      <summary>
+            Get if user is considered being the host.
+            </summary>
+    </member>
+    <member name="P:Alteruna.User.Latency">
+      <summary>
+            Get latency of user.
+            </summary>
+    </member>
+    <member name="P:Alteruna.User.Name">
+      <summary>
+            Name of user
+            </summary>
+    </member>
+    <member name="M:Alteruna.User.op_Equality(Alteruna.User,Alteruna.User)"></member>
+    <member name="M:Alteruna.User.op_Implicit(Alteruna.User)~System.UInt16"></member>
+    <member name="M:Alteruna.User.op_Implicit(Alteruna.User)~System.Int32"></member>
+    <member name="M:Alteruna.User.op_Implicit(Alteruna.User)~System.String"></member>
+    <member name="M:Alteruna.User.op_Inequality(Alteruna.User,Alteruna.User)"></member>
+    <member name="M:Alteruna.User.ToString"></member>
+    <member name="T:Alteruna.UserId">
+      <summary>
+            User Indexes to target multiple users.
+            </summary>
+    </member>
+    <member name="F:Alteruna.UserId.All">
+      <summary>
+            Use to target all except self.
+            </summary>
+    </member>
+    <member name="F:Alteruna.UserId.AllInclusive">
+      <summary>
+            Use to target all users, including self.
+            </summary>
+    </member>
+    <member name="T:Alteruna.UtcTime">
+      <summary>
+            Useful time related fields using global time.
+            Note that its its common for the system time to be inaccurate, expect a difference by 5 seconds.
+            If the machine time is not automatically updated, it can be up to much more.
+            </summary>
+    </member>
+    <member name="P:Alteruna.UtcTime.Milliseconds">
+      <summary>
+            Get the number of milliseconds that have elapsed since 1970-01-01T00:00:00.000Z in Coordinated Universal Time.
+            </summary>
+    </member>
+    <member name="P:Alteruna.UtcTime.MillisecondsFloat">
+      <summary>
+            Get Coordinated Universal Time in milliseconds casted to float with modulus to avoid losing precision.
+            The value will loop on 16777215 milliseconds in order to avoid losing precision.
+            </summary>
+    </member>
+    <member name="P:Alteruna.UtcTime.Now">
+      <summary>Gets a <see cref="T:System.DateTime" /> object that is set to the current date and time on this computer, expressed as the Coordinated Universal Time (UTC).</summary>
+      <returns>An object whose value is the current UTC date and time.</returns>
+    </member>
+    <member name="P:Alteruna.UtcTime.Seconds">
+      <summary>
+            Get the number of seconds that have elapsed since 1970-01-01T00:00:00.000Z in Coordinated Universal Time.
+            </summary>
+    </member>
+    <member name="P:Alteruna.UtcTime.SecondsFloat"></member>
+    <member name="T:Alteruna.VoiceSynchronizable"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.Activity"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.AssembleData(Alteruna.Writer,System.Byte)"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.AvailableInputDevices"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.ClearDevice"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.ClearDeviceLocal"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.DeviceName"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.DisassembleData(Alteruna.Reader,System.Byte)"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.IsActive"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.IsSender"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.LocalInputController"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.PackageLossBuffer"></member>
+    <member name="P:Alteruna.VoiceSynchronizable.PeakVolume"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.PlaybackSource"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.Possessed(System.Boolean,Alteruna.User)"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.SendFrequency"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.SetDevice"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.SetDevice(System.Int32)"></member>
+    <member name="M:Alteruna.VoiceSynchronizable.SetDevice(System.String)"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.SilenceCutoff"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.SilenceTimeout"></member>
+    <member name="F:Alteruna.VoiceSynchronizable.Volume"></member>
+    <member name="T:Alteruna.VoiceSynchronizable.BitDepth"></member>
+    <member name="T:Alteruna.VoiceSynchronizable.EncryptionType"></member>
+    <member name="T:Alteruna.Writer">
+      <summary>
+            Class <c>Reader</c> is used to read data recieved from another User.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Writer.EndCompress(Alteruna.Trinity.PacketProcessing.CompressionMethod)">
+      <summary>
+            Compresses the data already written to the writer.
+            If StartCompress has not been called, the data will be compressed from the start of the writer.
+            </summary>
+      <param name="method">Compression method used.</param>
+      <returns>Number of bytes saved by compression.</returns>
+    </member>
+    <member name="M:Alteruna.Writer.SerializeAndPackString``1(``0)">
+      <summary>
+            Pack an object into a string that cane later be unpacked using <see cref="M:Alteruna.Reader.DeserializePackedString``1(System.String)" />.
+            </summary>
+      <param name="obj">Given object to pack.</param>
+      <typeparam name="T">Object Type.</typeparam>
+      <returns>Packed string.</returns>
+    </member>
+    <member name="M:Alteruna.Writer.StartCompress">
+      <summary>
+            Sets the current position of the writer as the start of the data to be compressed.
+            Default to the start of the Writer.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Writer.Write(System.Boolean)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Byte)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Byte[])"></member>
+    <member name="M:Alteruna.Writer.Write(System.Byte[],System.Int32,System.Int32)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Guid)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Int16)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Int32)"></member>
+    <member name="M:Alteruna.Writer.Write(System.Single)"></member>
+    <member name="M:Alteruna.Writer.Write(System.String)"></member>
+    <member name="M:Alteruna.Writer.Write(System.UInt16)"></member>
+    <member name="M:Alteruna.Writer.Write(System.UInt32)"></member>
+    <member name="M:Alteruna.Writer.WriteGeneric``1(``0)">
+      <summary>
+            identical to WriteObject
+            </summary>
+    </member>
+    <member name="M:Alteruna.Writer.WriteObject(System.Object)"></member>
+    <member name="M:Alteruna.Writer.WriteObject(System.Object,System.Type)">
+      <summary>
+            Write an object of given type.
+            </summary>
+      <param name="value">object</param>
+      <param name="type">Type may be ether a value type object, implementing IFormatter, or is serializable.</param>
+      <exception cref="T:System.ArgumentNullException">Given object was null</exception>
+      <exception cref="T:System.Runtime.Serialization.SerializationException">Thrown when given object was not serializable.</exception>
+    </member>
+    <member name="M:Alteruna.Writer.WriteObject``1(``0)">
+      <summary>
+            Write an object of given type.
+            </summary>
+      <param name="value">object</param>
+      <typeparam name="T">Type may be ether a value type object, implementing IFormatter, or is serializable.</typeparam>
+      <exception cref="T:System.ArgumentNullException">Given object was null</exception>
+      <exception cref="T:System.Runtime.Serialization.SerializationException">Thrown when given object was not serializable.</exception>
+    </member>
+    <member name="T:Alteruna.Configs.AlterunaConfig">
+      <summary>
+            Configuration for Alteruna.
+            The settings are accessed from the project settings under Alteruna Multiplayer.
+            </summary>
+      <remarks>
+        <img src="../images/Doc.Configs.ProjectConfigs.png" />
+      </remarks>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.AllowMultiplayerSingleton">
+      <summary>
+            Allow the usage of singleton for location the multiplayer reference.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.ConnectOnStart">
+      <summary>
+            Automatically connect to alteruna services on start.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.DisableCamerasOnNonOwnedAvatars">
+      <summary>
+            When true, cameras will be automatically disabled on avatars that are not owned by the local client.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.EnableLOD">
+      <summary>
+            Enable the network level of detail system.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.SimpleAttributes">
+      <summary>
+            Simple attributes changed the method of invoking attributes for all clients.
+            Simply calling the method will resolve in the attribute being invoked on all clients (inclusive).
+            </summary>
+    </member>
+    <member name="P:Alteruna.Configs.AlterunaConfig.Transport">
+      <summary>
+            Target network transportation layer to utilize.
+            WebSocket only works in WebGL builds.
+            TCP is compatible with WebSocket.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Scoreboard.IScoreObject">
+      <summary>
+            Defines the interface for a score object, providing methods for managing and serializing score data.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.AddUser(System.UInt16)">
+      <summary>
+            Adds a new user with the specified userID to the score object.
+            </summary>
+      <param name="userID">The userID of the user to add.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.AppendScore``1(System.UInt16,``0)">
+      <summary>
+            Appends a score value for a specified user.
+            </summary>
+      <param name="userID">The userID for which the score is to be appended.</param>
+      <param name="value">The score value to append.</param>
+      <typeparam name="T">The type of the score value, must be a struct and implement IConvertible.</typeparam>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.DeserializeValue(Alteruna.Reader,System.UInt16)">
+      <summary>
+            Deserializes a single value identified by the userID.
+            </summary>
+      <param name="reader">The reader to use for deserialization.</param>
+      <param name="userID">The user ID identifying the value to deserialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.DeserializeValues(Alteruna.Reader)">
+      <summary>
+            Deserializes all values using the provided reader.
+            </summary>
+      <param name="reader">The reader to use for deserialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.Get(System.UInt16)">
+      <summary>
+            Retrieves an object corresponding to the given ID.
+            </summary>
+      <param name="id">The ID for which the object is to be retrieved.</param>
+      <returns>The object associated with the specified ID.</returns>
+    </member>
+    <member name="P:Alteruna.Scoreboard.IScoreObject.Key">
+      <summary>
+            Gets the key associated with the score object.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Scoreboard.IScoreObject.OnChanged">
+      <summary>
+            Action invoked when a value in the score object is changed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.Serialize(Alteruna.Writer)">
+      <summary>
+            Serializes the score object using the provided writer.
+            </summary>
+      <param name="writer">The writer to use for serialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.SerializeValue(Alteruna.Writer,System.UInt16)">
+      <summary>
+            Serializes a single value identified by the userID.
+            </summary>
+      <param name="writer">The writer to use for serialization.</param>
+      <param name="userID">The user ID identifying the value to serialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.SerializeValues(Alteruna.Writer)">
+      <summary>
+            Serializes all values using the provided writer.
+            </summary>
+      <param name="writer">The writer to use for serialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.Set(System.UInt16,System.Object)">
+      <summary>
+            Sets the value for the given ID.
+            </summary>
+      <param name="id">The ID for which the value is to be set.</param>
+      <param name="obj">The object to set.</param>
+    </member>
+    <member name="P:Alteruna.Scoreboard.IScoreObject.Size">
+      <summary>
+            Get or set the size of the value array.
+            Size need to be as large as the highest index user in room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.IScoreObject.ToString(System.UInt16)">
+      <summary>
+            Returns a string representation of the score object for the specified userID.
+            </summary>
+      <param name="userID">The user ID for which to generate the string representation.</param>
+    </member>
+    <member name="T:Alteruna.Scoreboard.ScoreObject`1">
+      <summary>
+            Represents a score object holding a list of values of type T.
+            This class manages the storage, retrieval, and manipulation of score data.
+            </summary>
+      <typeparam name="T">The type of the score data.</typeparam>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.#ctor(System.String,`0[])"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.#ctor(System.String,`0[],System.Func{`0,`0,`0})"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.AppendScore(System.UInt16,`0)">
+      <summary>
+            Appends a score value for a specified user.
+            </summary>
+      <param name="userID">The userID for which the score is to be appended.</param>
+      <param name="value">The score value to append.</param>
+      <typeparam name="T">The type of the score value, must be a struct and implement IConvertible.</typeparam>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.AppendScore``1(System.UInt16,``0)">
+      <summary>
+            Appends a score value for a specified user.
+            </summary>
+      <param name="userID">The userID for which the score is to be appended.</param>
+      <param name="value">The score value to append.</param>
+      <typeparam name="T">The type of the score value, must be a struct and implement IConvertible.</typeparam>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.DeserializeValues(Alteruna.Reader)">
+      <summary>
+            Deserializes all values using the provided reader.
+            </summary>
+      <param name="reader">The reader to use for deserialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.Get(System.UInt16)"></member>
+    <member name="P:Alteruna.Scoreboard.ScoreObject`1.Key">
+      <summary>
+            Gets the key associated with the score object.
+            </summary>
+    </member>
+    <member name="P:Alteruna.Scoreboard.ScoreObject`1.OnChanged">
+      <summary>
+            Action invoked when a value in the score object is changed.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.SerializeValues(Alteruna.Writer)">
+      <summary>
+            Serializes all values using the provided writer.
+            </summary>
+      <param name="writer">The writer to use for serialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.Set(System.UInt16,System.Object)">
+      <summary>
+            Sets the value for the given ID.
+            </summary>
+      <param name="id">The ID for which the value is to be set.</param>
+      <param name="obj">The object to set.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.Set(System.UInt16,`0)"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObject`1.ToString"></member>
+    <member name="P:Alteruna.Scoreboard.ScoreObject`1.Value">
+      <summary>
+            Gets or sets the list of values. Setting this property invokes OnChanged.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Scoreboard.ScoreObjectMethods">
+      <summary>
+            Provides static extension methods for managing and manipulating score objects within a array of IScoreObjects.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.AddUser(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.UInt16)">
+      <summary>
+            Adds a user with the specified userID to all IScoreObjects in the array.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to add the user to.</param>
+      <param name="userID">The userID of the user to add.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.AppendScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.Int32,System.UInt16,``0)">
+      <summary>
+            Appends a score value for a specified user, identified by an ID, in a ScoreObject from an array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="scoreId">The ID of the ScoreObject to append the score to.</param>
+      <param name="userID">The userID for which the score is to be appended.</param>
+      <param name="value">The score value to append.</param>
+      <typeparam name="T">The type of the score value to append.</typeparam>
+      <exception cref="!:InvalidTypeException">Thrown if no score of the specified type with the given ID is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.AppendScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String,System.UInt16,``0)"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.Deserialize(Alteruna.Reader)">
+      <summary>
+            Deserializes and returns an IScoreObject from the reader.
+            </summary>
+      <param name="reader">The reader to use for deserialization.</param>
+      <returns>The deserialized IScoreObject.</returns>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeList(Alteruna.Reader)">
+      <summary>
+            Deserializes and returns a array of IScoreObjects from the reader.
+            </summary>
+      <param name="reader">The reader to use for deserialization.</param>
+      <returns>A array of deserialized IScoreObjects.</returns>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeValue(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Reader,System.Int32,System.UInt16)">
+      <summary>
+            Deserializes the value of a specific IScoreObject identified by scoreID and userID from the reader.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="reader">The reader to use for deserialization.</param>
+      <param name="scoreId">The ID of the IScoreObject to deserialize.</param>
+      <param name="userID">The userID associated with the value to deserialize.</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown if the scoreID is out of range of the scoreList.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeValue(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Reader,System.String,System.UInt16)">
+      <summary>
+            Deserializes the value of a specific IScoreObject identified by name and userID from the reader.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="reader">The reader to use for deserialization.</param>
+      <param name="name">The name of the IScoreObject to deserialize.</param>
+      <param name="userID">The userID associated with the value to deserialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Reader)">
+      <summary>
+            Deserializes the values of IScoreObjects in the array from the reader.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="reader">The reader to use for deserialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Reader,System.String)">
+      <summary>
+            Deserializes the values of a specific IScoreObject identified by name from the reader.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="reader">The reader to use for deserialization.</param>
+      <param name="name">The name of the IScoreObject to deserialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.DeserializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Reader,System.UInt16)">
+      <summary>
+            Deserializes the values of IScoreObjects in the array for a specific userID from the reader.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="reader">The reader to use for deserialization.</param>
+      <param name="userID">The userID associated with the values to deserialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.Int32)">
+      <summary>
+            Retrieves a ScoreObject by its ID from a array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search through.</param>
+      <param name="id">The ID of the ScoreObject to find.</param>
+      <typeparam name="T">The type of the ScoreObject to retrieve.</typeparam>
+      <returns>A ScoreObject of the specified type.</returns>
+      <exception cref="!:InvalidTypeException">Thrown if no score of the specified type with the given ID is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.Int32,System.UInt16)">
+      <summary>
+            Retrieves the score of type T for the given score ID and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search.</param>
+      <param name="scoreId">The ID of the score object.</param>
+      <param name="userID">The userID for which the score is to be retrieved.</param>
+      <typeparam name="T">The type of the score to retrieve.</typeparam>
+      <returns>The score of type T.</returns>
+      <exception cref="!:InvalidTypeException">Thrown if no score of the specified type with the given ID is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String)">
+      <summary>
+            Retrieves a ScoreObject of a specific type from a array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search through.</param>
+      <param name="key">The key of the ScoreObject to find.</param>
+      <typeparam name="T">The type of the ScoreObject to retrieve.</typeparam>
+      <returns>A ScoreObject of the specified type.</returns>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScore(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String)"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String,System.UInt16)">
+      <summary>
+            Retrieves the score of type T for the given key and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search.</param>
+      <param name="key">The key of the score object.</param>
+      <param name="userID">The userID for which the score is to be retrieved.</param>
+      <typeparam name="T">The type of the score to retrieve.</typeparam>
+      <returns>The score of type T.</returns>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScoreID(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Scoreboard.IScoreObject)">
+      <summary>
+            Retrieves the ID of a given IScoreObject from an array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search through.</param>
+      <param name="score">The IScoreObject to find the ID for.</param>
+      <returns>The ID of the specified IScoreObject, if found.</returns>
+      <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if the IScoreObject is not found in the array.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScoreID(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String)">
+      <summary>
+            Retrieves the ID of a ScoreObject identified by a key from an array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search through.</param>
+      <param name="key">The key of the ScoreObject to find the ID for.</param>
+      <returns>The ID of the ScoreObject, if found.</returns>
+      <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if no score with the given key is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.GetScoreID``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String)">
+      <summary>
+            Retrieves the ID of a ScoreObject of a specific type, identified by a key, from an array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to search through.</param>
+      <param name="key">The key of the ScoreObject to find the ID for.</param>
+      <typeparam name="T">The type of the ScoreObject to retrieve the ID for.</typeparam>
+      <returns>The ID of the ScoreObject, if found.</returns>
+      <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if no score of the specified type with the given key is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeList(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer)">
+      <summary>
+            Serializes the array of IScoreObjects.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to serialize.</param>
+      <param name="writer">The writer to use for serialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeValue(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer,System.Int32,System.UInt16)">
+      <summary>
+            Serializes the value of a specific IScoreObject identified by scoreID and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="writer">The writer to use for serialization.</param>
+      <param name="scoreId">The ID of the IScoreObject to serialize.</param>
+      <param name="userID">The userID associated with the value to serialize.</param>
+      <exception cref="T:System.IndexOutOfRangeException">Thrown if the scoreID is out of range of the scoreList.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeValue(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer,System.String,System.UInt16)">
+      <summary>
+            Serializes the value of a specific IScoreObject identified by name and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="writer">The writer to use for serialization.</param>
+      <param name="name">The name of the IScoreObject to serialize.</param>
+      <param name="userID">The userID associated with the value to serialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer)">
+      <summary>
+            Serializes the values of the IScoreObjects in the array.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects to serialize.</param>
+      <param name="writer">The writer to use for serialization.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer,System.String)">
+      <summary>
+            Serializes the values of a specific IScoreObject identified by name.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="writer">The writer to use for serialization.</param>
+      <param name="name">The name of the IScoreObject to serialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SerializeValues(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},Alteruna.Writer,System.UInt16)">
+      <summary>
+            Serializes the values of IScoreObjects in the array for a specific userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="writer">The writer to use for serialization.</param>
+      <param name="userID">The userID associated with the values to serialize.</param>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.Int32,``0,System.UInt16)">
+      <summary>
+            Sets the individual score for the specified score ID and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="scoreId">The ID of the score object.</param>
+      <param name="value">The value to set for the specified userID.</param>
+      <param name="userID">The userID for which the score is to be set.</param>
+      <typeparam name="T">The type of the score to set.</typeparam>
+      <exception cref="!:InvalidTypeException">Thrown if no score of the specified type with the given ID is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.Int32,``0[])">
+      <summary>
+            Sets the score for the specified score ID with the given array of values.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="scoreId">The ID of the score object.</param>
+      <param name="array">The array of values to set.</param>
+      <typeparam name="T">The type of the score to set.</typeparam>
+      <exception cref="!:InvalidTypeException">Thrown if no score of the specified type with the given ID is found.</exception>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String,``0,System.UInt16)">
+      <summary>
+            Sets the individual score for the specified key and userID.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="key">The key of the score object.</param>
+      <param name="value">The value to set for the specified userID.</param>
+      <param name="userID">The userID for which the score is to be set.</param>
+      <typeparam name="T">The type of the score to set.</typeparam>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreObjectMethods.SetScore``1(System.Collections.Generic.List{Alteruna.Scoreboard.IScoreObject},System.String,``0[])">
+      <summary>
+            Sets the score for the specified key with the given array of values.
+            </summary>
+      <param name="scoreList">The array of IScoreObjects.</param>
+      <param name="key">The key of the score object.</param>
+      <param name="array">The array of values to set.</param>
+      <typeparam name="T">The type of the score to set.</typeparam>
+    </member>
+    <member name="T:Alteruna.Scoreboard.ScoreType">
+      <summary>
+            Defines the types of scores that can be managed within the scoreboard system.
+            This enumeration is used to specify the data type of the scores being handled,
+            allowing for flexible and type-safe management of score data.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Scoreboard.ScoreTypeMethods">
+      <summary>
+            Provides extension methods for the ScoreType enumeration.
+            This class is used to dynamically create IScoreObject instances based on different ScoreTypes.
+            It simplifies the creation of score objects for various data types without hardcoding specific types.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreTypeMethods.TypeToScoreObject(Alteruna.Scoreboard.ScoreType,System.String,System.Int32)">
+      <summary>
+            Converts a ScoreType to an IScoreObject with the specified name and capacity.
+            </summary>
+      <param name="type">The ScoreType to convert.</param>
+      <param name="name">The name for the new IScoreObject.</param>
+      <param name="capacity">The initial capacity for the ScoreObject, defaulting to 1.</param>
+      <returns>An IScoreObject of the specified type, defaulting to <c>System.Object</c>.</returns>
+    </member>
+    <member name="M:Alteruna.Scoreboard.ScoreTypeMethods.TypeToScoreType``1"></member>
+    <member name="M:Alteruna.Scoreboard.ScoreTypeMethods.TypeToScoreType(System.Type)">
+      <summary>
+            Get ScoreType from a Type.
+            </summary>
+      <param name="type">The Type to convert.</param>
+      <returns>The ScoreType corresponding to the specified Type.</returns>
+    </member>
+    <member name="T:Alteruna.Trinity.PersistenceStorage">
+      <summary>
+            Works similar to Unity's PlayerPrefs, but stores data in cloud.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.Delete(System.String,Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Delete by key.
+            </summary>
+      <param name="key">target</param>
+      <param name="type">type of storage</param>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.DeleteAll(Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Delete all.
+            </summary>
+      <param name="type">type of storage</param>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.DeleteAllAsync(Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Delete all asynchronously.
+            </summary>
+      <param name="type">type of storage</param>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.DeleteAsync(System.String,Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Delete by key asynchronously.
+            </summary>
+      <param name="key">target</param>
+      <param name="type">type of storage</param>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetFloat(System.String,System.Single)">
+      <summary>
+            Get float by key.
+            If the key does not exist or the request fails, the default value will be returned.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.GetFloatAsync(System.String,System.Single)" /> instead.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetFloatAsync(System.String,System.Single)">
+      <summary>
+            Get float by key asynchronously.
+            If the key does not exist or the request fails, the default value will be returned.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetInt(System.String,System.Int32)">
+      <summary>
+            Get int32 by key.
+            If the key does not exist or the request fails, the default value will be returned.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.GetIntAsync(System.String,System.Int32)" /> instead.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetIntAsync(System.String,System.Int32)">
+      <summary>
+            Get int32 by key asynchronously.
+            If the key does not exist or the request fails, the default value will be returned.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetString(System.String,System.String)">
+      <summary>
+            Get string by key.
+            If the key does not exist or the request fails, the default value will be returned.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.GetStringAsync(System.String,System.String)" /> instead.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.GetStringAsync(System.String,System.String)">
+      <summary>
+            Get string by key asynchronously.
+            If the key does not exist or the request fails, the default value will be returned.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.HasKey(System.String)">
+      <summary>
+            Check if a key exists.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.HasKeyAsync(System.String)" /> instead.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.HasKeyAsync(System.String)">
+      <summary>
+            Check if a key exists asynchronously.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.List(Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Get a dictionary of all keys and values.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.ListAsync(Alteruna.Trinity.PersistenceStorage.StorageType)" /> instead.
+            </summary>
+      <returns>Dictionary of keys and values.</returns>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.List32">
+      <summary>
+            Get a dictionary of all 32-bit or lower keys as Int32 and values.
+            If called on the main thread, consider using <see cref="M:Alteruna.Trinity.PersistenceStorage.List32Async" /> instead.
+            </summary>
+      <returns>Dictionary of keys and values.</returns>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.List32Async">
+      <summary>
+            Get a dictionary of all 32-bit or lower keys as Int32 and values asynchronously.
+            </summary>
+      <returns>Dictionary of keys and values.</returns>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.ListAsync(Alteruna.Trinity.PersistenceStorage.StorageType)">
+      <summary>
+            Get a dictionary of all keys and values asynchronously.
+            </summary>
+      <returns>Dictionary of keys and values.</returns>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetFloat(System.String,System.Single)">
+      <summary>
+            Set float by key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetFloatAsync(System.String,System.Single)">
+      <summary>
+            Set float by key asynchronously.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetInt(System.String,System.Int32)">
+      <summary>
+            Set int by key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetIntAsync(System.String,System.Int32)">
+      <summary>
+            Set int by key asynchronously.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetString(System.String,System.String)">
+      <summary>
+            Set string by key.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.PersistenceStorage.SetStringAsync(System.String,System.String)">
+      <summary>
+            Set string by key asynchronously.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Trinity.PersistenceStorage.StorageType">
+      <summary>
+            StorageType is used to specify which storage to use when calling List and Delete methods.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PersistenceStorage.StorageType.STR">
+      <summary>
+            String type storage in ASCII-7 encoding.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PersistenceStorage.StorageType.I32">
+      <summary>
+            32-bit storage. Values are stored as Int32 in the database.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PersistenceStorage.StorageType.ALL">
+      <summary>
+            Unspecified storage type.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Trinity.Reliability">
+      <summary>
+            Type <c>Reliability</c> defines modes of reliability
+            for messages sent using Trinity Network Protocol 
+            </summary>
+    </member>
+    <member name="T:Alteruna.Trinity.Exceptions.LicenseException">
+      <summary>
+            Represents errors that occur during license operations.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.LicenseException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.LicenseException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.LicenseException.#ctor(System.String,System.Exception)"></member>
+    <member name="P:Alteruna.Trinity.Exceptions.LicenseException.Message"></member>
+    <member name="T:Alteruna.Trinity.Exceptions.NotInRoomException">
+      <summary>
+            The exception that is thrown when a user is not in a room.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.NotInRoomException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.NotInRoomException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.NotInRoomException.#ctor(System.String,System.Exception)"></member>
+    <member name="T:Alteruna.Trinity.Exceptions.RoomException">
+      <summary>
+            Represents errors that occur during room operations.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor(Alteruna.Room)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor(Alteruna.Room,System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor(Alteruna.Room,System.String,System.Exception)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.RoomException.#ctor(System.String,System.Exception)"></member>
+    <member name="P:Alteruna.Trinity.Exceptions.RoomException.Message"></member>
+    <member name="P:Alteruna.Trinity.Exceptions.RoomException.Room"></member>
+    <member name="T:Alteruna.Trinity.Exceptions.UserException">
+      <summary>
+            Represents errors that occur during user operations.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserException.#ctor(System.String,System.Exception)"></member>
+    <member name="T:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException">
+      <summary>
+            The exception that is thrown when a user index from a argument is not a valid user.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException.#ctor(System.String,System.Exception)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexArgumentOutOfRangeException.#ctor(System.String,System.String)"></member>
+    <member name="T:Alteruna.Trinity.Exceptions.UserIndexOutOfRangeException">
+      <summary>
+            The exception that is thrown when a user index is not a valid user.
+            </summary>
+    </member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexOutOfRangeException.#ctor"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexOutOfRangeException.#ctor(System.String)"></member>
+    <member name="M:Alteruna.Trinity.Exceptions.UserIndexOutOfRangeException.#ctor(System.String,System.Exception)"></member>
+    <member name="T:Alteruna.Trinity.PacketProcessing.CompressionMethod">
+      <summary>
+            Compression types for data compression.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PacketProcessing.CompressionMethod.None">
+      <summary>
+            No compression.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PacketProcessing.CompressionMethod.GZip">
+      <summary>
+            Zip compression.
+            Less effective on small amounts of data.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PacketProcessing.CompressionMethod.RunLengthEncoding">
+      <summary>
+            Run-Length Encoding (RLE) compression.
+            Effective form compressing data with many repeating bytes.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PacketProcessing.CompressionMethod.Base64">
+      <summary>
+            Base64 encoding.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.PacketProcessing.CompressionMethod.NibbleZeroIndicator">
+      <summary>
+            Nibble Zero Indicator (NZI) compression.
+            Inefficient for compressing data similar to ASCII and UTF8 strings.
+            Works as well on small amounts of data as it does on large amounts of data.
+            </summary>
+    </member>
+    <member name="T:Alteruna.Trinity.Transport.TransportType">
+      <summary>
+            Implemented network transportation layers.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.Transport.TransportType.Default">
+      <summary>
+            Can send unreliable or reliable.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.Transport.TransportType.TCP">
+      <summary>
+            Only send as reliable TCP.
+            </summary>
+    </member>
+    <member name="F:Alteruna.Trinity.Transport.TransportType.WebSocket">
+      <summary>
+            Compatible with <see cref="F:Alteruna.Trinity.Transport.TransportType.TCP" />.
+            Only Works in browser.
+            </summary>
+    </member>
+  </members>
+</doc>
