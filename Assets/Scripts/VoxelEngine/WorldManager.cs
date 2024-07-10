@@ -244,7 +244,6 @@ namespace VoxelEngine
         private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited)
         {
             // TODO stack overflow here
-            // TODO block place/highlight misplace
             var totalAdjacentSolids = new List<Vector3Int> { posNorm };
             visited.Add(posNorm);
             foreach (var adjacent in new Vector3Int[]
@@ -346,16 +345,19 @@ namespace VoxelEngine
                 ? this.topID
                 : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
             this.blockHealth = blockHealth;
+            textureIDs=new Dictionary<int, ushort>
+            {
+                {0, this.sideID },
+                {1, this.sideID },
+                {2, this.topID },
+                {3, this.bottomID },
+                {4, this.sideID },
+                {5, this.sideID },
+            };
         }
 
         // Convert the face index to the corresponding texture ID
         // The face index order is given by VoxelData.FaceChecks
-        public int GetTextureID(int i) =>
-            i switch
-            {
-                2 => topID,
-                3 => bottomID,
-                _ => sideID
-            };
+        public Dictionary<int, ushort> textureIDs;
     }
 }

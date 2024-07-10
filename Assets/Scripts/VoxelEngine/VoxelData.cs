@@ -54,5 +54,7 @@ namespace VoxelEngine
             new(-1, 0, 0), // Left Face
             new(1, 0, 0) // Right Face
         };
+
+        public static readonly int[] Triangles = { 0, 1, 2, 2, 1, 3 };
     }
 }

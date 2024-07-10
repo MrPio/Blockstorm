@@ -22,11 +22,11 @@ namespace Model
         };
         public static readonly List<Weapon> Melees = new()
         {
-            new Weapon(name: "shovel", damage: 35, rof: 35, distance: 4, type: WeaponType.Melee, fireAnimation:"shovel")
+            new Weapon(name: "shovel", damage: 35, rof: 42, distance: 4, type: WeaponType.Melee, fireAnimation:"shovel")
         };
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 36, type: WeaponType.Primary, fireAnimation:"gun",zoom:1.75f)
+            new Weapon(name: "ak47", damage: 24*10, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation:"gun",zoom:1.75f)
         };
 
         public string name, audio, fireAnimation;
