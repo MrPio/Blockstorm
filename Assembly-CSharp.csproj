@@ -100,6 +100,7 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
     <None Include="Assets\Alteruna\Resources\RegisteredLicense.txt" />
     <None Include="Assets\Alteruna\Plugins\Alteruna.Trinity.xml" />
+    <None Include="Assets\Resources\Prefabs\maps\Harbor.json" />
     <None Include="Assets\SkySeries Freebie\Hdri setup.txt" />
     <Reference Include="UnityEngine">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

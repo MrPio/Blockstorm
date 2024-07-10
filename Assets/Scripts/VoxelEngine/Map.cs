@@ -33,7 +33,7 @@ namespace VoxelEngine
         private Map DeserializeMap()
         {
             // From blocksList list to blocks array
-            blocks = new byte[size.y, size.x, size.y];
+            blocks = new byte[size.y, size.x, size.z];
             foreach (var block in blocksList)
                 blocks[block.y, block.x, block.z] = block.type;
             blocksHealth = new Dictionary<Vector3Int, uint>();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Unity.Mathematics;
@@ -95,6 +96,14 @@ namespace VoxelEngine
             new("dark_grey", topID: (6, 14), blockHealth: BlockHealth.Low),
             new("black", topID: (6, 15), blockHealth: BlockHealth.Low),
 
+            new("red_alt", topID: (7, 5), blockHealth: BlockHealth.Low),
+            new("green_alt", topID: (7, 6), blockHealth: BlockHealth.Low),
+            new("blue_alt", topID: (7, 7), blockHealth: BlockHealth.Low),
+            new("yellow_alt", topID: (7, 8), blockHealth: BlockHealth.Low),
+            new("orange_alt", topID: (7, 9), blockHealth: BlockHealth.Low),
+            new("white_alt", topID: (7, 10), blockHealth: BlockHealth.Low),
+            new("grey_alt", topID: (7, 11), blockHealth: BlockHealth.Low),
+
             new("steel_red", topID: (3, 10), blockHealth: BlockHealth.Medium),
             new("steel_green", topID: (3, 11), blockHealth: BlockHealth.Medium),
             new("steel_blue", topID: (3, 12), blockHealth: BlockHealth.Medium),
@@ -130,6 +139,8 @@ namespace VoxelEngine
             new("flame_box", topID: (2, 12), blockHealth: BlockHealth.OneHit),
         };
 
+        public byte BlockTypeIndex(string blockName) => (byte)blockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
+
         public Material material, transparentMaterial;
         [Range(1, 128)] public int chunkSize = 2;
         [Range(1, 512)] public int viewDistance = 2;
@@ -137,7 +148,7 @@ namespace VoxelEngine
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
         [ItemCanBeNull] private Chunk[,] _nonSolidChunks;
-        [CanBeNull] private List<Chunk> _brokenChunks=new();
+        [CanBeNull] private List<Chunk> _brokenChunks = new();
         [NonSerialized] public Map map;
         private Vector3 _playerLastPos;
         [SerializeField] private string mapName = "Harbor";
@@ -155,7 +166,7 @@ namespace VoxelEngine
             map = newMap;
             var mapSize = map.size;
             var chunksX = Mathf.CeilToInt((float)mapSize.x / chunkSize);
-            var chunksZ = Mathf.CeilToInt((float)mapSize.y / chunkSize);
+            var chunksZ = Mathf.CeilToInt((float)mapSize.z / chunkSize);
             _chunks = new Chunk[chunksX, chunksZ];
             _nonSolidChunks = new Chunk[chunksX, chunksZ];
             for (var x = 0; x < chunksX; x++)
@@ -232,6 +243,8 @@ namespace VoxelEngine
         [CanBeNull]
         private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited)
         {
+            // TODO stack overflow here
+            // TODO block place/highlight misplace
             var totalAdjacentSolids = new List<Vector3Int> { posNorm };
             visited.Add(posNorm);
             foreach (var adjacent in new Vector3Int[]
@@ -239,11 +252,11 @@ namespace VoxelEngine
                          new(0, -1, 0), new(0, 1, 0),
                          new(0, 0, 1), new(0, 0, -1),
                          new(1, 0, 0), new(-1, 0, 0),
-                         
-                         new(1, 0, 1), new(-1, 0, 1),new(1, 0, -1), new(-1, 0, -1),
-                         new( 0, 1,1), new( 0, -1,1),new( 0, 1,-1), new( 0, -1,-1),
-                         new( 1, 1,0), new( -1, 1,0),new( 1, -1,0), new( -1, -1,0),
-                         
+
+                         new(1, 0, 1), new(-1, 0, 1), new(1, 0, -1), new(-1, 0, -1),
+                         new(0, 1, 1), new(0, -1, 1), new(0, 1, -1), new(0, -1, -1),
+                         new(1, 1, 0), new(-1, 1, 0), new(1, -1, 0), new(-1, -1, 0),
+
                          new(1, 1, 1), new(-1, -1, -1),
                      })
             {

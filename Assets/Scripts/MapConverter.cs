@@ -1,13 +1,56 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using EasyButtons;
 using Managers;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
+
+public enum CopyType
+{
+    Rotate180,
+    MirrorX,
+    MirrorZ
+}
+
+public enum CopyDirection
+{
+    X,
+    Z
+}
+
+[Serializable]
+public class CopyRule
+{
+    [Serializable]
+    public struct RemappingRule
+    {
+        public string oldName, newName;
+    }
+
+    public Vector3Int from, to;
+    public CopyType copyType;
+    public RemappingRule[] remappingRules;
+    public CopyDirection direction;
+
+    public CopyRule(Vector3Int from, Vector3Int to, CopyType copyType, RemappingRule[] remappingRules,
+        CopyDirection direction)
+    {
+        this.from = from;
+        this.to = to;
+        this.copyType = copyType;
+        this.remappingRules = remappingRules;
+        this.direction = direction;
+    }
+}
 
 public class MapConverter : MonoBehaviour
 {
     public string mapName = "";
+    public CopyRule[] copyRules;
+    public CopyRule.RemappingRule[] remappingRules;
     public GameObject cube;
 
     /*
@@ -28,11 +71,11 @@ public class MapConverter : MonoBehaviour
         {
             var id = int.Parse(cube.material.mainTexture.name.Split('_')[1]) - 1;
             var blockType = blockTypesList.FindIndex(e => e.topID == id || e.bottomID == id || e.sideID == id);
-            var pos = Vector3Int.FloorToInt(cube.transform.position + Vector3.one * 0.05f);
+            var posNorm = Vector3Int.FloorToInt(cube.transform.position + Vector3.one * 0.25f);
             blockTypes.Add((byte)blockType);
-            positionsX.Add(pos.x);
-            positionsY.Add(pos.y);
-            positionsZ.Add(pos.z);
+            positionsX.Add(posNorm.x);
+            positionsY.Add(posNorm.y);
+            positionsZ.Add(posNorm.z);
         }
 
         var minX = positionsX.Min();
@@ -46,10 +89,49 @@ public class MapConverter : MonoBehaviour
                 (short)(positionsY[i] - minY + 1),
                 (short)(positionsZ[i] - minZ),
                 blockType)).ToList();
-        for (var x = 0; x < maxX - minX; x++)
-        for (var z = 0; z < maxZ - minZ; z++)
+        var mapSize = new Vector3Int(maxX - minX + 1, Map.MaxHeight, maxZ - minZ + 1);
+        // Apply remapping rules
+        foreach (var block in blocksList)
+        foreach (var remap in remappingRules)
+            if (block.type == WorldManager.instance.BlockTypeIndex(remap.oldName))
+                block.type = WorldManager.instance.BlockTypeIndex(remap.newName);
+        // Add bottom bedrock layer
+        for (var x = 0; x < mapSize.x; x++)
+        for (var z = 0; z < mapSize.z; z++)
             blocksList.Add(new BlockEncoding((short)x, 0, (short)z, 1));
-        var map = new Map(mapName, blocksList, new Vector3Int(maxX - minX + 1, Map.MaxHeight, maxZ - minZ + 1));
+        // Apply copy rules
+        foreach (var rule in copyRules)
+        {
+            if (rule.direction == CopyDirection.X)
+                throw new ArgumentOutOfRangeException();
+            mapSize.z += rule.to.z - rule.from.z - 1;
+            var blocksToCopy = blocksList.Where(it =>
+                it.x >= rule.from.x && it.x < rule.to.x && it.y >= rule.from.y && it.y < rule.to.y &&
+                it.z >= rule.from.z && it.z < rule.to.z);
+            var newBlocks = rule.copyType switch
+            {
+                CopyType.Rotate180 =>
+                    blocksToCopy.Select(it =>
+                        new BlockEncoding((short)(maxX - minX - it.x), it.y, (short)
+                            (maxZ - minZ - 1 + rule.to.z - rule.from.z - it.z), it.type)).ToList(),
+                CopyType.MirrorX =>
+                    blocksToCopy.Select(it =>
+                        new BlockEncoding((short)(maxX - minX - it.x), it.y, (short)
+                            (it.z + maxZ - minZ - 1), it.type)).ToList(),
+                CopyType.MirrorZ =>
+                    blocksToCopy.Select(it =>
+                        new BlockEncoding((short)(it.x), it.y, (short)
+                            (it.z + maxZ - minZ - 1), it.type)).ToList(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            foreach (var block in newBlocks)
+            foreach (var remap in rule.remappingRules)
+                if (block.type == WorldManager.instance.BlockTypeIndex(remap.oldName))
+                    block.type = WorldManager.instance.BlockTypeIndex(remap.newName);
+            blocksList.AddRange(newBlocks);
+        }
+
+        var map = new Map(mapName, blocksList, mapSize);
         IOManager.Serialize(map, "maps", map.name);
         print($"Map [{map.name}] saved successfully!");
     }

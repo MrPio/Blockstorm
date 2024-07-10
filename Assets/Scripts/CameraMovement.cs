@@ -10,7 +10,7 @@ using VoxelEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public const float FOV = 68;
+    public const float FOVMain = 68, FOVWeapon=44;
     private Transform highlightBlock, placeBlock;
     [SerializeField] private CharacterController characterController;
     public float sensitivity;

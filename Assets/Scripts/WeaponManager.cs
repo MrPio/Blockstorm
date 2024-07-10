@@ -23,12 +23,12 @@ public class WeaponManager : MonoBehaviour
     public Animator animator;
     private float _lastSwitch = -99;
     [SerializeField] private CameraMovement cameraMovement;
-    private ParticleSystem blockDigEffect;
+    private ParticleSystem _blockDigEffect;
     private WorldManager _wm;
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
     [NonSerialized] public static bool isAiming;
     [SerializeField] private Camera mainCamera, weaponCamera;
-    private Transform crosshair;
+    private Transform _crosshair;
     [SerializeField] private GameObject bodyBlood, headBlood;
     [SerializeField]private Alteruna.Avatar avatar;
 
@@ -57,8 +57,8 @@ public class WeaponManager : MonoBehaviour
 
     private void Awake()
     {
-        blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
-        crosshair = GameObject.FindWithTag("Crosshair").transform;
+        _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
+        _crosshair = GameObject.FindWithTag("Crosshair").transform;
     }
 
     private void Start()
@@ -121,11 +121,11 @@ public class WeaponManager : MonoBehaviour
                         var blockType = _wm.GetVoxel(Vector3Int.FloorToInt(pos));
                         if (blockType is { isSolid: true })
                         {
-                            blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
-                            blockDigEffect.GetComponent<Renderer>().material =
+                            _blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
+                            _blockDigEffect.GetComponent<Renderer>().material =
                                 Resources.Load<Material>(
                                     $"Textures/texturepacks/blockade/Materials/blockade_{(blockType.topID + 1):D1}");
-                            blockDigEffect.Play();
+                            _blockDigEffect.Play();
                             if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
                                     blockType.name.Contains(it)))
                                 audioSource.PlayOneShot(blockDamageLightClip, 1);
@@ -188,7 +188,7 @@ public class WeaponManager : MonoBehaviour
     private void ToggleAim()
     {
         isAiming = !isAiming;
-        crosshair.gameObject.SetActive(!isAiming);
+        _crosshair.gameObject.SetActive(!isAiming);
         foreach (var child in transform.parent.GetComponentsInChildren<Transform>()
                      .Where(it => it != transform && it != transform.parent))
             Destroy(child.gameObject);
@@ -198,8 +198,8 @@ public class WeaponManager : MonoBehaviour
         {
             it.layer = LayerMask.NameToLayer("WeaponCamera");
             it.AddComponent<WeaponSway>();
-            mainCamera.fieldOfView = CameraMovement.FOV / (isAiming ? _weaponModel!.zoom : 1);
-            weaponCamera.fieldOfView = CameraMovement.FOV / (isAiming ? _weaponModel!.zoom : 1);
+            mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.zoom : 1);
+            weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.zoom : 1);
         });
     }
 }
