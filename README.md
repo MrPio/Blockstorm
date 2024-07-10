@@ -22,9 +22,10 @@
 | Texturepack and BlockTypes array                   | ✅ |
 | Chunk subdivision                   |   ✅     |
 | Map generator | ✅ |
-| Creating and deleting blocks | 🕓 |
-| Submeshes for transparent blocks | 🕓 |
-| Multiplayer implementation |  |
+| Creating and deleting blocks | ✅ |
+| Submeshes for transparent blocks | ✅ |
+| Inventory management | ✅ |
+| Multiplayer implementation | 🕓  |
 
 ## 🖼️ Misc
 
