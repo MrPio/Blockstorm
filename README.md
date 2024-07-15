@@ -30,8 +30,15 @@
 ## 🖼️ Misc
 
 https://github.com/MrPio/Blockstorm/assets/22773005/e25463cc-ab7e-43fe-b7b9-2c0adc6ca4b8
+![Screenshot 2024-07-15 101909](https://github.com/user-attachments/assets/)
+![Screenshot 2024-07-15 101936](https://github.com/user-attachments/assets/1917d90b-392e-472f-b486-5979aca787d6)
+![Screenshot 2024-07-15 102200](https://github.com/user-attachments/assets/3ebc0807-0c6c-4289-87a8-3210c02b3cf3)
+<div style="display: flex; width: 100%;">
+ <img src="https://github.com/user-attachments/assets/50fe4225-7ecb-42bd-a3fc-61d3ce5af7d5" width="49.5%"/>
+ <img src="https://github.com/user-attachments/assets/1c7d7ac3-9246-466e-809d-1fc4be379fd4" width="49.5%"/>
+</div>
 
-![immagine](https://github.com/MrPio/Blockstorm/assets/22773005/0909d249-9888-44f2-b739-0dc28a8db868)
+
 
 ## 👥 Authors
 |        Author       |            Github profile           |
