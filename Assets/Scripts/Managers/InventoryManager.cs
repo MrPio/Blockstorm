@@ -7,8 +7,10 @@ namespace Managers
 {
     public class InventoryManager
     {
-        public uint health,armor,blocks;
+        public Team team = Team.Yellow;
+        public uint health, armor, blocks;
         public bool hasHelmet;
+
         [CanBeNull] public Weapon block, // Block
             melee, // Melee
             primary, // Rifles

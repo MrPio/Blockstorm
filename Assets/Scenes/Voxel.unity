@@ -194,6 +194,16 @@ MonoBehaviour:
   copyRules: []
   remappingRules: []
   cube: {fileID: 0}
+  redSpawn:
+    team: 0
+    spawnLayers:
+    - bottomLeft:
+        x: 5
+        z: 235
+      topRight:
+        x: 21
+        z: 244
+      y: 3
 --- !u!224 &1418050011 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4023092887392787448, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}

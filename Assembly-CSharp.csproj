@@ -51,6 +51,7 @@
     <Compile Include="Assets\Scripts\Managers\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
+    <Compile Include="Assets\Scripts\Utils\Vector2XZ.cs" />
     <Compile Include="Assets\Scripts\Utils\Destroyable.cs" />
     <Compile Include="Assets\Scripts\MapConverter.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />

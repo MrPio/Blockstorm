@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Managers;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -35,6 +36,9 @@ public class Player : MonoBehaviour
         _transform = transform;
         WorldManager.instance.UpdatePlayerPos(_transform.position);
         _cameraInitialLocalPosition = cameraTransform.localPosition;
+        var spawnPoint = WorldManager.instance.map.GetRandomSpawnPoint(InventoryManager.Instance.team);
+        transform.position = spawnPoint + Vector3.up*10; // TODO: this should be 1
+        print(spawnPoint);
     }
 
     private void Update()

@@ -8,6 +8,7 @@ using Managers.IO;
 using Managers.Serializer;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Utils;
 using VoxelEngine;
 
 public enum CopyType
@@ -54,6 +55,7 @@ public class MapConverter : MonoBehaviour
     public CopyRule[] copyRules;
     public CopyRule.RemappingRule[] remappingRules;
     public GameObject cube;
+    [SerializeField] private Spawn redSpawn;
 
     /*
      * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
@@ -173,11 +175,32 @@ public class MapConverter : MonoBehaviour
     /*
      * Serialize the map currently loaded in the world manager using the provided serialization method.
      * This is used to convert JSON encoded maps to binary encoding, which uses much less disk space.
+     * This is also used to add spawn points to a map.
      */
     [Button]
     private void SerializeMap(Serializers serializer)
     {
         var map = WorldManager.instance.map;
+        map.spawns = new List<Spawn>
+        {
+            redSpawn,
+            new Spawn(Team.Blue,
+                redSpawn.spawnLayers.Select(it =>
+                        new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, it.bottomLeft.z),
+                            new Vector2XZ(map.size.x - it.bottomLeft.x, it.topRight.z), it.y))
+                    .ToList()),
+            new Spawn(Team.Green,
+                redSpawn.spawnLayers.Select(it =>
+                        new SpawnArea(new Vector2XZ(it.bottomLeft.x, map.size.z - it.topRight.z),
+                            new Vector2XZ(it.topRight.x, map.size.z - it.bottomLeft.z), it.y))
+                    .ToList()),
+            new Spawn(Team.Yellow,
+                redSpawn.spawnLayers.Select(it =>
+                        new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, map.size.z - it.topRight.z),
+                            new Vector2XZ(map.size.x - it.bottomLeft.x, map.size.z - it.bottomLeft.z), it.y))
+                    .ToList())
+        };
+
         if (serializer is Serializers.BinarySerializer)
             BinarySerializer.Instance.Serialize(map, "maps", map.name);
         else if (serializer is Serializers.JsonSerializer)

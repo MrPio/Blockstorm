@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using ExtensionFunctions;
 using Managers.IO;
 using Managers.Serializer;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
+using Random = UnityEngine.Random;
 
 namespace VoxelEngine
 {
+    public enum Team
+    {
+        Red,
+        Blue,
+        Green,
+        Yellow
+    }
+
     [Serializable]
     public class Map
     {
-        public static ISerializer Serializer => BinarySerializer.Instance;
+        public static ISerializer Serializer => JsonSerializer.Instance;
         public const short MaxHeight = 128;
 
         private static readonly string MapsDir = "maps/";
@@ -22,7 +33,8 @@ namespace VoxelEngine
         [SerializeField] private List<BlockEncoding> blocksList;
         [NonSerialized] public byte[,,] blocks; // y,x,z
         [NonSerialized] public Dictionary<Vector3Int, uint> blocksHealth;
-        public SerializableVector3Int size;
+        [SerializeField] public SerializableVector3Int size;
+        [SerializeField] public List<Spawn> spawns;
 
         public Map(string name, List<BlockEncoding> blocksList, Vector3Int size)
         {
@@ -57,6 +69,8 @@ namespace VoxelEngine
                 (blocksHealth.ContainsKey(pos) ? blocksHealth[pos] : (int)blockHealth) - damage);
             return blocksHealth[pos];
         }
+
+        public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == team).GetRandomSpawnPoint;
     }
 
     [Serializable]
@@ -72,5 +86,41 @@ namespace VoxelEngine
             this.z = z;
             this.type = type;
         }
+    }
+
+    [Serializable]
+    public class Spawn
+    {
+        [SerializeField] public Team team;
+        [SerializeField] public List<SpawnArea> spawnLayers;
+
+        public Spawn(Team team, List<SpawnArea> spawnLayers)
+        {
+            this.team = team;
+            this.spawnLayers = spawnLayers;
+        }
+
+        public Vector3 GetRandomSpawnPoint => spawnLayers.RandomItem().GetRandomSpawnPoint;
+    }
+
+    /**
+     * A spawn area. Each spawn area consists of a rectangle on the XZ plane,
+     * drawn at the given Y position.
+     */
+    [Serializable]
+    public class SpawnArea
+    {
+        [SerializeField] public Vector2XZ bottomLeft, topRight;
+        [SerializeField] public short y;
+
+        public SpawnArea(Vector2XZ bottomLeft, Vector2XZ topRight, short y)
+        {
+            this.bottomLeft = bottomLeft;
+            this.topRight = topRight;
+            this.y = y;
+        }
+
+        public Vector3 GetRandomSpawnPoint =>
+            new(Random.Range(bottomLeft.x, topRight.x), y, Random.Range(bottomLeft.z, topRight.z));
     }
 }
