@@ -137,6 +137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 958774637}
   - component: {fileID: 958774638}
+  - component: {fileID: 958774639}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: WorldManager
@@ -177,6 +178,22 @@ MonoBehaviour:
   viewDistance: 128
   atlasCount: 16
   mapName: Harbor
+--- !u!114 &958774639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 958774635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8445078b9843434aabb20ac6b0ba470f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapName: 
+  copyRules: []
+  remappingRules: []
+  cube: {fileID: 0}
 --- !u!224 &1418050011 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4023092887392787448, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}

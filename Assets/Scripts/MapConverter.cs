@@ -4,6 +4,8 @@ using System.Data;
 using System.Linq;
 using EasyButtons;
 using Managers;
+using Managers.IO;
+using Managers.Serializer;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VoxelEngine;
@@ -132,7 +134,7 @@ public class MapConverter : MonoBehaviour
         }
 
         var map = new Map(mapName, blocksList, mapSize);
-        IOManager.Serialize(map, "maps", map.name);
+        Map.Serializer.Serialize(map, "maps", map.name);
         print($"Map [{map.name}] saved successfully!");
     }
 
@@ -160,5 +162,25 @@ public class MapConverter : MonoBehaviour
             cubeGo.GetComponent<MeshRenderer>().material =
                 Resources.Load($"Textures/texturepacks/blockade/Materials/blockade_{(textureId + 1):D1}") as Material;
         }
+    }
+
+    private enum Serializers
+    {
+        JsonSerializer,
+        BinarySerializer
+    }
+
+    /*
+     * Serialize the map currently loaded in the world manager using the provided serialization method.
+     * This is used to convert JSON encoded maps to binary encoding, which uses much less disk space.
+     */
+    [Button]
+    private void SerializeMap(Serializers serializer)
+    {
+        var map = WorldManager.instance.map;
+        if (serializer is Serializers.BinarySerializer)
+            BinarySerializer.Instance.Serialize(map, "maps", map.name);
+        else if (serializer is Serializers.JsonSerializer)
+            JsonSerializer.Instance.Serialize(map, "maps", map.name);
     }
 }

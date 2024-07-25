@@ -46,14 +46,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\VoxelEngine\Map.cs" />
+    <Compile Include="Assets\Scripts\Managers\Serializer\BinarySerializer.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Scripts\Managers\InventoryManager.cs" />
-    <Compile Include="Assets\Scripts\Managers\IOManager.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
     <Compile Include="Assets\Scripts\Utils\Destroyable.cs" />
     <Compile Include="Assets\Scripts\MapConverter.cs" />
+    <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
     <Compile Include="Assets\NetworkContainerUI.cs" />
+    <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
@@ -65,6 +67,7 @@
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
+    <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\WeaponManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />

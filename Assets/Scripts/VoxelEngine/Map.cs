@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Managers;
+using Managers.IO;
+using Managers.Serializer;
 using Unity.Mathematics;
 using UnityEngine;
-using static System.String;
+using Utils;
 
 namespace VoxelEngine
 {
     [Serializable]
     public class Map
     {
+        public static ISerializer Serializer => BinarySerializer.Instance;
         public const short MaxHeight = 128;
 
         private static readonly string MapsDir = "maps/";
@@ -18,9 +20,9 @@ namespace VoxelEngine
 
         // We assume to have no more than 256 types of blocks. Otherwise an int would be required (4x size)
         [SerializeField] private List<BlockEncoding> blocksList;
-        public byte[,,] blocks; // y,x,z
+        [NonSerialized] public byte[,,] blocks; // y,x,z
         [NonSerialized] public Dictionary<Vector3Int, uint> blocksHealth;
-        public Vector3Int size;
+        public SerializableVector3Int size;
 
         public Map(string name, List<BlockEncoding> blocksList, Vector3Int size)
         {
@@ -40,7 +42,7 @@ namespace VoxelEngine
             return this;
         }
 
-        public static Map GetMap(string mapName) => IOManager.Deserialize<Map>(MapsDir + mapName).DeserializeMap();
+        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(MapsDir + mapName).DeserializeMap();
 
         public BlockType GetBlock(Vector3Int pos) => WorldManager.instance.blockTypes[blocks[pos.y, pos.x, pos.z]];
 
@@ -52,7 +54,7 @@ namespace VoxelEngine
             if (blockHealth is BlockHealth.OneHit)
                 return 0;
             blocksHealth[pos] = (uint)math.max(0,
-                (blocksHealth.ContainsKey(pos) ? blocksHealth[pos] : (int) blockHealth ) - damage);
+                (blocksHealth.ContainsKey(pos) ? blocksHealth[pos] : (int)blockHealth) - damage);
             return blocksHealth[pos];
         }
     }
