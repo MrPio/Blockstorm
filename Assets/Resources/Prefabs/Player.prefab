@@ -825,7 +825,6 @@ MonoBehaviour:
   weaponCamera: {fileID: 3434581067932685962}
   bodyBlood: {fileID: 614115134421451849, guid: 073f95ed3978e444fa53e631a9c607d8, type: 3}
   headBlood: {fileID: 1327947280328091902, guid: 05b1ab6389f259143984bcd439d1e3d8, type: 3}
-  avatar: {fileID: 3532541641754327256}
 --- !u!82 &7486929924204302242
 AudioSource:
   m_ObjectHideFlags: 0
@@ -950,8 +949,6 @@ GameObject:
   - component: {fileID: 5505040103345985529}
   - component: {fileID: 6541506331053138863}
   - component: {fileID: 7261302375098064695}
-  - component: {fileID: 6373531298160274696}
-  - component: {fileID: 3532541641754327256}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1204,61 +1201,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &6373531298160274696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4172920852534759685}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1312809854, guid: 0ae8d181602a00248a82f64a684a1c88, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Multiplayer: {fileID: 0}
-  _uidString: 8dc01acd-6f7b-493b-a9ce-cc5d9fbbedd6
-  BucketBehaviors:
-  - Name: Min
-    NetLOD: 0
-    Frequency: -1
-  - Name: Low
-    NetLOD: 1
-    Frequency: 0
-  - Name: Mid
-    NetLOD: 2
-    Frequency: 0
-  - Name: High
-    NetLOD: 3
-    Frequency: 0
-  - Name: Max
-    NetLOD: 4
-    Frequency: 120
-  Reliability: 2
-  UseGlobalPosition: 0
-  refreshRate: 30
-  SyncedAxes: -1
---- !u!114 &3532541641754327256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4172920852534759685}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -2141718255, guid: 0ae8d181602a00248a82f64a684a1c88, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Multiplayer: {fileID: 0}
-  IsPossessor: 0
-  IsPossessed: 0
-  OnPossessed:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUnpossessed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4271093908788584194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1943,7 +1885,6 @@ MonoBehaviour:
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}
   audioSource: {fileID: 7999131348516531350}
-  avatar: {fileID: 3532541641754327256}
 --- !u!114 &3407597305520257956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2153,7 +2094,7 @@ Camera:
     height: 1
   near clip plane: 0.05
   far clip plane: 1000
-  field of view: 68
+  field of view: 44
   orthographic: 0
   orthographic size: 5
   m_Depth: -1

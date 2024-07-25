@@ -30,7 +30,6 @@ public class WeaponManager : MonoBehaviour
     [SerializeField] private Camera mainCamera, weaponCamera;
     private Transform _crosshair;
     [SerializeField] private GameObject bodyBlood, headBlood;
-    [SerializeField]private Alteruna.Avatar avatar;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -63,7 +62,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
-        if(!Player.isDebug &&!avatar.IsMe)
+        if (!Player.isDebug)
             return;
         isAiming = false;
         _wm = WorldManager.instance;
@@ -72,7 +71,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
-        if(!Player.isDebug &&!avatar.IsMe)
+        if (!Player.isDebug)
             return;
         if (_weaponModel != null)
         {
@@ -114,11 +113,11 @@ public class WeaponManager : MonoBehaviour
                 RaycastHit hit;
 
                 // Ground hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1<<LayerMask.NameToLayer("Ground")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
                     {
                         var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
-                        var blockType = _wm.GetVoxel(Vector3Int.FloorToInt(pos));
+                        var blockType = _wm.GetVoxel(pos);
                         if (blockType is { isSolid: true })
                         {
                             _blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
@@ -136,15 +135,15 @@ public class WeaponManager : MonoBehaviour
                             _wm.DamageBlock(pos, _weaponModel.damage);
                         }
                     }
+
                 // Enemy hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1<<LayerMask.NameToLayer("Enemy")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Enemy")))
                     if (hit.collider != null)
                     {
                         print(hit.transform.gameObject.name);
-                        Instantiate(hit.transform.gameObject.name=="HEAD"?headBlood:bodyBlood, hit.point,
-                            Quaternion.FromToRotation(Vector3.up,-cameraTransform.forward));
+                        Instantiate(hit.transform.gameObject.name == "HEAD" ? headBlood : bodyBlood, hit.point,
+                            Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward));
                     }
-
             }
         }
     }

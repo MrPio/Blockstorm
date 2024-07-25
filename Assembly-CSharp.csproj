@@ -45,61 +45,28 @@
     <Analyzer Include="D:\Programmi\Unity\2022.3.33f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\RoomBrowserRow.cs" />
-    <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Map.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandLeaveRoom.cs" />
-    <Compile Include="Assets\Scripts\CameraMovement.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\CustomRoomInfo.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
     <Compile Include="Assets\Scripts\Managers\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Managers\IOManager.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
-    <Compile Include="Assets\CanvasEffects.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandMe.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandPrint.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\MapDescriptions.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\CreateRoomMenu.cs" />
-    <Compile Include="Assets\Alteruna\Scripts\Examples\ExampleAttributeRpc.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandLoadScene.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandTp.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\ITextChatCommand.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\PasswordPopup.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\RoomBrowserSortButton.cs" />
-    <Compile Include="Assets\Alteruna\Scripts\Examples\ExampleRpcSerializable.cs" />
     <Compile Include="Assets\Scripts\Utils\Destroyable.cs" />
     <Compile Include="Assets\Scripts\MapConverter.cs" />
-    <Compile Include="Assets\Scripts\WeaponManager.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandJoinRoom.cs" />
-    <Compile Include="Assets\Alteruna\Scripts\Examples\ExampleSynchronizable.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandSync.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandCreateRoom.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomMenu\RoomMenu.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandMove.cs" />
-    <Compile Include="Assets\Alteruna\Scripts\Examples\ExampleRpcProcedureParameters.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandScale.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatSynchronizable.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\StatusPopup.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandRoom.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandUid.cs" />
     <Compile Include="Assets\Scripts\WeaponSway.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandRotate.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\TextChat\TextChatCommands\CommandTarget.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\RoomBrowser.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
-    <Compile Include="Assets\Alteruna\Scripts\EnsureEventSystem.cs" />
-    <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
-    <Compile Include="Assets\Alteruna\Prefabs\RoomBrowser\Scripts\BaseRoomBrowser.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
+    <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
+    <Compile Include="Assets\Scripts\CameraMovement.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
+    <Compile Include="Assets\CanvasEffects.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
+    <Compile Include="Assets\Scripts\WeaponManager.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
+    <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Utils\Activable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
-    <None Include="Assets\Alteruna\Resources\RegisteredLicense.txt" />
-    <None Include="Assets\Alteruna\Plugins\Alteruna.Trinity.xml" />
     <None Include="Assets\Resources\Prefabs\maps\Harbor.json" />
     <None Include="Assets\SkySeries Freebie\Hdri setup.txt" />
     <Reference Include="UnityEngine">
@@ -351,17 +318,20 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
-    <Reference Include="Alteruna.TrinityEditor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Alteruna\Plugins\Alteruna.TrinityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.testtools.codecoverage@1.2.5\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.visualscripting@1.9.4\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Alteruna.Trinity">
-      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Alteruna\Plugins\Alteruna.Trinity.dll</HintPath>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.nuget.mono-cecil@1.11.4\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.nuget.newtonsoft-json@3.2.1\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -729,14 +699,104 @@
     <Reference Include="System.Xml.Serialization">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Burst.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="EasyButtons">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\EasyButtons.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetworkSolutionInterface">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkSolutionInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Networking.Transport">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Networking.Transport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Rider.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Flow">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Components">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Mathematics.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetStatsMonitor.Configuration">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStatsMonitor.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.Tilemap.Extras.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.Tilemap.Extras.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetStats">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStats.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Editor.PackageChecker">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Editor.PackageChecker.dll</HintPath>
+    </Reference>
+    <Reference Include="PPv2URPConverters">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.MetricTestData">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.MetricTestData.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VSCode.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Profiling.Core">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Profiling.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.Common">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Common.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Unity.EditorCoroutines.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="EasyButtons.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\EasyButtons.Editor.dll</HintPath>
@@ -744,14 +804,11 @@
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Burst.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
+    <Reference Include="Unity.PlasticSCM.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
@@ -762,8 +819,8 @@
     <Reference Include="Unity.ShaderGraph.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="EasyButtons">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\EasyButtons.dll</HintPath>
+    <Reference Include="Unity.VisualStudio.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
@@ -777,53 +834,35 @@
     <Reference Include="Unity.VisualScripting.Core.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Rider.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualStudio.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Runtime">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.NetStatsMonitor.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStatsMonitor.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Flow.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Mathematics.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Mathematics.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Tilemap.Extras.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.Tilemap.Extras.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.NetStatsMonitor.Implementation">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStatsMonitor.Implementation.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.Initialization">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Initialization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.Adapters">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Adapters.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
@@ -831,14 +870,8 @@
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="PPv2URPConverters">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Shaders">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
@@ -849,17 +882,26 @@
     <Reference Include="Unity.Searcher.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Searcher.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.MetricTypes">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.MetricTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Networking.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Networking.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualScripting.State">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VSCode.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.NetStatsReporting">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStatsReporting.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.Tilemap.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.MetricEvents">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.MetricEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetStatsMonitor.Component">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStatsMonitor.Component.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

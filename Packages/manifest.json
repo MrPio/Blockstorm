@@ -5,6 +5,8 @@
     "com.unity.2d.tilemap.extras": "3.1.2",
     "com.unity.collab-proxy": "2.3.1",
     "com.unity.feature.development": "1.0.1",
+    "com.unity.multiplayer.tools": "1.1.1",
+    "com.unity.netcode.gameobjects": "1.9.1",
     "com.unity.render-pipelines.universal": "14.0.11",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.6",

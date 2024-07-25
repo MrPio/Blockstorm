@@ -9,7 +9,7 @@ using VoxelEngine;
 
 public class Player : MonoBehaviour
 {
-    public static  bool isDebug=true;
+    public static bool isDebug = true;
     [SerializeField] public float speed = 8f, fallSpeed = 2, gravity = 9.18f, jumpHeight = 1.25f, maxVelocityY = 20f;
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Transform groundCheck;
@@ -25,13 +25,11 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip walkGeneric, walkMetal, walkWater;
     private float _lastWalkCheck;
-    private Alteruna.Avatar _avatar;
-    [SerializeField]private GameObject playerBody;
+    [SerializeField] private GameObject playerBody;
 
     private void Start()
     {
-        _avatar = GetComponent<Alteruna.Avatar>();
-        if(!isDebug && !_avatar.IsMe)
+        if (!isDebug)
             return;
         playerBody.SetActive(false);
         _transform = transform;
@@ -41,9 +39,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if(!isDebug && !_avatar.IsMe)
+        if (!isDebug)
             return;
-        
+
         _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.2f, 0.4f), Quaternion.identity,
             groundLayerMask);
         if (_isGrounded && _velocity.y < 0)

@@ -28,7 +28,6 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private Alteruna.Avatar avatar;
     public bool CanDig
     {
         get => _canDig;
@@ -66,7 +65,7 @@ public class CameraMovement : MonoBehaviour
 
     private void Start()
     {
-        if(!Player.isDebug && !avatar.IsMe)
+        if(!Player.isDebug)
             return;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -76,7 +75,7 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(!Player.isDebug &&!avatar.IsMe)
+        if(!Player.isDebug)
             return;
         // Handle camera rotation
         var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
