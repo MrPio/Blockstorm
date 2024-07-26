@@ -83,6 +83,10 @@ https://github.com/MrPio/Blockstorm/assets/22773005/e25463cc-ab7e-43fe-b7b9-2c0a
  <img src="https://github.com/user-attachments/assets/1c7d7ac3-9246-466e-809d-1fc4be379fd4" width="49.5%"/>
 </div>
 
+ <img src="https://github.com/user-attachments/assets/38f9ff7a-28a6-48d4-ac46-6d05bb4515fb" width="99.5%"/>
+
+
+
 ## 👥 Authors
 
 |     Author      |      Github profile      |
