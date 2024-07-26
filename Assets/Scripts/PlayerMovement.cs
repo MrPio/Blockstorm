@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Managers;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using VoxelEngine;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
-    public static bool isDebug = true;
     [SerializeField] public float speed = 8f, fallSpeed = 2, gravity = 9.18f, jumpHeight = 1.25f, maxVelocityY = 20f;
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Transform groundCheck;
@@ -26,65 +26,65 @@ public class Player : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip walkGeneric, walkMetal, walkWater;
     private float _lastWalkCheck;
-    [SerializeField] private GameObject playerBody;
 
     private void Start()
     {
-        if (!isDebug)
-            return;
-        playerBody.SetActive(false);
         _transform = transform;
         WorldManager.instance.UpdatePlayerPos(_transform.position);
         _cameraInitialLocalPosition = cameraTransform.localPosition;
-        var spawnPoint = WorldManager.instance.map.GetRandomSpawnPoint(InventoryManager.Instance.team);
-        transform.position = spawnPoint + Vector3.up*10; // TODO: this should be 1
-        print(spawnPoint);
     }
 
     private void Update()
     {
-        if (!isDebug)
+        if (!IsOwner)
             return;
 
+        // When the player has touched the ground, activate his jump.
         _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.2f, 0.4f), Quaternion.identity,
             groundLayerMask);
         if (_isGrounded && _velocity.y < 0)
         {
-            // The player has touched the ground
+            // When the player hits the ground after a hard enough fall, start the camera bounce animation.
             if (_velocity.y < -fallSpeed * 2)
             {
-                // The player has hit the ground
                 _cameraBounceStart = Time.time;
                 _cameraBounceIntensity = 1f * Mathf.Pow(-_velocity.y / maxVelocityY, 3f);
             }
-
+            // The vertical speed is set to a value less than 0 to get a faster fall on the next fall. 
             _velocity.y = -fallSpeed;
         }
 
-        var dampFactor = (Time.time - _cameraBounceStart) / cameraBounceDuration;
+        // Move the camera down when hitting the ground after an high fall.
+        var bounceTime = (Time.time - _cameraBounceStart) / cameraBounceDuration;
         cameraTransform.transform.localPosition = _cameraInitialLocalPosition + Vector3.down *
-            ((dampFactor > 1 ? 0 : cameraBounceCurve.Evaluate(dampFactor)) * _cameraBounceIntensity);
+            ((bounceTime > 1 ? 0 : cameraBounceCurve.Evaluate(bounceTime)) * _cameraBounceIntensity);
 
+        // Handle XZ movement
         var x = Input.GetAxis("Horizontal");
         var z = Input.GetAxis("Vertical");
         var move = _transform.right * x + _transform.forward * z;
-        if (Input.GetButtonDown("Jump") && _isGrounded && !WeaponManager.isAiming)
-            _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
         characterController.Move(move * (speed * Time.deltaTime * (WeaponManager.isAiming ? 0.66f : 1f)) +
                                  _velocity * Time.deltaTime);
 
+        // Handle jump
+        if (Input.GetButtonDown("Jump") && _isGrounded && !WeaponManager.isAiming)
+            _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
+
         // Invisible walls on map edges
         var mapSize = WorldManager.instance.map.size;
-        if (_transform.position.x > mapSize.x || _transform.position.y > mapSize.y ||
-            _transform.position.z > mapSize.z || _transform.position.x > 0 || _transform.position.y > 0 ||
-            _transform.position.z > 0)
-            transform.position = new Vector3(MathF.Max(0.5f, Mathf.Min(_transform.position.x, mapSize.x - 0.5f)),
-                MathF.Max(0.5f, Mathf.Min(_transform.position.y, mapSize.y - 0.5f)),
-                MathF.Max(0.5f, Mathf.Min(_transform.position.z, mapSize.z - 0.5f)));
+        var pos = _transform.position;
+        if (pos.x > mapSize.x || pos.y > mapSize.y ||
+            pos.z > mapSize.z || pos.x > 0 || pos.y > 0 ||
+            pos.z > 0)
+            transform.position = new Vector3(MathF.Max(0.5f, Mathf.Min(pos.x, mapSize.x - 0.5f)),
+                MathF.Max(0.5f, Mathf.Min(pos.y, mapSize.y - 0.5f)),
+                MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
-        WorldManager.instance.UpdatePlayerPos(_transform.position);
+        // Update the view distance. Render new chunks if needed.
+        WorldManager.instance.UpdatePlayerPos(pos);
+
         // Play walk sound
         if (Time.time - _lastWalkCheck > 0.075f)
         {

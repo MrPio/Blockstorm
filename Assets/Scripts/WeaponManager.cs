@@ -7,6 +7,7 @@ using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers;
 using Model;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VoxelEngine;
@@ -62,8 +63,6 @@ public class WeaponManager : MonoBehaviour
 
     private void Start()
     {
-        if (!Player.isDebug)
-            return;
         isAiming = false;
         _wm = WorldManager.instance;
         SwitchEquipped(WeaponType.Block);
@@ -71,8 +70,6 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
-        if (!Player.isDebug)
-            return;
         if (_weaponModel != null)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1) && _weaponModel.type != WeaponType.Block)
