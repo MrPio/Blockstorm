@@ -5,44 +5,37 @@ using ExtensionFunctions;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Partials
 {
     [ExecuteAlways]
     public class Stack : MonoBehaviour
     {
-        private List<Transform> _children = new();
-        [SerializeField] private Transform target;
+        [SerializeField] private List<RectTransform> children = new();
         [SerializeField] private float gap = 1, offset;
-        [SerializeField] private bool vertical = true, useRectTransform, auto, inverse;
+        [SerializeField] private bool vertical = true, inverse, force;
 
         [Button("Update")]
         public void UpdateUI()
         {
             // Retrieve first level children
-            if (_children.Count == 0)
-                _children = transform.GetComponentsInChildren<Transform>(true).ToList().Where(it => it.parent == transform)
+            if (force || children.Count == 0)
+                children = transform.GetComponentsInChildren<RectTransform>(true).ToList()
+                    .Where(it => it.parent == transform)
                     .ToList();
 
-            // Update position according to the target to follow
-            if (target)
-                transform.position = target.position + (vertical ? Vector3.up : Vector3.right) * offset;
-
             // Arrange the children in a stack
-            var located = 0;
-            var activeChildren = _children.Where(child => child.gameObject.activeSelf).ToList();
-            var rect = GetComponent<RectTransform>().rect;
-            var step = (vertical ? rect.height : rect.width) / math.max(1, activeChildren.Count - 1) ;
+            var accumulator = 0f;
+            var activeChildren = children.Where(child => child.gameObject.activeSelf).ToList();
             foreach (var child in activeChildren)
             {
                 // Calculate child position
-                var childPos = (vertical ? Vector3.up : Vector3.right) * ((auto ? step : gap) * located++ * (inverse ? -1f : 1f));
+                var childPos = (vertical ? Vector3.up : Vector3.right) * ((accumulator + gap) * (inverse ? -1f : 1f));
 
                 // Assign child position
-                if (useRectTransform)
-                    child.GetComponent<RectTransform>().anchoredPosition = childPos;
-                else
-                    child.transform.position = childPos;
+                child.anchoredPosition = childPos;
+                accumulator += vertical ? child.rect.height : child.rect.width;
             }
         }
 
