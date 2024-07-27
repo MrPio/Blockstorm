@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ExtensionFunctions;
+using JetBrains.Annotations;
 using Managers.IO;
 using Managers.Serializer;
 using Unity.Mathematics;
@@ -35,6 +36,7 @@ namespace VoxelEngine
         [NonSerialized] public Dictionary<Vector3Int, uint> blocksHealth;
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
+        [SerializeField] public List<CameraSpawn> cameraSpawns;
 
         public Map(string name, List<BlockEncoding> blocksList, Vector3Int size)
         {
@@ -71,6 +73,9 @@ namespace VoxelEngine
         }
 
         public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == team).GetRandomSpawnPoint;
+
+        public void Save([CanBeNull] ISerializer serializer = null) =>
+            (serializer ?? Serializer).Serialize(this, "maps", name);
     }
 
     [Serializable]
@@ -122,5 +127,25 @@ namespace VoxelEngine
 
         public Vector3 GetRandomSpawnPoint =>
             new(Random.Range(bottomLeft.x, topRight.x), y, Random.Range(bottomLeft.z, topRight.z));
+    }
+
+    /**
+     * A camera spawn position.
+     * This is loaded when the player has chosen the map, but is still choosing the team.
+     * A nullish value for team indicates the global camera that record the map from an high position.
+     */
+    [Serializable]
+    public class CameraSpawn
+    {
+        [SerializeField] public Utils.Nullable<Team> team;
+        [SerializeField] public Vector3 position;
+        [SerializeField] public Vector3 rotation;
+
+        public CameraSpawn(Vector3 position, Vector3 rotation, Utils.Nullable<Team> team)
+        {
+            this.position = position;
+            this.rotation = rotation;
+            this.team = team;
+        }
     }
 }

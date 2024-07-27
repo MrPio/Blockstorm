@@ -190,6 +190,7 @@ namespace VoxelEngine
         public BlockType GetVoxel(Vector3Int pos) =>
             IsVoxelInWorld(pos) ? blockTypes[map.blocks[pos.y, pos.x, pos.z]] : null;
 
+        // This is used to update the rendered chunks
         public void UpdatePlayerPos(Vector3 playerPos)
         {
             if (Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .5)

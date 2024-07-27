@@ -24,6 +24,11 @@ public enum CopyDirection
     Z
 }
 
+/**
+ * A rule used to automate the duplication of parts of the map.
+ * This is useful for symmetric maps. Instead of building it in its entirety,
+ * you could build only a quarter of it and then duplicate and rotate it 3 times.
+ */
 [Serializable]
 public class CopyRule
 {
@@ -56,6 +61,7 @@ public class MapConverter : MonoBehaviour
     public CopyRule.RemappingRule[] remappingRules;
     public GameObject cube;
     [SerializeField] private Spawn redSpawn;
+    [SerializeField] private List<SpawnCamera> spawnCameras;
 
     /*
      * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
@@ -136,7 +142,7 @@ public class MapConverter : MonoBehaviour
         }
 
         var map = new Map(mapName, blocksList, mapSize);
-        Map.Serializer.Serialize(map, "maps", map.name);
+        map.Save();
         print($"Map [{map.name}] saved successfully!");
     }
 
@@ -166,6 +172,7 @@ public class MapConverter : MonoBehaviour
         }
     }
 
+    // This is used to select an ISerializer concrete in the editor.
     private enum Serializers
     {
         JsonSerializer,
@@ -202,8 +209,29 @@ public class MapConverter : MonoBehaviour
         };
 
         if (serializer is Serializers.BinarySerializer)
-            BinarySerializer.Instance.Serialize(map, "maps", map.name);
+            map.Save(BinarySerializer.Instance);
         else if (serializer is Serializers.JsonSerializer)
-            JsonSerializer.Instance.Serialize(map, "maps", map.name);
+            map.Save(JsonSerializer.Instance);
+    }
+
+    [Serializable]
+    private class SpawnCamera
+    {
+        public Camera camera;
+        public Utils.Nullable<Team> team;
+    }
+
+    /*
+     * Set a list of spawn camera for the currently loaded map.
+     * Spawn camera is used to show a part of the map in the connection menu instead of a black screen.
+     */
+    [Button]
+    private void AddSpawnCameras()
+    {
+        var map = WorldManager.instance.map;
+        map.cameraSpawns ??= new List<CameraSpawn>();
+        map.cameraSpawns.AddRange(spawnCameras.Select(it =>
+            new CameraSpawn(it.camera.transform.position, it.camera.transform.rotation.eulerAngles, it.team)).ToList());
+        map.Save();
     }
 }
