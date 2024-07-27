@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace Utils
+namespace Partials
 {
     public class Activable : MonoBehaviour
     {

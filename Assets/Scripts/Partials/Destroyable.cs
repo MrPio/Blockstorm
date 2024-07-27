@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Utils
+namespace Partials
 {
     public class Destroyable:MonoBehaviour
     {

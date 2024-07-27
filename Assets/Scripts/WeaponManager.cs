@@ -7,6 +7,7 @@ using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers;
 using Model;
+using UI;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;

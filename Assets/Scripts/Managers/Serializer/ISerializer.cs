@@ -1,4 +1,4 @@
-﻿namespace Managers.IO
+﻿namespace Managers.Serializer
 {
     public interface ISerializer
     {

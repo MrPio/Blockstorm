@@ -2,7 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Utils
+namespace Partials
 {
     public class NetworkDestroyable : NetworkBehaviour
     {
