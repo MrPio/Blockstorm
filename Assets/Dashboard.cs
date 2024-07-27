@@ -32,6 +32,7 @@ public class Dashboard : MonoBehaviour
         if (Input.GetKey(KeyCode.Tab) && _acc > refreshRate)
         {
             _acc = 0;
+            // TODO: only the server can access ConnectedClientsList, so a network variable or a Client RPC should be created
             foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
             {
                 // var playerObject = client.PlayerObject; | TODO: use playerObject.name as players' username 

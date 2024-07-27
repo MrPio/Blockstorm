@@ -15,5 +15,8 @@ namespace ExtensionFunctions
                 Random.Range(bounds.min.x, bounds.max.x),
                 Random.Range(bounds.min.y, bounds.max.y)
             );
+
+        public static Vector3 RandomVector3(float min, float max) =>
+            new(Random.Range(min, max), Random.Range(min, max), Random.Range(min, max));
     }
 }
