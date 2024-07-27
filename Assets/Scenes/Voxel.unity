@@ -1117,14 +1117,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1611964766}
     m_Modifications:
-    - target: {fileID: 323554038700931353, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -54
-      objectReference: {fileID: 0}
-    - target: {fileID: 2166360494382511753, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -108
-      objectReference: {fileID: 0}
     - target: {fileID: 4023092887392787448, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1208,10 +1200,6 @@ PrefabInstance:
     - target: {fileID: 5024829376151596112, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}
       propertyPath: m_Name
       value: NetworkContainer
-      objectReference: {fileID: 0}
-    - target: {fileID: 5426113711946924266, guid: d2dec7c9426f1b949a3beebfee90f0b2, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -162
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -277,7 +277,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1062297621451872230}
-  - component: {fileID: 1907089221045903010}
   m_Layer: 5
   m_Name: GreenYellowPanels
   m_TagString: Untagged
@@ -306,18 +305,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0, y: -350}
   m_SizeDelta: {x: 0, y: 44}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &1907089221045903010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1407200857435245124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1763915263978851302
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +316,6 @@ GameObject:
   - component: {fileID: 4542492269637551248}
   - component: {fileID: 2593863168903096621}
   - component: {fileID: 4967857251863565075}
-  - component: {fileID: 5876568461972316604}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -395,18 +381,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5876568461972316604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1763915263978851302}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2096747758486619623
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,7 +665,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8226611109776559984
 RectTransform:
   m_ObjectHideFlags: 0
@@ -728,17 +702,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children:
-  - {fileID: 4542492269637551248}
-  - {fileID: 2930756813337697007}
-  - {fileID: 1078706371388723216}
-  - {fileID: 1062297621451872230}
-  - {fileID: 7901041764116284994}
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 0
+  refreshOnActivateChange: 0
 --- !u!1 &3030347728686576762
 GameObject:
   m_ObjectHideFlags: 0
@@ -940,7 +907,6 @@ GameObject:
   - component: {fileID: 2126173531644107425}
   - component: {fileID: 2264441843412154030}
   - component: {fileID: 8895033218128688456}
-  - component: {fileID: 506137472663639761}
   - component: {fileID: 9091381549521379233}
   m_Layer: 5
   m_Name: BlueScore
@@ -1006,18 +972,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &506137472663639761
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4253663529170815184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &9091381549521379233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1030,12 +984,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children: []
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 1
+  refreshOnActivateChange: 0
 --- !u!1 &5111314288150540118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1045,7 +997,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7901041764116284994}
-  - component: {fileID: 6506790468868163344}
   m_Layer: 5
   m_Name: GreenYellowScores
   m_TagString: Untagged
@@ -1074,18 +1025,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0, y: -394}
   m_SizeDelta: {x: 0, y: 250}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &6506790468868163344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5111314288150540118}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5131567162347013962
 GameObject:
   m_ObjectHideFlags: 0
@@ -1097,7 +1036,6 @@ GameObject:
   - component: {fileID: 46915708359701654}
   - component: {fileID: 7135227945746238910}
   - component: {fileID: 926295671027566280}
-  - component: {fileID: 340477163312557049}
   - component: {fileID: 6675201083825803004}
   m_Layer: 5
   m_Name: GreenScore
@@ -1163,18 +1101,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &340477163312557049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5131567162347013962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6675201083825803004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1187,12 +1113,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children: []
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 1
+  refreshOnActivateChange: 0
 --- !u!1 &5450909938985605449
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,7 +1126,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2930756813337697007}
-  - component: {fileID: 716948677964714198}
   m_Layer: 5
   m_Name: BlueRedPanels
   m_TagString: Untagged
@@ -1231,18 +1154,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0, y: -56}
   m_SizeDelta: {x: 0, y: 44}
   m_Pivot: {x: 0.5, y: 1}
---- !u!114 &716948677964714198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5450909938985605449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5694888047573869422
 GameObject:
   m_ObjectHideFlags: 0
@@ -1254,7 +1165,6 @@ GameObject:
   - component: {fileID: 8053150118363125823}
   - component: {fileID: 8258736425717197163}
   - component: {fileID: 4575684544627016502}
-  - component: {fileID: 4313365567424670080}
   - component: {fileID: 7013900521117112865}
   m_Layer: 5
   m_Name: YellowScore
@@ -1320,18 +1230,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4313365567424670080
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5694888047573869422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7013900521117112865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1344,12 +1242,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children: []
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 1
+  refreshOnActivateChange: 0
 --- !u!1 &6213188483837423049
 GameObject:
   m_ObjectHideFlags: 0
@@ -1361,7 +1257,6 @@ GameObject:
   - component: {fileID: 8302981839970904623}
   - component: {fileID: 1166085919448707102}
   - component: {fileID: 983207245890384654}
-  - component: {fileID: 75886616277256582}
   - component: {fileID: 5875952966804848016}
   m_Layer: 5
   m_Name: RedScore
@@ -1427,18 +1322,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &75886616277256582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6213188483837423049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5875952966804848016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1451,12 +1334,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children: []
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 1
+  refreshOnActivateChange: 0
 --- !u!1 &6477083047153650322
 GameObject:
   m_ObjectHideFlags: 0
@@ -1468,7 +1349,6 @@ GameObject:
   - component: {fileID: 1672973922979980032}
   - component: {fileID: 995300502788163450}
   - component: {fileID: 1886974708268265369}
-  - component: {fileID: 7998466719177250455}
   m_Layer: 5
   m_Name: BluePanel
   m_TagString: Untagged
@@ -1534,18 +1414,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &7998466719177250455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6477083047153650322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6648344917285491740
 GameObject:
   m_ObjectHideFlags: 0
@@ -1557,7 +1425,6 @@ GameObject:
   - component: {fileID: 3243658302363903723}
   - component: {fileID: 1474021024370443113}
   - component: {fileID: 7993345458661814416}
-  - component: {fileID: 2625610338347679965}
   m_Layer: 5
   m_Name: GreenPanel
   m_TagString: Untagged
@@ -1623,18 +1490,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2625610338347679965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6648344917285491740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6677983874387131077
 GameObject:
   m_ObjectHideFlags: 0
@@ -1646,7 +1501,6 @@ GameObject:
   - component: {fileID: 1436829673707838758}
   - component: {fileID: 8879111339474815624}
   - component: {fileID: 2939644171968773982}
-  - component: {fileID: 1206796827011047812}
   m_Layer: 5
   m_Name: YellowPanel
   m_TagString: Untagged
@@ -1712,18 +1566,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1206796827011047812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6677983874387131077}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6897883117829409261
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,7 +1576,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1078706371388723216}
   - component: {fileID: 5586248324342727356}
-  - component: {fileID: 6058235297613855292}
   m_Layer: 5
   m_Name: BlueRedScores
   m_TagString: Untagged
@@ -1771,18 +1612,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6897883117829409261}
   m_CullTransparentMesh: 1
---- !u!114 &6058235297613855292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6897883117829409261}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8286352070439500819
 GameObject:
   m_ObjectHideFlags: 0
@@ -1794,7 +1623,6 @@ GameObject:
   - component: {fileID: 9077577171255882683}
   - component: {fileID: 1430223495296349244}
   - component: {fileID: 6276719952071109113}
-  - component: {fileID: 2569363906641172737}
   m_Layer: 5
   m_Name: RedPanel
   m_TagString: Untagged
@@ -1860,15 +1688,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2569363906641172737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8286352070439500819}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

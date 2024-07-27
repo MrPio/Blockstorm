@@ -10,7 +10,6 @@ namespace Utils
 
         private void Start()
         {
-            print(IsOwner);
             ifIsMe.ForEach(o => o.SetActive(IsOwner));
             ifIsNotMe.ForEach(o => o.SetActive(!IsOwner));
         }

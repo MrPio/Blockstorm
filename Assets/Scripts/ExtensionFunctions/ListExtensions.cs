@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace ExtensionFunctions
@@ -30,5 +31,11 @@ namespace ExtensionFunctions
 
         public static List<T> RandomSublist<T>(this List<T> list, int length)
             => list.ToList().Shuffle().Take(length).ToList();
+        
+        public static void Print<T>(this List<T> list)
+        {
+            foreach (var item in list)
+                Debug.Log(item.ToString());
+        }
     }
 }

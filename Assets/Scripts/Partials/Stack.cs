@@ -12,35 +12,33 @@ namespace Partials
     [ExecuteAlways]
     public class Stack : MonoBehaviour
     {
-        [SerializeField] private List<RectTransform> children = new();
-        [SerializeField] private float gap = 1, offset;
-        [SerializeField] private bool vertical = true, inverse, force;
+        [SerializeField] private float gap;
+        [SerializeField] private bool vertical = true, inverse, refreshOnActivateChange;
 
         [Button("Update")]
         public void UpdateUI()
         {
-            // Retrieve first level children
-            if (force || children.Count == 0)
-                children = transform.GetComponentsInChildren<RectTransform>(true).ToList()
-                    .Where(it => it.parent == transform)
-                    .ToList();
-
             // Arrange the children in a stack
             var accumulator = 0f;
-            var activeChildren = children.Where(child => child.gameObject.activeSelf).ToList();
-            foreach (var child in activeChildren)
+            var count = 0;
+            foreach (Transform child in transform)
             {
                 // Calculate child position
-                var childPos = (vertical ? Vector3.up : Vector3.right) * ((accumulator + gap) * (inverse ? -1f : 1f));
+                var childPos = (vertical ? Vector3.up : Vector3.right) *
+                               ((accumulator + gap * count) * (inverse ? -1f : 1f));
+                count++;
 
                 // Assign child position
-                child.anchoredPosition = childPos;
-                accumulator += vertical ? child.rect.height : child.rect.width;
+                var rect = child.GetComponent<RectTransform>();
+                rect.anchoredPosition = childPos;
+                accumulator += vertical ? rect.rect.height : rect.rect.width;
             }
         }
 
         private void Awake()
         {
+            if (!refreshOnActivateChange)
+                return;
             // Listen on  children enable/disable
             foreach (Transform child in transform)
             {
