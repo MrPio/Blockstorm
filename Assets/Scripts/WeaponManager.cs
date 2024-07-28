@@ -70,6 +70,7 @@ public class WeaponManager : MonoBehaviour
     {
         if (_weaponModel != null)
         {
+            player.lastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             audioSource.PlayOneShot(_fireClip, 0.5f);
             animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.fireAnimation}"));
 

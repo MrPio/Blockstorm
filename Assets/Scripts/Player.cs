@@ -58,6 +58,9 @@ public class Player : NetworkBehaviour
     private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    public readonly NetworkVariable<long> lastShot = new(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     public readonly NetworkVariable<byte> cameraRotationX = new(0,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -84,9 +87,15 @@ public class Player : NetworkBehaviour
         {
             _isPlayerWalking.OnValueChanged += (_, newValue) =>
             {
-                bodyAnimator.SetTrigger(newValue
+                var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastShot.Value < 400;
+                bodyAnimator.SetTrigger(newValue && !isShooting
                     ? Animator.StringToHash("walk")
                     : Animator.StringToHash("idle"));
+            };
+            lastShot.OnValueChanged += (_, _) =>
+            {
+                bodyAnimator.SetTrigger(Animator.StringToHash("idle"));
+                _isPlayerWalking.Value = false;
             };
 
             equipped.OnValueChanged += (_, newValue) =>
@@ -275,7 +284,6 @@ public class Player : NetworkBehaviour
         var directionToEnemy = attacker.transform.position - cameraTransform.position;
         var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
         var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
-        print(angle);
 
         var circleDamageGo = Instantiate(circleDamage, circleDamageContainer.transform);
         circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
