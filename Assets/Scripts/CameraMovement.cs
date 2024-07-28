@@ -9,7 +9,7 @@ using VoxelEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public const float FOVMain = 68, FOVWeapon=44;
+    public const float FOVMain = 68, FOVWeapon = 44;
     private Transform _highlightBlock, _placeBlock;
     [SerializeField] private CharacterController characterController;
     public float sensitivity;
@@ -27,6 +27,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
     [SerializeField] private AudioSource audioSource;
+
     public bool CanDig
     {
         get => _canDig;
@@ -35,6 +36,7 @@ public class CameraMovement : MonoBehaviour
             _canDig = value;
             if (value)
                 _canPlace = false;
+            if (_highlightBlock is null || _placeBlock is null) return;
             _highlightBlock.gameObject.SetActive(false);
             _placeBlock.gameObject.SetActive(false);
         }
@@ -48,22 +50,20 @@ public class CameraMovement : MonoBehaviour
             _canPlace = InventoryManager.Instance.blocks > 0 && value;
             if (value)
                 _canDig = false;
+            if (_highlightBlock is null || _placeBlock is null) return;
             _highlightBlock.gameObject.SetActive(false);
             _placeBlock.gameObject.SetActive(false);
         }
     }
 
-    private void Awake()
+    private void Start()
     {
         _highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
         _highlightBlock.gameObject.SetActive(false);
         _placeBlock = GameObject.FindWithTag("PlaceBlock").transform;
         _placeBlock.gameObject.SetActive(false);
         _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
-    }
 
-    private void Start()
-    {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         _wm = WorldManager.instance;
@@ -73,8 +73,8 @@ public class CameraMovement : MonoBehaviour
     private void LateUpdate()
     {
         // Handle camera rotation
-        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
-        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity *(WeaponManager.isAiming?0.66f:1f);
+        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity * (WeaponManager.isAiming ? 0.66f : 1f);
+        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity * (WeaponManager.isAiming ? 0.66f : 1f);
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
         _transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
@@ -106,9 +106,10 @@ public class CameraMovement : MonoBehaviour
                     audioSource.PlayOneShot(noBlockDamageClip);
                 else
                     audioSource.PlayOneShot(blockDamageMediumClip);
-                ServerManager.instance.DamageVoxelServerRpc(_highlightBlock.transform.position, InventoryManager.Instance.melee!.damage);
-                
+                ServerManager.instance.DamageVoxelServerRpc(_highlightBlock.transform.position,
+                    InventoryManager.Instance.melee!.damage);
             }
+
             weaponManager.Fire();
         }
 
@@ -118,7 +119,8 @@ public class CameraMovement : MonoBehaviour
                  Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
-            ServerManager.instance.EditVoxelServerRpc(_placeBlock.transform.position, InventoryManager.Instance.blockId);
+            ServerManager.instance.EditVoxelServerRpc(_placeBlock.transform.position,
+                InventoryManager.Instance.blockId);
             // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
             _placeBlock.gameObject.SetActive(false);
             weaponManager.Fire();
@@ -139,7 +141,8 @@ public class CameraMovement : MonoBehaviour
         if (_blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
             _blockDigEffect.Stop();
     }
-/**
+
+    /**
  * We use voxels, so we don't have a collider in every cube.
  * The strategy used here is to beam a ray of incremental length until a solid
  * voxel location is reached or the iteration ends.
@@ -187,6 +190,4 @@ public class CameraMovement : MonoBehaviour
         _highlightBlock.gameObject.SetActive(false);
         _placeBlock.gameObject.SetActive(false);
     }
-
-
 }

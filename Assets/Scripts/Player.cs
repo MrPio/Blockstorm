@@ -14,33 +14,50 @@ using Random = UnityEngine.Random;
 
 public class Player : NetworkBehaviour
 {
-    [SerializeField] public float speed = 8f, fallSpeed = 2, gravity = 9.18f, jumpHeight = 1.25f, maxVelocityY = 20f;
-    [SerializeField] private CharacterController characterController;
-    [SerializeField] private Transform groundCheck;
-    [SerializeField] private LayerMask groundLayerMask;
-    private Transform _transform;
-    private bool _isGrounded;
-    private Vector3 _velocity;
-    [SerializeField] private AnimationCurve cameraBounceCurve;
+    [Header("Params")] [SerializeField] public float speed = 8f;
+    [SerializeField] public float fallSpeed = 2f;
+    [SerializeField] public float gravity = 9.18f;
+    [SerializeField] public float jumpHeight = 1.25f;
+    [SerializeField] public float maxVelocityY = 20f;
     [SerializeField] private float cameraBounceDuration;
-    [SerializeField] private Transform cameraTransform;
-    private float _cameraBounceStart, _cameraBounceIntensity;
-    private Vector3 _cameraInitialLocalPosition;
-    public AudioSource audioSource;
-    public AudioClip walkGeneric, walkMetal, walkWater;
-    private float _lastWalkCheck;
+    [SerializeField] private AnimationCurve cameraBounceCurve;
+    [SerializeField] private LayerMask groundLayerMask;
+
+    [Header("Components")] [SerializeField]
+    private CharacterController characterController;
+
+    [SerializeField] private Transform groundCheck;
     [SerializeField] private Animator bodyAnimator;
     [SerializeField] private Transform enemyWeaponContainer;
     [SerializeField] private WeaponManager weaponManager;
+    [SerializeField] public AudioSource audioSource;
+    [SerializeField] private Transform cameraTransform;
+
+    [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
+    [SerializeField] public List<GameObject> smokes;
+
+    [Header("AudioClips")] [SerializeField]
+    public AudioClip walkGeneric;
+
+    [SerializeField] public AudioClip walkMetal;
+    [SerializeField] public AudioClip walkWater;
+
+    private Transform _transform;
+    private bool _isGrounded;
+    private Vector3 _velocity;
+    private float _cameraBounceStart, _cameraBounceIntensity;
+    private Vector3 _cameraInitialLocalPosition;
+    private float _lastWalkCheck;
+    [NonSerialized] public GameObject weaponPrefab;
 
     private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    private readonly NetworkVariable<Message> _equipped = new(new Message { message = "" },
+    public readonly NetworkVariable<Message> equipped = new(new Message { message = "" },
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
-    private struct Message : INetworkSerializable
+    public struct Message : INetworkSerializable
     {
         public FixedString32Bytes message;
 
@@ -63,13 +80,13 @@ public class Player : NetworkBehaviour
                     : Animator.StringToHash("idle"));
             };
 
-            _equipped.OnValueChanged += (_, newValue) =>
+            equipped.OnValueChanged += (_, newValue) =>
             {
                 print($"Player {OwnerClientId} has equipped {newValue.message}");
                 foreach (Transform child in enemyWeaponContainer)
                     Destroy(child.gameObject);
                 var go = Resources.Load<GameObject>($"Prefabs/weapons/enemy/{newValue.message.Value.ToUpper()}");
-                Instantiate(go, enemyWeaponContainer).Apply(o =>
+                weaponPrefab = Instantiate(go, enemyWeaponContainer).Apply(o =>
                 {
                     o.AddComponent<WeaponSway>();
                     if (newValue.message.Value.ToUpper() == "BLOCK")
@@ -95,8 +112,6 @@ public class Player : NetworkBehaviour
         _transform = transform;
         _cameraInitialLocalPosition = cameraTransform.localPosition;
         WorldManager.instance.UpdatePlayerPos(_transform.position);
-        weaponManager.SwitchEquipped(WeaponType.Block);
-        _equipped.Value = new Message { message = weaponManager.WeaponModel!.name };
     }
 
     private void Update()
@@ -204,12 +219,32 @@ public class Player : NetworkBehaviour
             if (weapon != null)
             {
                 weaponManager.SwitchEquipped(weapon.Value);
-                _equipped.Value = new Message { message = weaponManager.WeaponModel.name };
+                equipped.Value = new Message { message = weaponManager.WeaponModel.name };
             }
 
             if (Input.GetMouseButtonDown(1) && weaponManager.WeaponModel!.type != WeaponType.Block &&
                 weaponManager.WeaponModel!.type != WeaponType.Melee)
                 weaponManager.ToggleAim();
         }
+    }
+
+    public void SpawnWeaponEffect(WeaponType weaponType)
+    {
+        var mouth = weaponPrefab.transform.Find("mouth");
+        if (mouth)
+        {
+            Instantiate(
+                weaponType == WeaponType.Tertiary ? smokes.RandomItem() : muzzles.RandomItem(),
+                mouth).Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
+            if (IsOwner)
+                SpawnWeaponEffectClientRpc(weaponManager.WeaponModel!.type);
+        }
+    }
+
+    [ClientRpc]
+    private void SpawnWeaponEffectClientRpc(WeaponType weaponType)
+    {
+        if (!IsOwner)
+            SpawnWeaponEffect(weaponType);
     }
 }

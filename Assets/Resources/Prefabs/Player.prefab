@@ -730,6 +730,7 @@ MonoBehaviour:
   weaponCamera: {fileID: 3434581067932685962}
   bodyBlood: {fileID: 614115134421451849, guid: 073f95ed3978e444fa53e631a9c607d8, type: 3}
   headBlood: {fileID: 1327947280328091902, guid: 05b1ab6389f259143984bcd439d1e3d8, type: 3}
+  player: {fileID: 5505040103345985529}
 --- !u!82 &7486929924204302242
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1009,6 +1010,12 @@ MonoBehaviour:
   bodyAnimator: {fileID: 5344357331696806508}
   enemyWeaponContainer: {fileID: 5783601706238397705}
   weaponManager: {fileID: 7821993980020846379}
+  muzzles:
+  - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
+  - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
+  smokes:
+  - {fileID: 8503936026029454668, guid: 7050b4bcf0be2734d9c4c7e8bfb5602b, type: 3}
+  weaponPrefab: {fileID: 0}
 --- !u!143 &6541506331053138863
 CharacterController:
   m_ObjectHideFlags: 0
