@@ -57,6 +57,7 @@ public struct MyCustomData : INetworkSerializable {
     }
 }
 ```
+Note: Each player instance has its own version of the network variable! One for each Script in the scene. One is the owner, the others are the other players.
 
 ## Remote Procedure Calls
 

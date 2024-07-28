@@ -10,6 +10,7 @@ namespace VoxelEngine
 {
     public class WorldManager : MonoBehaviour
     {
+        public static ushort maxPlayers = 32;
         public static WorldManager instance;
 
         [NonSerialized] public readonly BlockType[] blockTypes =
@@ -139,7 +140,8 @@ namespace VoxelEngine
             new("flame_box", topID: (2, 12), blockHealth: BlockHealth.OneHit),
         };
 
-        public byte BlockTypeIndex(string blockName) => (byte)blockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
+        public byte BlockTypeIndex(string blockName) =>
+            (byte)blockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 
         public Material material, transparentMaterial;
         [Range(1, 128)] public int chunkSize = 2;
@@ -229,7 +231,7 @@ namespace VoxelEngine
             });
         }
 
-        public bool DamageBlock(Vector3 pos, uint damage)
+        public bool DamageVoxel(Vector3 pos, uint damage)
         {
             var posNorm = Vector3Int.FloorToInt(pos);
             if (map.DamageBlock(Vector3Int.FloorToInt(pos), damage) <= 0)
@@ -346,14 +348,14 @@ namespace VoxelEngine
                 ? this.topID
                 : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
             this.blockHealth = blockHealth;
-            textureIDs=new Dictionary<int, ushort>
+            textureIDs = new Dictionary<int, ushort>
             {
-                {0, this.sideID },
-                {1, this.sideID },
-                {2, this.topID },
-                {3, this.bottomID },
-                {4, this.sideID },
-                {5, this.sideID },
+                { 0, this.sideID },
+                { 1, this.sideID },
+                { 2, this.topID },
+                { 3, this.bottomID },
+                { 4, this.sideID },
+                { 5, this.sideID },
             };
         }
 

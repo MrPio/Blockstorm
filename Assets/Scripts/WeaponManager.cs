@@ -7,7 +7,9 @@ using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers;
 using Model;
+using Network;
 using UI;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,10 +17,10 @@ using VoxelEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
+// who: Owner
 public class WeaponManager : MonoBehaviour
 {
     [CanBeNull] private Model.Weapon _weaponModel;
-
     private AudioClip _fireClip;
     [SerializeField] private AudioClip switchEquippedClip;
     public AudioSource audioSource;
@@ -66,10 +68,9 @@ public class WeaponManager : MonoBehaviour
     {
         isAiming = false;
         _wm = WorldManager.instance;
-        SwitchEquipped(WeaponType.Block);
     }
 
-    private void Update()
+    /*private void Update()
     {
         if (_weaponModel != null)
         {
@@ -88,7 +89,7 @@ public class WeaponManager : MonoBehaviour
                 _weaponModel.type != WeaponType.Melee)
                 ToggleAim();
         }
-    }
+    }*/
 
     public void Fire()
     {
@@ -110,6 +111,17 @@ public class WeaponManager : MonoBehaviour
                 Ray ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
                 RaycastHit hit;
 
+                // Enemy hit
+                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Enemy")))
+                    if (hit.collider != null)
+                    {
+                        Instantiate(hit.transform.gameObject.name == "HEAD" ? headBlood : bodyBlood,
+                            hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
+                            Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
+                            Quaternion.Euler(0, Random.Range(-180, 180), 0));
+                        return; // Prevents damaging the ground
+                    }
+
                 // Ground hit
                 if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
@@ -130,18 +142,8 @@ public class WeaponManager : MonoBehaviour
                                 audioSource.PlayOneShot(noBlockDamageClip, 1);
                             else
                                 audioSource.PlayOneShot(blockDamageMediumClip, 1);
-                            _wm.DamageBlock(pos, _weaponModel.damage);
+                            ServerManager.instance.DamageVoxelServerRpc(pos, _weaponModel.damage);
                         }
-                    }
-
-                // Enemy hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Enemy")))
-                    if (hit.collider != null)
-                    {
-                        Instantiate(hit.transform.gameObject.name == "HEAD" ? headBlood : bodyBlood,
-                            hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
-                            Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
-                            Quaternion.Euler(0, Random.Range(-180, 180), 0));
                     }
             }
         }
@@ -183,7 +185,7 @@ public class WeaponManager : MonoBehaviour
         });
     }
 
-    private void ToggleAim()
+    public void ToggleAim()
     {
         isAiming = !isAiming;
         _crosshair.gameObject.SetActive(!isAiming);

@@ -8,7 +8,7 @@ namespace UI
     {
         [SerializeField] private Button hostBtn, serverBtn, clientBtn;
 
-        private void Awake()
+        private void Start()
         {
             hostBtn.onClick.AddListener(() =>
             {

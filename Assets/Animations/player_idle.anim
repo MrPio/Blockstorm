@@ -67,55 +67,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: -26.931, y: -99.785, z: 164.469}
-        inSlope: {x: 0, y: 0, z: 0}
-        outSlope: {x: 0, y: 0, z: 0}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: {x: 2.725, y: -23.71, z: 23.411}
-        inSlope: {x: 0, y: 0, z: 0}
-        outSlope: {x: 0, y: 0, z: 0}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: {x: -1.414, y: -8.145, z: 6.061}
-        inSlope: {x: 0, y: 0, z: 0}
-        outSlope: {x: 0, y: 0, z: 0}
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: {x: 70.966, y: -87.046, z: -5.002}
+        value: {x: 80.542, y: -0.001, z: 53.739}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -131,7 +83,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 54.373, y: 24.158, z: 36.488}
+        value: {x: 5.021, y: 2.758, z: 28.829}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -142,13 +94,28 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
-  m_PositionCurves:
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: -0.00519, y: 0.00701, z: -0.00012}
+        value: {x: 60.757, y: 27.365, z: 37.788}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -80.626, y: 0.001, z: 55.777}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -159,6 +126,167 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -41.609, y: 11.768, z: -10.867}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -45.579, y: -12.471, z: -14.078}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -158.513, y: 16.904999, z: 89.315}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+  m_PositionCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.0001, y: 0.00766, z: 0.00184}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.00048, y: 0.00472, z: 0.00018}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.00002, y: 0.00628, z: -0.00087}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.00223, y: 0.00742, z: -0.00064}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.00148, y: 0.00633, z: -0.00324}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: 0.00000010730582, y: 0.00454027, z: -0.0000000030267984}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: {x: -0.00101, y: 0.00012, z: 0.00423}
+        inSlope: {x: 0, y: 0, z: 0}
+        outSlope: {x: 0, y: 0, z: 0}
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+        outWeight: {x: 0, y: 0.33333334, z: 0.33333334}
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
   m_ScaleCurves: []
   m_FloatCurves: []
   m_PPtrCurves: []
@@ -170,7 +298,61 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
+      path: 2401743328
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 3092010386
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 1294553536
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
       path: 220277242
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 2223699805
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 2267854789
+      attribute: 1
+      script: {fileID: 0}
+      typeID: 4
+      customType: 0
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 1278199790
       attribute: 1
       script: {fileID: 0}
       typeID: 4
@@ -206,6 +388,33 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
+      path: 2401743328
+      attribute: 4
+      script: {fileID: 0}
+      typeID: 4
+      customType: 4
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 3092010386
+      attribute: 4
+      script: {fileID: 0}
+      typeID: 4
+      customType: 4
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
+      path: 1294553536
+      attribute: 4
+      script: {fileID: 0}
+      typeID: 4
+      customType: 4
+      isPPtrCurve: 0
+      isIntCurve: 0
+      isSerializeReferenceCurve: 0
+    - serializedVersion: 2
       path: 220277242
       attribute: 4
       script: {fileID: 0}
@@ -233,16 +442,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     - serializedVersion: 2
-      path: 2401743328
-      attribute: 4
-      script: {fileID: 0}
-      typeID: 4
-      customType: 4
-      isPPtrCurve: 0
-      isIntCurve: 0
-      isSerializeReferenceCurve: 0
-    - serializedVersion: 2
-      path: 3092010386
+      path: 1278199790
       attribute: 4
       script: {fileID: 0}
       typeID: 4
@@ -467,7 +667,70 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -26.931
+        value: -0.0001
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00766
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00184
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 80.542
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -478,7 +741,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -488,7 +751,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -99.785
+        value: -0.001
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -499,7 +762,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -509,7 +772,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 164.469
+        value: 53.739
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -520,7 +783,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -530,7 +793,70 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 2.725
+        value: -0.00048
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00472
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00018
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 5.021
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -541,7 +867,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -551,7 +877,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -23.71
+        value: 2.758
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -562,7 +888,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -572,7 +898,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 23.411
+        value: 28.829
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -583,7 +909,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -593,7 +919,70 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -1.414
+        value: -0.00002
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00628
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.00087
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 60.757
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -604,7 +993,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -614,7 +1003,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -8.145
+        value: 27.365
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -625,7 +1014,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -635,7 +1024,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 6.061
+        value: 37.788
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -646,7 +1035,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -656,7 +1045,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -0.00519
+        value: -0.00223
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -677,7 +1066,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.00701
+        value: 0.00742
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -698,7 +1087,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -0.00012
+        value: -0.00064
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -719,7 +1108,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 70.966
+        value: -80.626
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -730,7 +1119,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -740,7 +1129,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -87.046
+        value: 0.001
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -751,7 +1140,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -761,7 +1150,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: -5.002
+        value: 55.777
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -772,7 +1161,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -782,7 +1171,70 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 54.373
+        value: -0.00148
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00633
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.00324
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -41.609
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -793,7 +1245,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -803,7 +1255,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 24.158
+        value: 11.768
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -814,7 +1266,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -824,7 +1276,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 36.488
+        value: -10.867
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -835,7 +1287,259 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00000010730582
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00454027
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.0000000030267984
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -45.579
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -12.471
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -14.078
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -0.00101
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00012
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.00423
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalPosition.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -158.513
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 16.904999
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 16
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 89.315
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: localEulerAnglesRaw.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
     classID: 4
     script: {fileID: 0}
     flags: 16
@@ -955,114 +1659,6 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.y
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
-    classID: 4
-    script: {fileID: 0}
-    flags: 0
-  - serializedVersion: 2
-    curve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
     path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP
     classID: 4
@@ -1099,6 +1695,150 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_1/LARM_TOP/LARM_CENTER/LARM_BOTTOM
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
     path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
     classID: 4
@@ -1125,6 +1865,42 @@ AnimationClip:
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
     path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.x
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.y
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
+    classID: 4
+    script: {fileID: 0}
+    flags: 0
+  - serializedVersion: 2
+    curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_LocalEulerAngles.z
+    path: Armature/BELLY_BOTTOM/BELLY_CENTER/BELLY_TOP/NONE_2/RARM_TOP/RARM_CENTER/RARM_BOTTOM/RARM_BOTTOM_end/WeaponContainer
     classID: 4
     script: {fileID: 0}
     flags: 0

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Managers;
 using Model;
+using Network;
 using Unity.Mathematics;
 using UnityEngine;
 using VoxelEngine;
@@ -105,8 +106,7 @@ public class CameraMovement : MonoBehaviour
                     audioSource.PlayOneShot(noBlockDamageClip);
                 else
                     audioSource.PlayOneShot(blockDamageMediumClip);
-                if (_wm.DamageBlock(_highlightBlock.transform.position, InventoryManager.Instance.melee!.damage))
-                    _highlightBlock.gameObject.SetActive(false);
+                ServerManager.instance.DamageVoxelServerRpc(_highlightBlock.transform.position, InventoryManager.Instance.melee!.damage);
                 
             }
             weaponManager.Fire();
@@ -118,7 +118,8 @@ public class CameraMovement : MonoBehaviour
                  Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
-            _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
+            ServerManager.instance.EditVoxelServerRpc(_placeBlock.transform.position, InventoryManager.Instance.blockId);
+            // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
             _placeBlock.gameObject.SetActive(false);
             weaponManager.Fire();
         }

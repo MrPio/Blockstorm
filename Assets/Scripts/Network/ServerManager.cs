@@ -8,28 +8,30 @@ namespace Network
     {
         public static ServerManager instance;
 
-        private void Awake()
+        private void Start()
         {
             instance = this;
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.L) && IsClient)
-            {
-                print(IsSpawned);
-                RequestPlayerListServerRpc();
-            }
-        }
-
         [ServerRpc(RequireOwnership = false)]
         public void RequestPlayerListServerRpc(ServerRpcParams rpcParams = default)
         {
-            // Only allow this to be called by a client
             if (!IsServer) return;
-
             var players = NetworkManager.Singleton.ConnectedClientsList.Select(it => it.ClientId);
             ClientManager.instance.SendPlayerListClientRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void EditVoxelServerRpc(Vector3 pos, byte newID, ServerRpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            ClientManager.instance.EditVoxelClientRpc(pos, newID);
+        }
+        
+        [ServerRpc(RequireOwnership = false)]
+        public void DamageVoxelServerRpc(Vector3 pos, uint damage, ServerRpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            ClientManager.instance.DamageVoxelClientRpc(pos, damage);
         }
     }
 }

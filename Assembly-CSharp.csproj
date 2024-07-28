@@ -65,7 +65,6 @@
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
     <Compile Include="Assets\Scripts\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
-    <Compile Include="Assets\Scripts\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
@@ -74,10 +73,10 @@
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
-    <Compile Include="Assets\Scripts\Network\SpawnPlayer.cs" />
     <Compile Include="Assets\Scripts\UI\CanvasEffects.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\WeaponManager.cs" />
+    <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
