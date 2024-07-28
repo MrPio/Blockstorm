@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Managers;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using VoxelEngine;
 
 public class Player : NetworkBehaviour
@@ -40,7 +36,7 @@ public class Player : NetworkBehaviour
             return;
 
         // When the player has touched the ground, activate his jump.
-        _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.2f, 0.4f), Quaternion.identity,
+        _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.3f, 0.4f), Quaternion.identity,
             groundLayerMask);
         if (_isGrounded && _velocity.y < 0)
         {

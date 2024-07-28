@@ -10,8 +10,18 @@ namespace Partials
 
         private void Start()
         {
-            ifIsMe.ForEach(o => o.SetActive(IsOwner));
-            ifIsNotMe.ForEach(o => o.SetActive(!IsOwner));
+            ifIsMe.ForEach(o =>
+            {
+                o.SetActive(IsOwner);
+                if (!IsOwner)
+                    Destroy(o);
+            });
+            ifIsNotMe.ForEach(o =>
+            {
+                o.SetActive(!IsOwner);
+                if (IsOwner)
+                    Destroy(o);
+            });
         }
     }
 }

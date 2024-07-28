@@ -10,9 +10,21 @@ namespace UI
 
         private void Awake()
         {
-            hostBtn.onClick.AddListener(() => NetworkManager.Singleton.StartHost());
-            serverBtn.onClick.AddListener(() => NetworkManager.Singleton.StartServer());
-            clientBtn.onClick.AddListener(() => NetworkManager.Singleton.StartClient());
+            hostBtn.onClick.AddListener(() =>
+            {
+                NetworkManager.Singleton.StartHost();
+                gameObject.SetActive(false);
+            });
+            serverBtn.onClick.AddListener(() =>
+            {
+                NetworkManager.Singleton.StartServer();
+                gameObject.SetActive(false);
+            });
+            clientBtn.onClick.AddListener(() =>
+            {
+                NetworkManager.Singleton.StartClient();
+                gameObject.SetActive(false);
+            });
         }
     }
 }

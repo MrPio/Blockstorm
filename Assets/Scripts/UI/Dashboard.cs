@@ -1,3 +1,5 @@
+using System.Collections;
+using Network;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,7 +13,6 @@ namespace UI
         [SerializeField] private GameObject playerStat;
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
-        private float _acc;
 
         private void Start()
         {
@@ -24,32 +25,45 @@ namespace UI
                 return;
 
             if (Input.GetKeyDown(KeyCode.Tab))
-                dashboard.SetActive(true);
-            if (Input.GetKeyUp(KeyCode.Tab))
-                dashboard.SetActive(false);
-
-            if (Input.GetKey(KeyCode.Tab) && _acc > refreshRate)
             {
-                _acc = 0;
-                // TODO: only the server can access ConnectedClientsList, so a network variable or a Client RPC should be created
-                foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+                dashboard.SetActive(true);
+                InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
+            }
+
+            if (Input.GetKeyUp(KeyCode.Tab))
+            {
+                dashboard.SetActive(false);
+                CancelInvoke(nameof(DashboardLoop));
+            }
+        }
+
+        private void DashboardLoop()
+        {
+            ServerManager.instance.RequestPlayerListServerRpc();
+        }
+
+        public void UpdateDashboard(ulong[] playerIds)
+        {
+            foreach (Transform child in yellowStats)
+                Destroy(child.gameObject);
+
+            IEnumerator AddPlayers()
+            {
+                // Wait for next frame to ensure that the garbage collector has destroyed the last game objects
+                yield return null;
+                foreach (var client in playerIds)
                 {
                     // var playerObject = client.PlayerObject; | TODO: use playerObject.name as players' username 
                     var stat = Instantiate(playerStat, yellowStats);
-                    stat.name = client.ClientId.ToString();
+                    stat.name = client.ToString();
                     stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().text =
-                        client.ClientId.ToString();
+                        client.ToString();
                 }
 
                 yellowStats.GetComponent<Stack>().UpdateUI();
             }
 
-            _acc += Time.deltaTime;
-            if (Input.GetKey(KeyCode.Tab) && _acc > refreshRate)
-            {
-                foreach (Transform child in yellowStats)
-                    Destroy(child.gameObject);
-            }
+            StartCoroutine(AddPlayers());
         }
     }
 }
