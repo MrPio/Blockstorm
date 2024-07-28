@@ -4,9 +4,11 @@ using System.Linq;
 using ExtensionFunctions;
 using Managers;
 using Model;
+using Network;
 using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using VoxelEngine;
 using Random = UnityEngine.Random;
@@ -32,9 +34,12 @@ public class Player : NetworkBehaviour
     [SerializeField] private WeaponManager weaponManager;
     [SerializeField] public AudioSource audioSource;
     [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform head;
+    [SerializeField] private Transform belly;
 
     [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
     [SerializeField] public List<GameObject> smokes;
+    [SerializeField] public GameObject circleDamage;
 
     [Header("AudioClips")] [SerializeField]
     public AudioClip walkGeneric;
@@ -52,6 +57,10 @@ public class Player : NetworkBehaviour
 
     private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    public readonly NetworkVariable<byte> cameraRotationX = new(0,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
 
     public readonly NetworkVariable<Message> equipped = new(new Message { message = "" },
         NetworkVariableReadPermission.Everyone,
@@ -93,6 +102,15 @@ public class Player : NetworkBehaviour
                         o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
                             $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
                 });
+            };
+
+            cameraRotationX.OnValueChanged += (_, newValue) =>
+            {
+                var rotation = (float)(newValue - 128);
+                var headRotation = Mathf.Clamp(rotation, -50, 20f) - 20f;
+                var bellyRotation = Mathf.Clamp(rotation, -25f, 25f);
+                head.localRotation = Quaternion.Euler(0f, 0f, headRotation);
+                belly.localRotation = Quaternion.Euler(0f, 0f, bellyRotation);
             };
         }
     }
@@ -237,14 +255,29 @@ public class Player : NetworkBehaviour
                 weaponType == WeaponType.Tertiary ? smokes.RandomItem() : muzzles.RandomItem(),
                 mouth).Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
             if (IsOwner)
-                SpawnWeaponEffectClientRpc(weaponManager.WeaponModel!.type);
+                SpawnWeaponEffectRpc(weaponManager.WeaponModel!.type);
         }
     }
 
-    [ClientRpc]
-    private void SpawnWeaponEffectClientRpc(WeaponType weaponType)
+    [Rpc(SendTo.NotOwner)]
+    private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
+
+
+    [Rpc(SendTo.Owner)]
+    public void DamageClientRpc(uint damage, ulong attackerID)
     {
-        if (!IsOwner)
-            SpawnWeaponEffect(weaponType);
+        print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
+        InventoryManager.Instance.hp -= damage;
+        var circleDamageContainer = GameObject.FindWithTag("CircleDamageContainer");
+        var attacker = GameObject.FindGameObjectsWithTag("Player")
+            .First(it => it.GetComponent<Player>().OwnerClientId == attackerID);
+
+        var directionToEnemy = attacker.transform.position - cameraTransform.position;
+        var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
+        var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
+        print(angle);
+
+        var circleDamageGo = Instantiate(circleDamage, circleDamageContainer.transform);
+        circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
     }
 }

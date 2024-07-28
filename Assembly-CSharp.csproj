@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
+    <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />
     <Compile Include="Assets\Scripts\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />

@@ -8,7 +8,7 @@ namespace Network
 {
     public class ClientManager : NetworkBehaviour
     {
-        [SerializeField] private Dashboard dashboard;
+        private Dashboard _dashboard;
         public static ClientManager instance;
         private Transform _highlightBlock;
 
@@ -16,13 +16,14 @@ namespace Network
         {
             instance = this;
             _highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
+            _dashboard = GameObject.FindWithTag("Dashboard").GetComponent<Dashboard>();
         }
 
         [ClientRpc]
         public void SendPlayerListClientRpc(ulong[] playerIds, ulong clientId)
         {
             if (NetworkManager.Singleton.LocalClientId != clientId) return;
-            dashboard.UpdateDashboard(playerIds);
+            _dashboard.UpdateDashboard(playerIds);
         }
 
         [ClientRpc]
@@ -36,7 +37,7 @@ namespace Network
         public void DamageVoxelClientRpc(Vector3 pos, uint newID)
         {
             if (!IsClient) return;
-            if(WorldManager.instance.DamageVoxel(pos, newID))
+            if (WorldManager.instance.DamageVoxel(pos, newID))
                 _highlightBlock.gameObject.SetActive(false);
         }
     }

@@ -195,7 +195,7 @@ namespace VoxelEngine
         // This is used to update the rendered chunks
         public void UpdatePlayerPos(Vector3 playerPos)
         {
-            if (Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .5)
+            if (Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
                 return;
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)
@@ -204,8 +204,7 @@ namespace VoxelEngine
                 _chunks[x, z].IsActive = math.abs(x * chunkSize - playerPos.x) < viewDistance &&
                                          math.abs(z * chunkSize - playerPos.z) < viewDistance;
                 if (_nonSolidChunks[x, z] != null)
-                    _nonSolidChunks[x, z].IsActive = math.abs(x * chunkSize - playerPos.x) < viewDistance &&
-                                                     math.abs(z * chunkSize - playerPos.z) < viewDistance;
+                    _nonSolidChunks[x, z].IsActive = _chunks[x, z].IsActive;
             }
         }
 
@@ -246,21 +245,9 @@ namespace VoxelEngine
         [CanBeNull]
         private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited)
         {
-            // TODO stack overflow here
             var totalAdjacentSolids = new List<Vector3Int> { posNorm };
             visited.Add(posNorm);
-            foreach (var adjacent in new Vector3Int[]
-                     {
-                         new(0, -1, 0), new(0, 1, 0),
-                         new(0, 0, 1), new(0, 0, -1),
-                         new(1, 0, 0), new(-1, 0, 0),
-
-                         new(1, 0, 1), new(-1, 0, 1), new(1, 0, -1), new(-1, 0, -1),
-                         new(0, 1, 1), new(0, -1, 1), new(0, 1, -1), new(0, -1, -1),
-                         new(1, 1, 0), new(-1, 1, 0), new(1, -1, 0), new(-1, -1, 0),
-
-                         new(1, 1, 1), new(-1, -1, -1),
-                     })
+            foreach (var adjacent in VoxelData.AdjacentVoxelsToCheck)
             {
                 var newPos = posNorm + adjacent;
                 if (visited.Contains(newPos))
@@ -268,13 +255,13 @@ namespace VoxelEngine
                 if (newPos.y < 1)
                     return null;
                 var adjacentVoxel = GetVoxel(newPos);
-                if (adjacentVoxel != null && adjacentVoxel.name != "air")
+                if (adjacentVoxel is { isSolid: true })
                 {
                     var adjacentSolids = GetAdjacentSolids(newPos, visited);
                     if (adjacentSolids == null)
                         return null;
                     totalAdjacentSolids.AddRange(adjacentSolids);
-                    if (totalAdjacentSolids.Count > 1000)
+                    if (totalAdjacentSolids.Count > 500)
                         return null;
                 }
             }
@@ -285,12 +272,7 @@ namespace VoxelEngine
         private bool CheckForFlyingMesh(Vector3Int posNorm)
         {
             var chunksToUpdate = new List<Chunk>();
-            foreach (var adjacent in new Vector3Int[]
-                     {
-                         new(0, -1, 0), new(0, 1, 0),
-                         new(0, 0, 1), new(0, 0, -1),
-                         new(1, 0, 0), new(-1, 0, 0),
-                     })
+            foreach (var adjacent in VoxelData.AdjacentVoxelsToCheck)
             {
                 var flyingBlocks = GetAdjacentSolids(posNorm + adjacent, new List<Vector3Int>());
                 if (flyingBlocks == null)

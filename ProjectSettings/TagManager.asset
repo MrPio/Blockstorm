@@ -15,6 +15,10 @@ TagManager:
   - PlaceBlock
   - Crosshair
   - BlockDigEffect
+  - Dashboard
+  - Canvas
+  - CircleDamageContainer
+  - ClientServerManagers
   layers:
   - Default
   - TransparentFX

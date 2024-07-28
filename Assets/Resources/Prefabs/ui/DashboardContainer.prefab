@@ -718,7 +718,7 @@ GameObject:
   - component: {fileID: 2839559859489817370}
   m_Layer: 5
   m_Name: DashboardContainer
-  m_TagString: Untagged
+  m_TagString: Dashboard
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

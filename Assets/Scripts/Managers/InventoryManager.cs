@@ -8,7 +8,7 @@ namespace Managers
     public class InventoryManager
     {
         public Team team = Team.Yellow;
-        public uint health, armor, blocks;
+        public uint hp, armor, blocks;
         public bool hasHelmet;
 
         [CanBeNull] public Weapon block, // Block
@@ -25,7 +25,7 @@ namespace Managers
 
         private InventoryManager()
         {
-            health = 100;
+            hp = 100;
             armor = 0;
             hasHelmet = false;
             melee = Weapon.Melees[0];

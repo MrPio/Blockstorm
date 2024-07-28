@@ -90,6 +90,8 @@ public class WeaponManager : MonoBehaviour
                             hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
                             Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                             Quaternion.Euler(0, Random.Range(-180, 180), 0));
+                        var attackedPlayer = hit.transform.GetComponentInParent<Player>();
+                        attackedPlayer.DamageClientRpc(_weaponModel.damage, player.OwnerClientId);
                         return; // Prevents damaging the ground
                     }
 

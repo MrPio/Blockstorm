@@ -78,3 +78,7 @@ private void TestServerRpc(ServerRpcParams serverRpcParams) {
 ...
 TestServerRpc(new());
 ```
+
+### Rpc
+
+Huge discovery! `[Rpc(SendTo.Everyone)]` are far too flexible and easy to use!

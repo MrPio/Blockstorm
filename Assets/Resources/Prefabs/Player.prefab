@@ -860,7 +860,7 @@ GameObject:
   - component: {fileID: 967321065677375941}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -972,11 +972,7 @@ MonoBehaviour:
   gravity: 24
   jumpHeight: 1.25
   maxVelocityY: 24
-  characterController: {fileID: 6541506331053138863}
-  groundCheck: {fileID: 2809431145089976558}
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
+  cameraBounceDuration: 0.6
   cameraBounceCurve:
     serializedVersion: 2
     m_Curve:
@@ -1001,21 +997,27 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  cameraBounceDuration: 0.6
-  cameraTransform: {fileID: 8653038877929598625}
-  audioSource: {fileID: 7261302375098064695}
-  walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
-  walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
-  walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  characterController: {fileID: 6541506331053138863}
+  groundCheck: {fileID: 2809431145089976558}
   bodyAnimator: {fileID: 5344357331696806508}
   enemyWeaponContainer: {fileID: 5783601706238397705}
   weaponManager: {fileID: 7821993980020846379}
+  audioSource: {fileID: 7261302375098064695}
+  cameraTransform: {fileID: 8653038877929598625}
+  head: {fileID: 585685400986964156}
+  belly: {fileID: 5095278080314030982}
   muzzles:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
   - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
   smokes:
   - {fileID: 8503936026029454668, guid: 7050b4bcf0be2734d9c4c7e8bfb5602b, type: 3}
-  weaponPrefab: {fileID: 0}
+  circleDamage: {fileID: 6303431667206910316, guid: 95b857bfeb59ff24a85579362964d179, type: 3}
+  walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
+  walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
+  walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
 --- !u!143 &6541506331053138863
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1864,7 +1866,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 6541506331053138863}
   sensitivity: 650
-  player: {fileID: 1263851460940361170}
+  playerTransform: {fileID: 1263851460940361170}
+  player: {fileID: 5505040103345985529}
   checkIncrement: 0.1
   weaponManager: {fileID: 7821993980020846379}
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}

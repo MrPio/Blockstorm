@@ -5,6 +5,7 @@ using Model;
 using Network;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 
 public class CameraMovement : MonoBehaviour
@@ -13,7 +14,8 @@ public class CameraMovement : MonoBehaviour
     private Transform _highlightBlock, _placeBlock;
     [SerializeField] private CharacterController characterController;
     public float sensitivity;
-    public Transform player;
+    public Transform playerTransform;
+    [SerializeField] private Player player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
     private float Reach => weaponManager.WeaponModel?.distance ?? 0f;
@@ -23,6 +25,7 @@ public class CameraMovement : MonoBehaviour
     private float _lastDig, _lastPlace, _lastFire;
     public WeaponManager weaponManager;
     private ParticleSystem _blockDigEffect;
+    private bool _isPlaceCursorBlocksStarted;
 
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
@@ -78,11 +81,20 @@ public class CameraMovement : MonoBehaviour
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
         _transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
-        player.Rotate(Vector3.up * mouseX);
+        playerTransform.Rotate(Vector3.up * mouseX);
+        player.cameraRotationX.Value = (byte)((int)_rotX + 128);
 
         // Handle green&red block indicators
-        if (_canDig || _canPlace)
-            PlaceCursorBlocks();
+        if ((_canDig || _canPlace) && !_isPlaceCursorBlocksStarted)
+        {
+            _isPlaceCursorBlocksStarted = true;
+            InvokeRepeating(nameof(PlaceCursorBlocks), 0f, 0.1f);
+        }
+        else if ((!_canDig && !_canPlace) && _isPlaceCursorBlocksStarted)
+        {
+            _isPlaceCursorBlocksStarted = false;
+            CancelInvoke(nameof(PlaceCursorBlocks));
+        }
 
         // If I am digging with a melee weapon
         if (weaponManager.WeaponModel is { type: WeaponType.Melee } &&
@@ -143,16 +155,15 @@ public class CameraMovement : MonoBehaviour
     }
 
     /**
- * We use voxels, so we don't have a collider in every cube.
- * The strategy used here is to beam a ray of incremental length until a solid
- * voxel location is reached or the iteration ends.
- */
+     * We use voxels, so we don't have a collider in every cube.
+     * The strategy used here is to beam a ray of incremental length until a solid
+     * voxel location is reached or the iteration ends.
+     */
     private void PlaceCursorBlocks()
     {
         var angleFactor = Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x);
         var headOffset = angleFactor < 0 ? -angleFactor * .3f : 0;
         angleFactor = angleFactor < 0 ? 0 : angleFactor;
-        var minDistance = _canPlace ? 1.04f + 1f * Mathf.Pow(angleFactor, 4.85f) - headOffset : 0;
         var lastPos = Vector3Int.FloorToInt(_transform.position);
         for (var lenght = checkIncrement; lenght < Reach; lenght += checkIncrement)
         {
@@ -179,6 +190,15 @@ public class CameraMovement : MonoBehaviour
                 var intersect = distanceXZ < characterController.radius + 0.25f &&
                                 distanceY < characterController.height - 0.2f;
                 _placeBlock.position = newPos;
+
+                // Check enemy intersection
+                if (Physics.CheckSphere(newPos, 0.5f, 1 << LayerMask.NameToLayer("Enemy")))
+                {
+                    _placeBlock.gameObject.SetActive(false);
+                    _highlightBlock.gameObject.SetActive(false);
+                    return;
+                }
+
                 _placeBlock.gameObject.SetActive(!intersect);
                 _highlightBlock.gameObject.SetActive(false);
                 return;
