@@ -186,6 +186,7 @@ namespace VoxelEngine
                 _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
 
+            // If this chunk is a group of flying voxels, let it fall and disappear from the map.
             if (_removedBlocks != null)
             {
                 _meshCollider.convex = true;
@@ -218,7 +219,7 @@ namespace VoxelEngine
                 var currentVoxel = posNorm + VoxelData.FaceChecks[p];
                 if (!IsVoxelInChunk(currentVoxel))
                 {
-                    Debug.Log($"Update {currentVoxel}, p={p}");
+                    // Debug.Log($"Update {currentVoxel}, p={p}");
                     var chunk = _wm.GetChunk(currentVoxel);
                     if (chunk != null && !processedChunks.Contains(chunk.coord))
                     {

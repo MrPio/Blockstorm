@@ -242,41 +242,94 @@ namespace VoxelEngine
             return false;
         }
 
-        [CanBeNull]
-        private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited)
+        /// <summary>
+        /// Starting from a given voxel, the neighboring voxels are visited recursively until
+        /// a detached structure is found or until the bottom of the map is reached.
+        /// </summary>
+        /// <param name="posNorm">The position of the starting voxel.</param>
+        /// <param name="visited">The list of already visited blocks.
+        /// This is used to implement an acyclic <b>Depth-first</b> search.</param>
+        /// <param name="stopVoxels">A list of voxels that, if found, invalidate the recursion.
+        /// This is used to reduce computation when checking for flying structures around a destroyed voxel</param>
+        /// <returns>
+        /// A list of block positions if a flying structure was found, or null otherwise.
+        /// </returns>
+        private List<Vector3Int> GetAdjacentSolids(Vector3Int posNorm, List<Vector3Int> visited = null,
+            List<Vector3Int> stopVoxels = null)
         {
-            var totalAdjacentSolids = new List<Vector3Int> { posNorm };
+            visited ??= new List<Vector3Int>();
+            stopVoxels ??= new List<Vector3Int>();
             visited.Add(posNorm);
-            foreach (var adjacent in VoxelData.AdjacentVoxelsToCheck)
+            var totalAdjacentSolids = new List<Vector3Int> { posNorm };
+
+            // Explore all the neighboring voxels.
+            foreach (var adjacent in VoxelData.AdjacentVoxels)
             {
                 var newPos = posNorm + adjacent;
+
+                // Skip this voxel if already visited or terminate if is a stop voxel.
                 if (visited.Contains(newPos))
                     continue;
-                if (newPos.y < 1)
+                if (stopVoxels.Contains(newPos))
                     return null;
+
+                // Get the voxel at the current position
                 var adjacentVoxel = GetVoxel(newPos);
-                if (adjacentVoxel is { isSolid: true })
-                {
-                    var adjacentSolids = GetAdjacentSolids(newPos, visited);
-                    if (adjacentSolids == null)
-                        return null;
-                    totalAdjacentSolids.AddRange(adjacentSolids);
-                    if (totalAdjacentSolids.Count > 1000)
-                        return null;
-                }
+
+                // Terminate the recursion if an indestructible voxel is reached.
+                if (newPos.y < 1 || adjacentVoxel is null ||
+                    adjacentVoxel is { blockHealth: BlockHealth.Indestructible })
+                    return null;
+
+                // Skip the block if non-solid
+                if (adjacentVoxel is not { isSolid: true })
+                    continue;
+
+                // Continue the depth-first search
+                var adjacentSolids = GetAdjacentSolids(newPos, visited);
+
+                // No flying structure can be found if any recursion cap condition is met.
+                if (adjacentSolids == null)
+                    return null;
+
+                totalAdjacentSolids.AddRange(adjacentSolids);
+
+                // Stop the recursion if when too many voxels have been visited.
+                // This reduces the cost of recursion.
+                if (totalAdjacentSolids.Count > 1000)
+                    return null;
             }
 
             return totalAdjacentSolids;
         }
 
-        private bool CheckForFlyingMesh(Vector3Int posNorm)
+        /// <summary>
+        /// Destroying a voxel can create a flying group of voxels.
+        /// Therefore, for each neighboring voxel we check if a flying structure has been created.
+        /// A fall animation is created for each flying structure detected and those voxels are removed from their chunks.
+        /// </summary>
+        /// <param name="posNorm">The position of the destroyed block.</param>
+        private void CheckForFlyingMesh(Vector3Int posNorm)
         {
             var chunksToUpdate = new List<Chunk>();
+            var stopVoxels = new List<Vector3Int>();
             foreach (var adjacent in VoxelData.AdjacentVoxelsToCheck)
             {
-                var flyingBlocks = GetAdjacentSolids(posNorm + adjacent, new List<Vector3Int>());
+                // Skip if the block is an air block or an indestructible block.
+                var newPos = posNorm + adjacent;
+                var adjacentVoxel = GetVoxel(newPos);
+                if (adjacentVoxel is { isSolid: false } or { blockHealth: BlockHealth.Indestructible })
+                    continue;
+
+                // Check if there is a flying structure that branches off from this neighboring voxel.
+                var flyingBlocks = GetAdjacentSolids(posNorm + adjacent, stopVoxels: stopVoxels);
+
+                // If no flying structure has been found, try the next neighboring voxel.
                 if (flyingBlocks == null)
                     continue;
+
+                // Remove the flying blocks from their chunks and update their meshes.
+                stopVoxels.AddRange(flyingBlocks);
                 var removedBlocks = new Dictionary<Vector3Int, byte>();
                 foreach (var block in flyingBlocks)
                 {
@@ -287,12 +340,12 @@ namespace VoxelEngine
                         chunksToUpdate.Add(chunk);
                 }
 
-                _brokenChunks.Add(new Chunk(removedBlocks));
+                // Spawn a falling group of voxels.
+                _brokenChunks!.Add(new Chunk(removedBlocks));
             }
 
             foreach (var chunk in chunksToUpdate)
                 chunk.UpdateMesh();
-            return true;
         }
     }
 
