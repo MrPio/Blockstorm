@@ -66,7 +66,7 @@ There are two types of RPCs: *ServerRpc* and *ClientRpc*.
 Requires the script to extend `NetworkBehaviour` and thus, to have a `NetworkObject` script attached.
 
 The procedure name must end with "ServerRpc" and "ClientRpc" respectively.
-This helps understanding where the code is executed.
+This helps to understand where the code is executed.
 
 The RPC accepts any *value-type* arguments plus `string` objects.
 

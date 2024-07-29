@@ -95,7 +95,7 @@ public class Player : NetworkBehaviour
             lastShot.OnValueChanged += (_, _) =>
             {
                 bodyAnimator.SetTrigger(Animator.StringToHash("idle"));
-                _isPlayerWalking.Value = false;
+                // _isPlayerWalking.Value = false;
             };
 
             equipped.OnValueChanged += (_, newValue) =>
@@ -127,7 +127,7 @@ public class Player : NetworkBehaviour
     private void Spawn()
     {
         _velocity = new();
-        var spawnPoint = WorldManager.instance.map.GetRandomSpawnPoint(InventoryManager.Instance.team) +
+        var spawnPoint = WorldManager.instance.map.GetRandomSpawnPoint(InventoryManager.Instance.Team) +
                          Vector3.up * 1.25f;
         var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
         transform.SetPositionAndRotation(spawnPoint, rotation);
@@ -233,24 +233,24 @@ public class Player : NetworkBehaviour
         if (weaponManager.WeaponModel != null)
         {
             WeaponType? weapon = null;
-            if (Input.GetKeyDown(KeyCode.Alpha1) && weaponManager.WeaponModel!.type != WeaponType.Block)
+            if (Input.GetKeyDown(KeyCode.Alpha1) && weaponManager.WeaponModel!.Type != WeaponType.Block)
                 weapon = WeaponType.Block;
-            else if (Input.GetKeyDown(KeyCode.Alpha2) && weaponManager.WeaponModel!.type != WeaponType.Melee)
+            else if (Input.GetKeyDown(KeyCode.Alpha2) && weaponManager.WeaponModel!.Type != WeaponType.Melee)
                 weapon = WeaponType.Melee;
-            else if (Input.GetKeyDown(KeyCode.Alpha3) && weaponManager.WeaponModel!.type != WeaponType.Primary)
+            else if (Input.GetKeyDown(KeyCode.Alpha3) && weaponManager.WeaponModel!.Type != WeaponType.Primary)
                 weapon = WeaponType.Primary;
-            else if (Input.GetKeyDown(KeyCode.Alpha4) && weaponManager.WeaponModel!.type != WeaponType.Secondary)
+            else if (Input.GetKeyDown(KeyCode.Alpha4) && weaponManager.WeaponModel!.Type != WeaponType.Secondary)
                 weapon = WeaponType.Secondary;
-            else if (Input.GetKeyDown(KeyCode.Alpha5) && weaponManager.WeaponModel!.type != WeaponType.Tertiary)
+            else if (Input.GetKeyDown(KeyCode.Alpha5) && weaponManager.WeaponModel!.Type != WeaponType.Tertiary)
                 weapon = WeaponType.Tertiary;
             if (weapon != null)
             {
                 weaponManager.SwitchEquipped(weapon.Value);
-                equipped.Value = new Message { message = weaponManager.WeaponModel.name };
+                equipped.Value = new Message { message = weaponManager.WeaponModel.Name };
             }
 
-            if (Input.GetMouseButtonDown(1) && weaponManager.WeaponModel!.type != WeaponType.Block &&
-                weaponManager.WeaponModel!.type != WeaponType.Melee)
+            if (Input.GetMouseButtonDown(1) && weaponManager.WeaponModel!.Type != WeaponType.Block &&
+                weaponManager.WeaponModel!.Type != WeaponType.Melee)
                 weaponManager.ToggleAim();
         }
     }
@@ -264,19 +264,23 @@ public class Player : NetworkBehaviour
                 weaponType == WeaponType.Tertiary ? smokes.RandomItem() : muzzles.RandomItem(),
                 mouth).Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
             if (IsOwner)
-                SpawnWeaponEffectRpc(weaponManager.WeaponModel!.type);
+                SpawnWeaponEffectRpc(weaponManager.WeaponModel!.Type);
         }
     }
 
     [Rpc(SendTo.NotOwner)]
     private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
 
-
     [Rpc(SendTo.Owner)]
     public void DamageClientRpc(uint damage, ulong attackerID)
     {
         print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
-        InventoryManager.Instance.hp -= damage;
+
+        // Update player's HP
+        InventoryManager.Instance.Hp -= (int)damage;
+        GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(InventoryManager.Instance.Hp);
+
+        // Spawn damage circle
         var circleDamageContainer = GameObject.FindWithTag("CircleDamageContainer");
         var attacker = GameObject.FindGameObjectsWithTag("Player")
             .First(it => it.GetComponent<Player>().OwnerClientId == attackerID);

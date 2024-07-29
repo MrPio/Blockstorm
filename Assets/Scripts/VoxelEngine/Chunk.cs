@@ -82,8 +82,8 @@ namespace VoxelEngine
 
         public Chunk(Dictionary<Vector3Int, byte> removedBlocks)
         {
-            this._removedBlocks = removedBlocks;
-            this.isSolid = true;
+            _removedBlocks = removedBlocks;
+            isSolid = true;
             _wm = WorldManager.instance;
             chunkGo = new GameObject($"Debris Chunk");
             chunkGo.transform.SetParent(_wm.transform);

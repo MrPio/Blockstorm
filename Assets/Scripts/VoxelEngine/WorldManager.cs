@@ -261,7 +261,7 @@ namespace VoxelEngine
                     if (adjacentSolids == null)
                         return null;
                     totalAdjacentSolids.AddRange(adjacentSolids);
-                    if (totalAdjacentSolids.Count > 500)
+                    if (totalAdjacentSolids.Count > 1000)
                         return null;
                 }
             }

@@ -215,7 +215,7 @@ namespace Utils
         private class SpawnCamera
         {
             public Camera camera;
-            public Utils.Nullable<Team> team;
+            public Nullable<Team> team;
         }
 
         /*

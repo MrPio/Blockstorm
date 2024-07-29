@@ -1237,7 +1237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3850862944521248549
 Transform:
   m_ObjectHideFlags: 0
@@ -1865,7 +1865,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 6541506331053138863}
-  sensitivity: 650
+  sensitivity: 500
   playerTransform: {fileID: 1263851460940361170}
   player: {fileID: 5505040103345985529}
   checkIncrement: 0.1

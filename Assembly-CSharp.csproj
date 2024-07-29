@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />
+    <Compile Include="Assets\Scripts\UI\LowHpHUD.cs" />
     <Compile Include="Assets\Scripts\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\Scripts\WeaponManager.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
+    <Compile Include="Assets\HpHUD.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />

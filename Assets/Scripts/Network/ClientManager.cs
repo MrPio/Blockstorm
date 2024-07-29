@@ -1,4 +1,6 @@
-﻿using UI;
+﻿using System.Collections;
+using System.Threading;
+using UI;
 using Unity.Netcode;
 using UnityEngine;
 using Utils;
@@ -26,6 +28,11 @@ namespace Network
             _dashboard.UpdateDashboard(playerIds);
         }
 
+        /// <summary>
+        /// Used to propagate the placement of a block through the network.
+        /// </summary>
+        /// <param name="pos">The position of the new voxel.</param>
+        /// <param name="newID">The type of the new voxel.</param>
         [ClientRpc]
         public void EditVoxelClientRpc(Vector3 pos, byte newID)
         {
@@ -33,11 +40,16 @@ namespace Network
             WorldManager.instance.EditVoxel(pos, newID);
         }
 
+        /// <summary>
+        /// Used to propagate the damage to a block through the network.
+        /// </summary>
+        /// <param name="pos">The position of the damaged voxel.</param>
+        /// <param name="damage">The damage dealt.</param>
         [ClientRpc]
-        public void DamageVoxelClientRpc(Vector3 pos, uint newID)
+        public void DamageVoxelClientRpc(Vector3 pos, uint damage)
         {
             if (!IsClient) return;
-            if (WorldManager.instance.DamageVoxel(pos, newID))
+            if (WorldManager.instance.DamageVoxel(pos, damage))
                 _highlightBlock.gameObject.SetActive(false);
         }
     }

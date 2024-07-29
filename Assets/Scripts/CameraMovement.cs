@@ -18,7 +18,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private Player player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
-    private float Reach => weaponManager.WeaponModel?.distance ?? 0f;
+    private float Reach => weaponManager.WeaponModel?.Distance ?? 0f;
     private WorldManager _wm;
     private Transform _transform;
     private bool _canDig, _canPlace;
@@ -50,7 +50,7 @@ public class CameraMovement : MonoBehaviour
         get => _canPlace;
         set
         {
-            _canPlace = InventoryManager.Instance.blocks > 0 && value;
+            _canPlace = InventoryManager.Instance.Blocks > 0 && value;
             if (value)
                 _canDig = false;
             if (_highlightBlock is null || _placeBlock is null) return;
@@ -97,7 +97,7 @@ public class CameraMovement : MonoBehaviour
         }
 
         // If I am digging with a melee weapon
-        if (weaponManager.WeaponModel is { type: WeaponType.Melee } &&
+        if (weaponManager.WeaponModel is { Type: WeaponType.Melee } &&
             Input.GetMouseButton(0) && Time.time - _lastDig > weaponManager.WeaponModel.Delay)
         {
             _lastDig = Time.time;
@@ -119,35 +119,35 @@ public class CameraMovement : MonoBehaviour
                 else
                     audioSource.PlayOneShot(blockDamageMediumClip);
                 ServerManager.instance.DamageVoxelServerRpc(_highlightBlock.transform.position,
-                    InventoryManager.Instance.melee!.damage);
+                    InventoryManager.Instance.Melee!.Damage);
             }
 
             weaponManager.Fire();
         }
 
         // If I am placing with an equipped block
-        else if (weaponManager.WeaponModel is { type: WeaponType.Block } && _placeBlock.gameObject.activeSelf &&
+        else if (weaponManager.WeaponModel is { Type: WeaponType.Block } && _placeBlock.gameObject.activeSelf &&
                  Input.GetMouseButton(0) &&
                  Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
             ServerManager.instance.EditVoxelServerRpc(_placeBlock.transform.position,
-                InventoryManager.Instance.blockId);
+                InventoryManager.Instance.BlockId);
             // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
             _placeBlock.gameObject.SetActive(false);
             weaponManager.Fire();
         }
 
         // If I am firing with a weapon
-        else if (weaponManager.WeaponModel is { type: WeaponType.Primary } or { type: WeaponType.Secondary } or
-                     { type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
+        else if (weaponManager.WeaponModel is { Type: WeaponType.Primary } or { Type: WeaponType.Secondary } or
+                     { Type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
                  Time.time - _lastFire > weaponManager.WeaponModel.Delay)
         {
             _lastFire = Time.time;
             weaponManager.Fire();
         }
 
-        if (weaponManager.WeaponModel is { type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
+        if (weaponManager.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
             _lastPlace -= weaponManager.WeaponModel.Delay * 0.65f;
 
         if (_blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))

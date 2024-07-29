@@ -38,10 +38,10 @@ public class WeaponManager : MonoBehaviour
             _weaponModel = value;
             if (value != null)
             {
-                _fireClip = Resources.Load<AudioClip>($"Audio/weapons/{value.audio.ToUpper()}");
-                if (value.type == WeaponType.Block)
+                _fireClip = Resources.Load<AudioClip>($"Audio/weapons/{value.Audio.ToUpper()}");
+                if (value.Type == WeaponType.Block)
                     cameraMovement.CanPlace = true;
-                else if (value.type == WeaponType.Melee)
+                else if (value.Type == WeaponType.Melee)
                     cameraMovement.CanDig = true;
                 else
                 {
@@ -63,7 +63,7 @@ public class WeaponManager : MonoBehaviour
         isAiming = false;
         _wm = WorldManager.instance;
         SwitchEquipped(WeaponType.Block);
-        player.equipped.Value = new Player.Message { message = WeaponModel!.name };
+        player.equipped.Value = new Player.Message { message = WeaponModel!.Name };
     }
 
     public void Fire()
@@ -72,19 +72,19 @@ public class WeaponManager : MonoBehaviour
         {
             player.lastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             audioSource.PlayOneShot(_fireClip, 0.5f);
-            animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.fireAnimation}"));
+            animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
 
-            if (_weaponModel.type != WeaponType.Block && _weaponModel.type != WeaponType.Melee)
+            if (_weaponModel.Type != WeaponType.Block && _weaponModel.Type != WeaponType.Melee)
             {
                 // Weapon Effect
-                player.SpawnWeaponEffect(_weaponModel!.type);
+                player.SpawnWeaponEffect(_weaponModel!.Type);
 
                 var cameraTransform = cameraMovement.transform;
                 Ray ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
                 RaycastHit hit;
 
                 // Enemy hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Enemy")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                     if (hit.collider != null)
                     {
                         Instantiate(hit.transform.gameObject.name == "HEAD" ? headBlood : bodyBlood,
@@ -92,12 +92,12 @@ public class WeaponManager : MonoBehaviour
                             Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                             Quaternion.Euler(0, Random.Range(-180, 180), 0));
                         var attackedPlayer = hit.transform.GetComponentInParent<Player>();
-                        attackedPlayer.DamageClientRpc(_weaponModel.damage, player.OwnerClientId);
+                        attackedPlayer.DamageClientRpc(_weaponModel.Damage, player.OwnerClientId);
                         return; // Prevents damaging the ground
                     }
 
                 // Ground hit
-                if (Physics.Raycast(ray, out hit, _weaponModel.distance, 1 << LayerMask.NameToLayer("Ground")))
+                if (Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
                     if (hit.collider != null)
                     {
                         var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
@@ -116,7 +116,7 @@ public class WeaponManager : MonoBehaviour
                                 audioSource.PlayOneShot(noBlockDamageClip, 1);
                             else
                                 audioSource.PlayOneShot(blockDamageMediumClip, 1);
-                            ServerManager.instance.DamageVoxelServerRpc(pos, _weaponModel.damage);
+                            ServerManager.instance.DamageVoxelServerRpc(pos, _weaponModel.Damage);
                         }
                     }
             }
@@ -132,11 +132,11 @@ public class WeaponManager : MonoBehaviour
             ToggleAim();
         WeaponModel = weaponType switch
         {
-            WeaponType.Block => InventoryManager.Instance.block,
-            WeaponType.Melee => InventoryManager.Instance.melee,
-            WeaponType.Primary => InventoryManager.Instance.primary,
-            WeaponType.Secondary => InventoryManager.Instance.secondary,
-            WeaponType.Tertiary => InventoryManager.Instance.tertiary,
+            WeaponType.Block => InventoryManager.Instance.Block,
+            WeaponType.Melee => InventoryManager.Instance.Melee,
+            WeaponType.Primary => InventoryManager.Instance.Primary,
+            WeaponType.Secondary => InventoryManager.Instance.Secondary,
+            WeaponType.Tertiary => InventoryManager.Instance.Tertiary,
             _ => throw new ArgumentOutOfRangeException(nameof(weaponType), weaponType, null)
         };
         audioSource.PlayOneShot(switchEquippedClip);
@@ -148,12 +148,12 @@ public class WeaponManager : MonoBehaviour
     {
         foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
             Destroy(child.gameObject);
-        var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.name.ToUpper()}");
+        var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}");
         player.weaponPrefab = Instantiate(go, transform).Apply(o =>
         {
             o.layer = LayerMask.NameToLayer("WeaponCamera");
             o.AddComponent<WeaponSway>();
-            if (WeaponModel.type == WeaponType.Block)
+            if (WeaponModel.Type == WeaponType.Block)
                 o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
                     $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
         });
@@ -167,13 +167,13 @@ public class WeaponManager : MonoBehaviour
                      .Where(it => it != transform && it != transform.parent))
             Destroy(child.gameObject);
         var go = Resources.Load<GameObject>(
-            $"Prefabs/weapons/{WeaponModel!.name.ToUpper()}" + (isAiming ? "_aim" : ""));
+            $"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}" + (isAiming ? "_aim" : ""));
         player.weaponPrefab = Instantiate(go, isAiming ? transform.parent : transform).Apply(o =>
         {
             o.layer = LayerMask.NameToLayer("WeaponCamera");
             o.AddComponent<WeaponSway>();
-            mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.zoom : 1);
-            weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.zoom : 1);
+            mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.Zoom : 1);
+            weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.Zoom : 1);
         });
     }
 }

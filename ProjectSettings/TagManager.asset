@@ -19,6 +19,7 @@ TagManager:
   - Canvas
   - CircleDamageContainer
   - ClientServerManagers
+  - HpContainer
   layers:
   - Default
   - TransparentFX
