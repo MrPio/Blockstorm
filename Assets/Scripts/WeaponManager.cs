@@ -87,7 +87,7 @@ public class WeaponManager : MonoBehaviour
                 if (Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                     if (hit.collider != null)
                     {
-                        Instantiate(hit.transform.gameObject.name == "HEAD" ? headBlood : bodyBlood,
+                        Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
                             hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
                             Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                             Quaternion.Euler(0, Random.Range(-180, 180), 0));

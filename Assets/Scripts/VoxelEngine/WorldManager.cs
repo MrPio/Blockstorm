@@ -296,7 +296,7 @@ namespace VoxelEngine
 
                 // Stop the recursion if when too many voxels have been visited.
                 // This reduces the cost of recursion.
-                if (totalAdjacentSolids.Count > 1000)
+                if (totalAdjacentSolids.Count > 4000)
                     return null;
             }
 

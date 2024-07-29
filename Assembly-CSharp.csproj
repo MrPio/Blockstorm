@@ -75,6 +75,7 @@
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
+    <Compile Include="Assets\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\WeaponManager.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />

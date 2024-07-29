@@ -97,7 +97,6 @@ public class Player : NetworkBehaviour
                 bodyAnimator.SetTrigger(Animator.StringToHash("idle"));
                 // _isPlayerWalking.Value = false;
             };
-
             equipped.OnValueChanged += (_, newValue) =>
             {
                 print($"Player {OwnerClientId} has equipped {newValue.message}");
@@ -112,14 +111,13 @@ public class Player : NetworkBehaviour
                             $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
                 });
             };
-
             cameraRotationX.OnValueChanged += (_, newValue) =>
             {
                 var rotation = (float)(newValue - 128);
                 var headRotation = Mathf.Clamp(rotation, -50, 20f) - 20f;
                 var bellyRotation = Mathf.Clamp(rotation, -25f, 25f);
-                head.localRotation = Quaternion.Euler(0f, 0f, headRotation);
-                belly.localRotation = Quaternion.Euler(0f, 0f, bellyRotation);
+                head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
+                belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
             };
         }
     }
