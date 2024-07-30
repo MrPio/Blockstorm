@@ -130,10 +130,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 995723953}
     m_Modifications:
-    - target: {fileID: 859926405249268054, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3006782948519643556, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1931877512
@@ -141,10 +137,6 @@ PrefabInstance:
     - target: {fileID: 8956516086936702484, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
       propertyPath: m_Name
       value: ServerManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 8956516086936702484, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9136066641219395334, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -729,18 +721,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClientManager
       objectReference: {fileID: 0}
-    - target: {fileID: 4923453520308799359, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6180080625161611371, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6180080625161611371, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
-      propertyPath: playerPrefab
-      value: 
-      objectReference: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
     - target: {fileID: 8408558640280020905, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1036,14 +1016,6 @@ PrefabInstance:
     - target: {fileID: 1451455230600076861, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_Name
       value: NetworkManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
-      propertyPath: LogLevel
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
-      propertyPath: NetworkConfig.PlayerPrefab
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2051934028837435098, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_LocalPosition.x

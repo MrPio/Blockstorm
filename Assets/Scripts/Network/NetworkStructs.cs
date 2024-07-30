@@ -43,8 +43,8 @@ namespace Network
             var positions = map.BlocksEdits.Keys;
             var ids = map.BlocksEdits.Values;
             Xs = positions.Select(it => (short)it.x).ToArray();
-            Ys = positions.Select(it => (short)it.x).ToArray();
-            Zs = positions.Select(it => (short)it.x).ToArray();
+            Ys = positions.Select(it => (short)it.y).ToArray();
+            Zs = positions.Select(it => (short)it.z).ToArray();
             Ids = ids.ToArray();
         }
     }
