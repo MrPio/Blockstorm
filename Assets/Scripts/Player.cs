@@ -10,6 +10,7 @@ using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
@@ -31,7 +32,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private Animator bodyAnimator;
     [SerializeField] private Transform enemyWeaponContainer;
-    [SerializeField] private WeaponManager weaponManager;
+    [SerializeField] private Weapon weapon;
     [SerializeField] public AudioSource audioSource;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private Transform head;
@@ -170,7 +171,7 @@ public class Player : NetworkBehaviour
         var move = _transform.right * x + _transform.forward * z;
         _velocity.y -= gravity * Time.deltaTime;
         _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
-        characterController.Move(move * (speed * Time.deltaTime * (WeaponManager.isAiming ? 0.66f : 1f)) +
+        characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f)) +
                                  _velocity * Time.deltaTime);
 
         // Broadcast the walking state
@@ -179,7 +180,7 @@ public class Player : NetworkBehaviour
             _isPlayerWalking.Value = isWalking;
 
         // Handle jump
-        if (Input.GetButtonDown("Jump") && _isGrounded && !WeaponManager.isAiming)
+        if (Input.GetButtonDown("Jump") && _isGrounded && !Weapon.isAiming)
             _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
 
         // Invisible walls on map edges
@@ -228,28 +229,25 @@ public class Player : NetworkBehaviour
         }
 
         // Handle inventory weapon switch
-        if (weaponManager.WeaponModel != null)
+        if (weapon.WeaponModel != null)
         {
             WeaponType? weapon = null;
-            if (Input.GetKeyDown(KeyCode.Alpha1) && weaponManager.WeaponModel!.Type != WeaponType.Block)
+            if (Input.GetKeyDown(KeyCode.Alpha1) && this.weapon.WeaponModel!.Type != WeaponType.Block)
                 weapon = WeaponType.Block;
-            else if (Input.GetKeyDown(KeyCode.Alpha2) && weaponManager.WeaponModel!.Type != WeaponType.Melee)
+            else if (Input.GetKeyDown(KeyCode.Alpha2) && this.weapon.WeaponModel!.Type != WeaponType.Melee)
                 weapon = WeaponType.Melee;
-            else if (Input.GetKeyDown(KeyCode.Alpha3) && weaponManager.WeaponModel!.Type != WeaponType.Primary)
+            else if (Input.GetKeyDown(KeyCode.Alpha3) && this.weapon.WeaponModel!.Type != WeaponType.Primary)
                 weapon = WeaponType.Primary;
-            else if (Input.GetKeyDown(KeyCode.Alpha4) && weaponManager.WeaponModel!.Type != WeaponType.Secondary)
+            else if (Input.GetKeyDown(KeyCode.Alpha4) && this.weapon.WeaponModel!.Type != WeaponType.Secondary)
                 weapon = WeaponType.Secondary;
-            else if (Input.GetKeyDown(KeyCode.Alpha5) && weaponManager.WeaponModel!.Type != WeaponType.Tertiary)
+            else if (Input.GetKeyDown(KeyCode.Alpha5) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
                 weapon = WeaponType.Tertiary;
             if (weapon != null)
-            {
-                weaponManager.SwitchEquipped(weapon.Value);
-                equipped.Value = new Message { message = weaponManager.WeaponModel.Name };
-            }
+                this.weapon.SwitchEquipped(weapon.Value);
 
-            if (Input.GetMouseButtonDown(1) && weaponManager.WeaponModel!.Type != WeaponType.Block &&
-                weaponManager.WeaponModel!.Type != WeaponType.Melee)
-                weaponManager.ToggleAim();
+            if (Input.GetMouseButtonDown(1) && this.weapon.WeaponModel!.Type != WeaponType.Block &&
+                this.weapon.WeaponModel!.Type != WeaponType.Melee)
+                this.weapon.ToggleAim();
         }
     }
 
@@ -262,7 +260,7 @@ public class Player : NetworkBehaviour
                 weaponType == WeaponType.Tertiary ? smokes.RandomItem() : muzzles.RandomItem(),
                 mouth).Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
             if (IsOwner)
-                SpawnWeaponEffectRpc(weaponManager.WeaponModel!.Type);
+                SpawnWeaponEffectRpc(weapon.WeaponModel!.Type);
         }
     }
 

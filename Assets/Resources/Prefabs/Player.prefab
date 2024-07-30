@@ -724,11 +724,11 @@ MonoBehaviour:
   audioSource: {fileID: 7486929924204302242}
   animator: {fileID: 661212344934770656}
   cameraMovement: {fileID: 2753835092349440889}
+  mainCamera: {fileID: 783449516086253421}
+  weaponCamera: {fileID: 3434581067932685962}
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}
-  mainCamera: {fileID: 783449516086253421}
-  weaponCamera: {fileID: 3434581067932685962}
   bodyBlood: {fileID: 614115134421451849, guid: 073f95ed3978e444fa53e631a9c607d8, type: 3}
   headBlood: {fileID: 1327947280328091902, guid: 05b1ab6389f259143984bcd439d1e3d8, type: 3}
   player: {fileID: 5505040103345985529}
@@ -948,7 +948,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1972594760
+  GlobalObjectIdHash: 519613176
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1006,7 +1006,7 @@ MonoBehaviour:
   groundCheck: {fileID: 2809431145089976558}
   bodyAnimator: {fileID: 6789867817577817733}
   enemyWeaponContainer: {fileID: 9084864200341798743}
-  weaponManager: {fileID: 7821993980020846379}
+  weapon: {fileID: 7821993980020846379}
   audioSource: {fileID: 7261302375098064695}
   cameraTransform: {fileID: 8653038877929598625}
   head: {fileID: 5335098393155266812}
@@ -1871,7 +1871,7 @@ MonoBehaviour:
   playerTransform: {fileID: 1263851460940361170}
   player: {fileID: 5505040103345985529}
   checkIncrement: 0.1
-  weaponManager: {fileID: 7821993980020846379}
+  weapon: {fileID: 7821993980020846379}
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}

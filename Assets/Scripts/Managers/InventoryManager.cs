@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
-using Model;
 using VoxelEngine;
 
 namespace Managers
@@ -11,7 +10,7 @@ namespace Managers
         public int Hp, Armor, Blocks;
         public bool HasHelmet; // TODO: handle halmet removal
 
-        [CanBeNull] public Weapon Block, // Block
+        [CanBeNull] public Model.Weapon Block, // Block
             Melee, // Melee
             Primary, // Rifles
             Secondary, // Pistols
@@ -28,9 +27,9 @@ namespace Managers
             Hp = 100;
             Armor = 0;
             HasHelmet = false;
-            Melee = Weapon.Melees[0];
-            Block = Weapon.Blocks[0];
-            Primary = Weapon.Primaries[0];
+            Melee = Model.Weapon.Melees[0];
+            Block = Model.Weapon.Blocks[0];
+            Primary = Model.Weapon.Primaries[0];
             Blocks = 100;
             BlockId = (byte)WorldManager.instance.blockTypes.ToList().FindIndex(e => e.name == "player_block_yellow");
         }

@@ -18,14 +18,14 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private Player player;
     private float _rotX, _rotY;
     public float checkIncrement = 0.1f;
-    private float Reach => weaponManager.WeaponModel?.Distance ?? 0f;
     private WorldManager _wm;
     private Transform _transform;
     private bool _canDig, _canPlace;
     private float _lastDig, _lastPlace, _lastFire;
-    public WeaponManager weaponManager;
+    public Weapon weapon;
     private ParticleSystem _blockDigEffect;
     private bool _isPlaceCursorBlocksStarted;
+    private float Reach => weapon.WeaponModel?.Distance ?? 0f;
 
     [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
 
@@ -76,8 +76,8 @@ public class CameraMovement : MonoBehaviour
     private void LateUpdate()
     {
         // Handle camera rotation
-        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity * (WeaponManager.isAiming ? 0.66f : 1f);
-        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity * (WeaponManager.isAiming ? 0.66f : 1f);
+        var mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivity * (Weapon.isAiming ? 0.66f : 1f);
+        var mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * sensitivity * (Weapon.isAiming ? 0.66f : 1f);
         _rotX -= mouseY;
         _rotX = Mathf.Clamp(_rotX, -90f, 90f);
         _transform.localRotation = Quaternion.Euler(_rotX, 0f, 0f);
@@ -97,8 +97,8 @@ public class CameraMovement : MonoBehaviour
         }
 
         // If I am digging with a melee weapon
-        if (weaponManager.WeaponModel is { Type: WeaponType.Melee } &&
-            Input.GetMouseButton(0) && Time.time - _lastDig > weaponManager.WeaponModel.Delay)
+        if (weapon.WeaponModel is { Type: WeaponType.Melee } &&
+            Input.GetMouseButton(0) && Time.time - _lastDig > weapon.WeaponModel.Delay)
         {
             _lastDig = Time.time;
             if (_highlightBlock.gameObject.activeSelf)
@@ -122,33 +122,33 @@ public class CameraMovement : MonoBehaviour
                     InventoryManager.Instance.Melee!.Damage);
             }
 
-            weaponManager.Fire();
+            weapon.Fire();
         }
 
         // If I am placing with an equipped block
-        else if (weaponManager.WeaponModel is { Type: WeaponType.Block } && _placeBlock.gameObject.activeSelf &&
+        else if (weapon.WeaponModel is { Type: WeaponType.Block } && _placeBlock.gameObject.activeSelf &&
                  Input.GetMouseButton(0) &&
-                 Time.time - _lastPlace > weaponManager.WeaponModel.Delay)
+                 Time.time - _lastPlace > weapon.WeaponModel.Delay)
         {
             _lastPlace = Time.time;
             ServerManager.instance.EditVoxelServerRpc(_placeBlock.transform.position,
                 InventoryManager.Instance.BlockId);
             // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
             _placeBlock.gameObject.SetActive(false);
-            weaponManager.Fire();
+            weapon.Fire();
         }
 
         // If I am firing with a weapon
-        else if (weaponManager.WeaponModel is { Type: WeaponType.Primary } or { Type: WeaponType.Secondary } or
+        else if (weapon.WeaponModel is { Type: WeaponType.Primary } or { Type: WeaponType.Secondary } or
                      { Type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
-                 Time.time - _lastFire > weaponManager.WeaponModel.Delay)
+                 Time.time - _lastFire > weapon.WeaponModel.Delay)
         {
             _lastFire = Time.time;
-            weaponManager.Fire();
+            weapon.Fire();
         }
 
-        if (weaponManager.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
-            _lastPlace -= weaponManager.WeaponModel.Delay * 0.65f;
+        if (weapon.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
+            _lastPlace -= weapon.WeaponModel.Delay * 0.65f;
 
         if (_blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
             _blockDigEffect.Stop();

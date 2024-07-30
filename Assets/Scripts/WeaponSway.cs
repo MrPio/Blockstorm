@@ -8,7 +8,7 @@ public class WeaponSway : MonoBehaviour {
     [SerializeField] private float multiplier=2.5f;
     private void Update()
     {
-        if(WeaponManager.isAiming)
+        if(Weapon.isAiming)
             return;
         // get mouse input
         var mouseX = Input.GetAxisRaw("Mouse X") * multiplier;
@@ -20,8 +20,8 @@ public class WeaponSway : MonoBehaviour {
         var rotationX = Quaternion.AngleAxis(-mouseY, Vector3.right);
         var rotationY = Quaternion.AngleAxis(mouseX, Vector3.up);
         
-        var rotationX2 = Quaternion.AngleAxis(z*5f *(WeaponManager.isAiming?0.4f:1f), Vector3.right);
-        var rotationY2 = Quaternion.AngleAxis(x*5f *(WeaponManager.isAiming?0.4f:1f), Vector3.up);
+        var rotationX2 = Quaternion.AngleAxis(z*5f *(Weapon.isAiming?0.4f:1f), Vector3.right);
+        var rotationY2 = Quaternion.AngleAxis(x*5f *(Weapon.isAiming?0.4f:1f), Vector3.up);
 
         var targetRotation = rotationX * rotationY*rotationX2*rotationY2;
 
