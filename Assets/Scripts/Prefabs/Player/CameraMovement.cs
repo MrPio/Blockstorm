@@ -131,7 +131,7 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(noBlockDamageClip);
                     else
                         audioSource.PlayOneShot(blockDamageMediumClip);
-                    _clientManager.DamageVoxelClientRpc(_highlightBlock.transform.position,
+                    _clientManager.DamageVoxelRpc(_highlightBlock.transform.position,
                         InventoryManager.Instance.Melee!.Damage);
                 }
 

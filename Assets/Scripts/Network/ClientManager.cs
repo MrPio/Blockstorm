@@ -1,4 +1,5 @@
-﻿using Prefabs.Player;
+﻿using System;
+using Prefabs.Player;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,7 +16,10 @@ namespace Network
         private WorldManager _wm;
 
         // Used to update the map status
-        public readonly NetworkVariable<MapStatus> MapStatus = new();
+        private readonly NetworkVariable<MapStatus> MapStatus = new(new MapStatus
+        {
+            Xs = Array.Empty<short>(), Ys = Array.Empty<short>(), Zs = Array.Empty<short>(), Ids = Array.Empty<byte>()
+        });
 
         private void Awake()
         {
@@ -54,8 +58,8 @@ namespace Network
         }
 
 
-        [ClientRpc]
-        public void SendPlayerListClientRpc(ulong[] playerIds, ulong clientId)
+        [Rpc(SendTo.Everyone)]
+        public void SendPlayerListRpc(ulong[] playerIds, ulong clientId)
         {
             if (NetworkManager.Singleton.LocalClientId != clientId) return;
             _dashboard.UpdateDashboard(playerIds);
@@ -66,9 +70,10 @@ namespace Network
         /// </summary>
         /// <param name="pos">The position of the new voxel.</param>
         /// <param name="newID">The type of the new voxel.</param>
-        [ClientRpc]
+        [Rpc(SendTo.Everyone)]
         public void EditVoxelClientRpc(Vector3 pos, byte newID)
         {
+            print("EditVoxelClientRpc");
             _wm.EditVoxel(pos, newID);
             if (IsHost)
                 MapStatus.Value = new MapStatus(_wm.Map);
@@ -79,8 +84,8 @@ namespace Network
         /// </summary>
         /// <param name="pos">The position of the damaged voxel.</param>
         /// <param name="damage">The damage dealt.</param>
-        [ClientRpc]
-        public void DamageVoxelClientRpc(Vector3 pos, uint damage)
+        [Rpc(SendTo.Everyone)]
+        public void DamageVoxelRpc(Vector3 pos, uint damage)
         {
             if (_wm.DamageVoxel(pos, damage))
                 _highlightBlock.gameObject.SetActive(false);

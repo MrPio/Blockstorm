@@ -18,6 +18,24 @@ namespace Model
     {
         private const float PlaceDelay = 0.375f;
 
+        public static readonly Dictionary<string, float> BodyPartMultipliers = new()
+        {
+            ["Head"] = 1.5f,
+            ["Body"] = 0.85f,
+            ["Chest"] = 1f,
+            
+            ["Arm:Left:Upper"] = 0.85f,
+            ["Arm:Left:Lower"] = 0.75f,
+            ["Arm:Right:Upper"] = 0.85f,
+            ["Arm:Right:Upper"] = 0.75f,
+            
+            ["Leg:Left:Upper"] = 0.65f,
+            ["Leg:Left:Lower"] = 0.5f,
+            ["Leg:Right:Upper"] = 0.65f,
+            ["Leg:Right:Lower"] = 0.5f,
+
+        };
+
         public static readonly List<Weapon> Blocks = new()
         {
             new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block,
@@ -32,7 +50,7 @@ namespace Model
 
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24*20, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
+            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
                 zoom: 1.75f)
         };
 

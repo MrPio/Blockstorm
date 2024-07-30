@@ -24,7 +24,7 @@ namespace Network
         {
             if (!IsServer) return;
             var players = NetworkManager.Singleton.ConnectedClientsList.Select(it => it.ClientId);
-            _clientManager.SendPlayerListClientRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
+            _clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
         }
     }
 }

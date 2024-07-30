@@ -21,6 +21,7 @@ TagManager:
   - ClientServerManagers
   - HpContainer
   - NetworkManager
+  - WorldCanvas
   layers:
   - Default
   - TransparentFX

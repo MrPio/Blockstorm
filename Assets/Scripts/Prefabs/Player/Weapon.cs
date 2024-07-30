@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using Managers;
 using Model;
 using Network;
+using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using VoxelEngine;
 using Random = UnityEngine.Random;
@@ -36,6 +38,7 @@ namespace Prefabs.Player
         [Header("Prefabs")] [SerializeField] private GameObject bodyBlood;
         [SerializeField] private GameObject headBlood;
         [SerializeField] private Player player;
+        [SerializeField] private GameObject damageText;
 
         [CanBeNull] private Model.Weapon _weaponModel;
         private AudioClip _fireClip;
@@ -46,6 +49,7 @@ namespace Prefabs.Player
         private Transform _crosshair;
         private Animator _crosshairAnimator;
         private ClientManager _clientManager;
+        private Canvas worldCanvas;
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -75,6 +79,7 @@ namespace Prefabs.Player
             _crosshairAnimator = _crosshair.Find("CrosshairLines").GetComponent<Animator>();
             _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
             _clientManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
+            worldCanvas = GameObject.FindWithTag("WorldCanvas").GetComponent<Canvas>();
         }
 
         private void Start()
@@ -111,16 +116,31 @@ namespace Prefabs.Player
             if (Physics.Raycast(ray, out var hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                 if (hit.collider is not null)
                 {
+                    var multiplier = Model.Weapon.BodyPartMultipliers[hit.transform.gameObject.name];
+                    var damage = (uint)(_weaponModel.Damage * multiplier);
+
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
                         hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
+                    // Spawn the damage text
+                    var damageTextGo = Instantiate(damageText, worldCanvas.transform);
+                    damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                                                      cameraTransform.forward * 0.45f;
+                    damageTextGo.transform.rotation = player.transform.rotation;
+                    damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
+                    damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                    {
+                        text.text = damage.ToString();
+                        text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                    });
+                    damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+
                     // Send the damage to the enemy
-                    // TODO: add multiplier based on which body part has been hit. Legs: 50%, head 150%, arms 75% and chest 100%
                     var attackedPlayer = hit.transform.GetComponentInParent<Player>();
-                    attackedPlayer.DamageClientRpc(_weaponModel.Damage, player.OwnerClientId);
+                    attackedPlayer.DamageClientRpc(damage, player.OwnerClientId);
 
                     // Prevents damaging the ground
                     return;
@@ -152,7 +172,7 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(blockDamageMediumClip, 1);
 
                     // Broadcast the damage action
-                    _clientManager.DamageVoxelClientRpc(pos, _weaponModel.Damage);
+                    _clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
                 }
         }
 
