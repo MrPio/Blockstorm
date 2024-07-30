@@ -11,9 +11,8 @@ namespace VoxelEngine
     public class WorldManager : MonoBehaviour
     {
         public static ushort maxPlayers = 32;
-        public static WorldManager instance;
 
-        [NonSerialized] public readonly BlockType[] blockTypes =
+        [NonSerialized] public static readonly BlockType[] BlockTypes =
         {
             new("air", topID: (15, 15), isSolid: false, isTransparent: true),
             new("iron", topID: (1, 0), blockHealth: BlockHealth.Indestructible), // Bedrock must be in index 1
@@ -141,7 +140,7 @@ namespace VoxelEngine
         };
 
         public byte BlockTypeIndex(string blockName) =>
-            (byte)blockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
+            (byte)BlockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 
         public Material material, transparentMaterial;
         [Range(1, 128)] public int chunkSize = 2;
@@ -151,22 +150,21 @@ namespace VoxelEngine
         private Chunk[,] _chunks;
         [ItemCanBeNull] private Chunk[,] _nonSolidChunks;
         [CanBeNull] private List<Chunk> _brokenChunks = new();
-        [NonSerialized] public Map map;
+        [NonSerialized] public Map Map;
         private Vector3 _playerLastPos;
         [SerializeField] private string mapName = "Harbor";
+        private bool _hasRendered;
 
         private void Start()
         {
-            instance = this;
             chunkSize = math.max(1, chunkSize);
             viewDistance = math.max(1, viewDistance);
-            LoadMap(Map.GetMap(mapName));
+            Map = Map.GetMap(mapName);
         }
 
-        private void LoadMap(Map newMap)
+        public void RenderMap()
         {
-            map = newMap;
-            var mapSize = map.size;
+            var mapSize = Map.size;
             var chunksX = Mathf.CeilToInt((float)mapSize.x / chunkSize);
             var chunksZ = Mathf.CeilToInt((float)mapSize.z / chunkSize);
             _chunks = new Chunk[chunksX, chunksZ];
@@ -174,28 +172,29 @@ namespace VoxelEngine
             for (var x = 0; x < chunksX; x++)
             for (var z = 0; z < chunksZ; z++)
             {
-                _chunks[x, z] = new Chunk(new ChunkCoord(x, z), isSolid: true);
+                _chunks[x, z] = new Chunk(new ChunkCoord(x, z, chunkSize), isSolid: true, this);
 
-                _nonSolidChunks[x, z] = new Chunk(new ChunkCoord(x, z), isSolid: false);
+                _nonSolidChunks[x, z] = new Chunk(new ChunkCoord(x, z, chunkSize), isSolid: false, this);
                 if (_nonSolidChunks[x, z].IsEmpty)
                 {
-                    Destroy(_nonSolidChunks[x, z].chunkGo);
+                    Destroy(_nonSolidChunks[x, z].ChunkGo);
                     _nonSolidChunks[x, z] = null;
                 }
             }
+            _hasRendered = true;
         }
 
         public bool IsVoxelInWorld(Vector3Int pos) =>
-            pos.x >= 0 && pos.x < map.size.x && pos.y >= 0 && pos.y < map.size.y && pos.z >= 0 && pos.z < map.size.z;
+            pos.x >= 0 && pos.x < Map.size.x && pos.y >= 0 && pos.y < Map.size.y && pos.z >= 0 && pos.z < Map.size.z;
 
         [CanBeNull]
         public BlockType GetVoxel(Vector3Int pos) =>
-            IsVoxelInWorld(pos) ? blockTypes[map.blocks[pos.y, pos.x, pos.z]] : null;
+            IsVoxelInWorld(pos) ? BlockTypes[Map.Blocks[pos.y, pos.x, pos.z]] : null;
 
         // This is used to update the rendered chunks
         public void UpdatePlayerPos(Vector3 playerPos)
         {
-            if (Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
+            if (!_hasRendered || Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
                 return;
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)
@@ -217,23 +216,33 @@ namespace VoxelEngine
             return null;
         }
 
+        public int counts;
         public void EditVoxel(Vector3 pos, byte newID)
         {
             var posNorm = Vector3Int.FloorToInt(pos);
-            map.blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
+            Map.Blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
+            Map.BlocksEdits[posNorm] = newID;
+            // var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            counts = 0;
             if (newID == 0)
                 CheckForFlyingMesh(posNorm);
-            GetChunk(posNorm)?.Apply(e =>
+            // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
+
+            GetChunk(posNorm)?.Apply(chunk =>
             {
-                e.UpdateMesh();
-                e.UpdateAdjacentChunks(posNorm);
+                chunk.UpdateMesh();
+                // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
+                chunk.UpdateAdjacentChunks(posNorm);
             });
+            // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
+            // Debug.Log(counts);
+
         }
 
         public bool DamageVoxel(Vector3 pos, uint damage)
         {
             var posNorm = Vector3Int.FloorToInt(pos);
-            if (map.DamageBlock(Vector3Int.FloorToInt(pos), damage) <= 0)
+            if (Map.DamageBlock(Vector3Int.FloorToInt(pos), damage) <= 0)
             {
                 EditVoxel(posNorm, 0);
                 return true;
@@ -262,9 +271,10 @@ namespace VoxelEngine
             visited.Add(posNorm);
             var totalAdjacentSolids = new List<Vector3Int> { posNorm };
 
-            // Explore all the neighboring voxels.
+            // Explore all the neighbouring voxels.
             foreach (var adjacent in VoxelData.AdjacentVoxels)
             {
+                counts++;
                 var newPos = posNorm + adjacent;
 
                 // Skip this voxel if already visited or terminate if is a stop voxel.
@@ -305,7 +315,7 @@ namespace VoxelEngine
 
         /// <summary>
         /// Destroying a voxel can create a flying group of voxels.
-        /// Therefore, for each neighboring voxel we check if a flying structure has been created.
+        /// Therefore, for each neighbouring voxel we check if a flying structure has been created.
         /// A fall animation is created for each flying structure detected and those voxels are removed from their chunks.
         /// </summary>
         /// <param name="posNorm">The position of the destroyed block.</param>
@@ -333,17 +343,17 @@ namespace VoxelEngine
                 var removedBlocks = new Dictionary<Vector3Int, byte>();
                 foreach (var block in flyingBlocks)
                 {
-                    removedBlocks[new Vector3Int(block.x, block.y, block.z)] = map.blocks[block.y, block.x, block.z];
-                    map.blocks[block.y, block.x, block.z] = 0;
+                    removedBlocks[new Vector3Int(block.x, block.y, block.z)] = Map.Blocks[block.y, block.x, block.z];
+                    Map.Blocks[block.y, block.x, block.z] = 0;
+                    Map.BlocksEdits[block] = 0;
                     var chunk = GetChunk(block);
                     if (!chunksToUpdate.Contains(chunk))
                         chunksToUpdate.Add(chunk);
                 }
 
                 // Spawn a falling group of voxels.
-                _brokenChunks!.Add(new Chunk(removedBlocks));
+                _brokenChunks!.Add(new Chunk(removedBlocks, this));
             }
-
             foreach (var chunk in chunksToUpdate)
                 chunk.UpdateMesh();
         }
@@ -383,7 +393,7 @@ namespace VoxelEngine
                 ? this.topID
                 : (ushort)(bottomID.Value.Item1 * 16 + bottomID.Value.Item2);
             this.blockHealth = blockHealth;
-            textureIDs = new Dictionary<int, ushort>
+            TextureIDs = new Dictionary<int, ushort>
             {
                 { 0, this.sideID },
                 { 1, this.sideID },
@@ -396,6 +406,6 @@ namespace VoxelEngine
 
         // Convert the face index to the corresponding texture ID
         // The face index order is given by VoxelData.FaceChecks
-        public Dictionary<int, ushort> textureIDs;
+        public Dictionary<int, ushort> TextureIDs;
     }
 }

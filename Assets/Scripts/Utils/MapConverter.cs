@@ -59,6 +59,12 @@ namespace Utils
         public GameObject cube;
         [SerializeField] private Spawn redSpawn;
         [SerializeField] private List<SpawnCamera> spawnCameras;
+        private WorldManager _wm;
+
+        private void Awake()
+        {
+            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
+        }
 
         /*
      * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
@@ -68,7 +74,7 @@ namespace Utils
         [Button]
         private void Map2Voxel()
         {
-            var blockTypesList = WorldManager.instance.blockTypes.ToList();
+            var blockTypesList = WorldManager.BlockTypes.ToList();
             var cubes = GameObject.FindWithTag("MapGenerator").GetComponentsInChildren<MeshRenderer>();
             var blockTypes = new List<byte>();
             var positionsX = new List<int>();
@@ -100,8 +106,8 @@ namespace Utils
             // Apply remapping rules
             foreach (var block in blocksList)
             foreach (var remap in remappingRules)
-                if (block.type == WorldManager.instance.BlockTypeIndex(remap.oldName))
-                    block.type = WorldManager.instance.BlockTypeIndex(remap.newName);
+                if (block.type == _wm.BlockTypeIndex(remap.oldName))
+                    block.type = _wm.BlockTypeIndex(remap.newName);
             // Add bottom bedrock layer
             for (var x = 0; x < mapSize.x; x++)
             for (var z = 0; z < mapSize.z; z++)
@@ -133,8 +139,8 @@ namespace Utils
                 };
                 foreach (var block in newBlocks)
                 foreach (var remap in rule.remappingRules)
-                    if (block.type == WorldManager.instance.BlockTypeIndex(remap.oldName))
-                        block.type = WorldManager.instance.BlockTypeIndex(remap.newName);
+                    if (block.type == _wm.BlockTypeIndex(remap.oldName))
+                        block.type = _wm.BlockTypeIndex(remap.newName);
                 blocksList.AddRange(newBlocks);
             }
 
@@ -153,8 +159,8 @@ namespace Utils
         private void Voxel2Map()
         {
             var map = GameObject.FindWithTag("MapGenerator").transform;
-            var blocks = WorldManager.instance.map.blocks;
-            var size = WorldManager.instance.map.size;
+            var blocks = _wm.Map.Blocks;
+            var size = _wm.Map.size;
             for (var y = 1; y < size.y; y++) // Ignoring the indestructible base
             for (var x = 0; x < size.x; x++)
             for (var z = 0; z < size.z; z++)
@@ -163,7 +169,7 @@ namespace Utils
                     continue;
                 var cubeGo = Instantiate(cube, map);
                 cubeGo.transform.position = new Vector3(x, y, z) + Vector3.one * 0.5f;
-                var textureId = WorldManager.instance.blockTypes[blocks[y, x, z]].topID;
+                var textureId = WorldManager.BlockTypes[blocks[y, x, z]].topID;
                 cubeGo.GetComponent<MeshRenderer>().material =
                     Resources.Load($"Textures/texturepacks/blockade/Materials/blockade_{(textureId + 1):D1}") as Material;
             }
@@ -184,7 +190,7 @@ namespace Utils
         [Button]
         private void SerializeMap(Serializers serializer)
         {
-            var map = WorldManager.instance.map;
+            var map = _wm.Map;
             map.spawns = new List<Spawn>
             {
                 redSpawn,
@@ -225,7 +231,7 @@ namespace Utils
         [Button]
         private void AddSpawnCameras()
         {
-            var map = WorldManager.instance.map;
+            var map = _wm.Map;
             map.cameraSpawns ??= new List<CameraSpawn>();
             map.cameraSpawns.AddRange(spawnCameras.Select(it =>
                 new CameraSpawn(it.camera.transform.position, it.camera.transform.rotation.eulerAngles, it.team)).ToList());

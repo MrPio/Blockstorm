@@ -1,34 +1,32 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Partials;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Utils;
 using Random = UnityEngine.Random;
 
 namespace VoxelEngine
 {
     public class ChunkCoord
     {
-        public readonly int x, z;
-        public readonly Vector3Int worldPos;
+        public readonly int X, Z;
+        public readonly Vector3Int WorldPos;
 
-        public ChunkCoord(int x, int z)
+        public ChunkCoord(int x, int z, int chunkSize)
         {
-            this.x = x;
-            this.z = z;
-            worldPos = new Vector3Int(x * WorldManager.instance.chunkSize, 0, z * WorldManager.instance.chunkSize);
+            X = x;
+            Z = z;
+            WorldPos = new Vector3Int(x * chunkSize, 0, z * chunkSize);
         }
     }
 
     public class Chunk
     {
         public static Dictionary<ushort, List<Vector2>> cachedUVs;
-        public readonly GameObject chunkGo;
+        public readonly GameObject ChunkGo;
         private MeshFilter _meshFilter; // Vertices
-        private MeshRenderer _meshRenderer; // Light + Material
+        private readonly MeshRenderer _meshRenderer; // Light + Material
         private MeshCollider _meshCollider; // Collisions
 
         private int _vertexIndex;
@@ -37,21 +35,21 @@ namespace VoxelEngine
         private readonly List<Vector2> _uvs = new();
         private readonly Vector3Int _size;
         private readonly WorldManager _wm;
-        public readonly ChunkCoord coord;
-        public readonly bool isSolid;
+        public readonly ChunkCoord Coord;
+        public readonly bool IsSolid;
         private Dictionary<Vector3Int, byte> _removedBlocks = null;
 
         public bool IsEmpty => _vertices.Count == 0;
 
-        public Chunk(ChunkCoord coord, bool isSolid)
+        public Chunk(ChunkCoord coord, bool isSolid, WorldManager wm)
         {
-            this.coord = coord;
-            this.isSolid = isSolid;
-            _wm = WorldManager.instance;
+            Coord = coord;
+            IsSolid = isSolid;
+            _wm = wm;
             _size = new Vector3Int(
-                math.min(_wm.chunkSize, _wm.map.size.x - coord.worldPos.x),
+                math.min(_wm.chunkSize, _wm.Map.size.x - coord.WorldPos.x),
                 Map.MaxHeight,
-                math.min(_wm.chunkSize, _wm.map.size.z - coord.worldPos.z)
+                math.min(_wm.chunkSize, _wm.Map.size.z - coord.WorldPos.z)
             );
 
             if (cachedUVs == null)
@@ -66,45 +64,45 @@ namespace VoxelEngine
                 }
             }
 
-            chunkGo = new GameObject($"Chunk ({coord.x},{coord.z}) " + (isSolid ? "Solid" : "NonSolid"))
+            ChunkGo = new GameObject($"Chunk ({coord.X},{coord.Z}) " + (isSolid ? "Solid" : "NonSolid"))
                 { layer = LayerMask.NameToLayer("Ground") };
-            chunkGo.transform.SetParent(_wm.transform);
-            chunkGo.transform.position = coord.worldPos;
+            ChunkGo.transform.SetParent(_wm.transform);
+            ChunkGo.transform.position = coord.WorldPos;
 
-            _meshRenderer = chunkGo.AddComponent<MeshRenderer>();
-            _meshFilter = chunkGo.AddComponent<MeshFilter>();
-            _meshCollider = chunkGo.AddComponent<MeshCollider>();
+            _meshRenderer = ChunkGo.AddComponent<MeshRenderer>();
+            _meshFilter = ChunkGo.AddComponent<MeshFilter>();
+            _meshCollider = ChunkGo.AddComponent<MeshCollider>();
             _meshRenderer.materials = new[] { _wm.material, _wm.transparentMaterial };
 
             UpdateMesh();
-            chunkGo.SetActive(false);
+            ChunkGo.SetActive(false);
         }
 
-        public Chunk(Dictionary<Vector3Int, byte> removedBlocks)
+        public Chunk(Dictionary<Vector3Int, byte> removedBlocks, WorldManager wm)
         {
             _removedBlocks = removedBlocks;
-            isSolid = true;
-            _wm = WorldManager.instance;
-            chunkGo = new GameObject($"Debris Chunk");
-            chunkGo.transform.SetParent(_wm.transform);
+            _wm = wm;
+            IsSolid = true;
+            ChunkGo = new GameObject($"Debris Chunk");
+            ChunkGo.transform.SetParent(_wm.transform);
 
             // coord = new ChunkCoord(removedBlocks.Keys.Min(it => it.x), removedBlocks.Keys.Min(it => it.z));
-            chunkGo.transform.position = removedBlocks.Keys.Aggregate(Vector3.zero, (acc, v) => acc + v) /
+            ChunkGo.transform.position = removedBlocks.Keys.Aggregate(Vector3.zero, (acc, v) => acc + v) /
                                          removedBlocks.Keys.Count;
 
-            _meshRenderer = chunkGo.AddComponent<MeshRenderer>();
-            _meshFilter = chunkGo.AddComponent<MeshFilter>();
-            _meshCollider = chunkGo.AddComponent<MeshCollider>();
+            _meshRenderer = ChunkGo.AddComponent<MeshRenderer>();
+            _meshFilter = ChunkGo.AddComponent<MeshFilter>();
+            _meshCollider = ChunkGo.AddComponent<MeshCollider>();
             _meshRenderer.materials = new[] { _wm.material };
 
             UpdateMesh();
-            chunkGo.SetActive(true);
+            ChunkGo.SetActive(true);
         }
 
         public bool IsActive
         {
-            get => chunkGo.activeSelf;
-            set => chunkGo.SetActive(value);
+            get => ChunkGo.activeSelf;
+            set => ChunkGo.SetActive(value);
         }
 
         // Check if there is a solid voxel (in the world) in the given position
@@ -112,10 +110,10 @@ namespace VoxelEngine
         private bool CheckVoxel(Vector3Int posNorm, byte currentBlockType)
         {
             if (_removedBlocks != null) return _removedBlocks.ContainsKey(posNorm);
-            var worldPos = posNorm + coord.worldPos;
+            var worldPos = posNorm + Coord.WorldPos;
             return _wm.IsVoxelInWorld(worldPos) &&
-                   (_wm.blockTypes[_wm.map.blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
-                    _wm.map.blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
+                   (WorldManager.BlockTypes[_wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
+                    _wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
@@ -128,12 +126,12 @@ namespace VoxelEngine
         private void AddVoxel(Vector3 pos)
         {
             var blockId = _removedBlocks == null
-                ? _wm.map.blocks[(int)pos.y,(int) pos.x + coord.worldPos.x, (int)pos.z + coord.worldPos.z]
-                : _removedBlocks[ Vector3Int.FloorToInt(pos +chunkGo.transform.position)];
-            var blockType = _wm.blockTypes[blockId];
+                ? _wm.Map.Blocks[(int)pos.y,(int) pos.x + Coord.WorldPos.x, (int)pos.z + Coord.WorldPos.z]
+                : _removedBlocks[ Vector3Int.FloorToInt(pos +ChunkGo.transform.position)];
+            var blockType = WorldManager.BlockTypes[blockId];
             // Skip if air
             if (blockType.name == "air") return;
-            if ((isSolid && !blockType.isSolid) || (!isSolid && blockType.isSolid))
+            if ((IsSolid && !blockType.isSolid) || (!IsSolid && blockType.isSolid))
                 return;
             for (var p = 0; p < 6; p++)
             {
@@ -141,7 +139,7 @@ namespace VoxelEngine
                 if (CheckVoxel(Vector3Int.FloorToInt(pos) + VoxelData.FaceChecks[p], blockId)) continue;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);
-                _uvs.AddRange(cachedUVs[blockType.textureIDs[p]]);
+                _uvs.AddRange(cachedUVs[blockType.TextureIDs[p]]);
                 for (var i = 0; i < VoxelData.Triangles.Length; i++)
                     if (blockType.isTransparent)
                         _transparentTriangles.Add(_vertexIndex + VoxelData.Triangles[i]);
@@ -164,7 +162,7 @@ namespace VoxelEngine
                     AddVoxel(new Vector3(x, y, z));
             else
                 foreach (var block in _removedBlocks.Keys)
-                    AddVoxel(block - chunkGo.transform.position);
+                    AddVoxel(block - ChunkGo.transform.position);
 
             var mesh = new Mesh
             {
@@ -182,7 +180,7 @@ namespace VoxelEngine
             mesh.RecalculateBounds();
             mesh.Optimize();
 
-            if (isSolid && _removedBlocks == null)
+            if (IsSolid && _removedBlocks == null)
                 _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
 
@@ -190,7 +188,7 @@ namespace VoxelEngine
             if (_removedBlocks != null)
             {
                 _meshCollider.convex = true;
-                var rb = chunkGo.AddComponent<Rigidbody>();
+                var rb = ChunkGo.AddComponent<Rigidbody>();
                 var dir = Vector3.up *
                           Random.Range(1f,
                               2f); //+ Vector3.left * Random.Range(-0.5f, 0.5f) +Vector3.forward * Random.Range(-0.5f, 0.5f);
@@ -198,7 +196,7 @@ namespace VoxelEngine
                 // rb.AddForceAtPosition(dir, Vector3.zero, ForceMode.Impulse);
                 rb.angularVelocity = Vector3.up * 0.25f + Vector3.left * Random.Range(-0.35f, 0.35f) +
                                      Vector3.forward * Random.Range(-0.35f, 0.35f);
-                chunkGo.AddComponent<Destroyable>().lifespan = 10f;
+                ChunkGo.AddComponent<Destroyable>().lifespan = 10f;
             }
         }
 
@@ -221,17 +219,17 @@ namespace VoxelEngine
                 {
                     // Debug.Log($"Update {currentVoxel}, p={p}");
                     var chunk = _wm.GetChunk(currentVoxel);
-                    if (chunk != null && !processedChunks.Contains(chunk.coord))
+                    if (chunk != null && !processedChunks.Contains(chunk.Coord))
                     {
                         chunk.UpdateMesh();
-                        processedChunks.Add(chunk.coord);
+                        processedChunks.Add(chunk.Coord);
                     }
                 }
             }
         }
 
         private bool IsVoxelInChunk(Vector3Int pos) =>
-            pos.x >= coord.x * _wm.chunkSize && pos.x < (coord.x + 1) * _wm.chunkSize &&
-            pos.z >= coord.z * _wm.chunkSize && pos.z < (coord.z + 1) * _wm.chunkSize;
+            pos.x >= Coord.X * _wm.chunkSize && pos.x < (Coord.X + 1) * _wm.chunkSize &&
+            pos.z >= Coord.Z * _wm.chunkSize && pos.z < (Coord.Z + 1) * _wm.chunkSize;
     }
 }

@@ -29,10 +29,11 @@ namespace VoxelEngine
 
         public string name;
 
-        // We assume to have no more than 256 types of blocks. Otherwise an int would be required (4x size)
+        // We assume that we have no more than 256 types of blocks.
         [SerializeField] private List<BlockEncoding> blocksList;
-        [NonSerialized] public byte[,,] blocks; // y,x,z
-        [NonSerialized] public Dictionary<Vector3Int, uint> blocksHealth;
+        [NonSerialized] public byte[,,] Blocks; // y,x,z
+        [NonSerialized] public Dictionary<Vector3Int, uint> BlocksHealth;
+        [NonSerialized] public Dictionary<Vector3Int, byte> BlocksEdits;
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
         [SerializeField] public List<CameraSpawn> cameraSpawns;
@@ -42,22 +43,24 @@ namespace VoxelEngine
             this.name = name;
             this.blocksList = blocksList;
             this.size = size;
-            blocksHealth = new Dictionary<Vector3Int, uint>();
+            BlocksHealth = new Dictionary<Vector3Int, uint>();
+            BlocksEdits = new Dictionary<Vector3Int, byte>();
         }
 
         private Map DeserializeMap()
         {
             // From blocksList list to blocks array
-            blocks = new byte[size.y, size.x, size.z];
+            Blocks = new byte[size.y, size.x, size.z];
             foreach (var block in blocksList)
-                blocks[block.y, block.x, block.z] = block.type;
-            blocksHealth = new Dictionary<Vector3Int, uint>();
+                Blocks[block.y, block.x, block.z] = block.type;
+            BlocksHealth = new Dictionary<Vector3Int, uint>();
+            BlocksEdits = new Dictionary<Vector3Int, byte>();
             return this;
         }
 
         public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(MapsDir + mapName).DeserializeMap();
 
-        public BlockType GetBlock(Vector3Int pos) => WorldManager.instance.blockTypes[blocks[pos.y, pos.x, pos.z]];
+        public BlockType GetBlock(Vector3Int pos) => WorldManager.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
 
         public uint DamageBlock(Vector3Int pos, uint damage)
         {
@@ -66,9 +69,9 @@ namespace VoxelEngine
                 return uint.MaxValue;
             if (blockHealth is BlockHealth.OneHit)
                 return 0;
-            blocksHealth[pos] = (uint)math.max(0,
-                (blocksHealth.ContainsKey(pos) ? blocksHealth[pos] : (int)blockHealth) - damage);
-            return blocksHealth[pos];
+            BlocksHealth[pos] = (uint)math.max(0,
+                (BlocksHealth.ContainsKey(pos) ? BlocksHealth[pos] : (int)blockHealth) - damage);
+            return BlocksHealth[pos];
         }
 
         public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == team).GetRandomSpawnPoint;

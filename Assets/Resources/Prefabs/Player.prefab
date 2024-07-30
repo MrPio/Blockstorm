@@ -1867,7 +1867,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 6541506331053138863}
-  sensitivity: 500
+  sensitivity: 100
+  smoothing: 1
   playerTransform: {fileID: 1263851460940361170}
   player: {fileID: 5505040103345985529}
   checkIncrement: 0.1

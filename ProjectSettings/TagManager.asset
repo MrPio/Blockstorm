@@ -20,6 +20,7 @@ TagManager:
   - CircleDamageContainer
   - ClientServerManagers
   - HpContainer
+  - NetworkManager
   layers:
   - Default
   - TransparentFX

@@ -14,8 +14,11 @@ namespace UI
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
 
+        private ServerManager _serverManager;
+
         private void Start()
         {
+            _serverManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ServerManager>();
             dashboard.SetActive(false);
         }
 
@@ -39,7 +42,7 @@ namespace UI
 
         private void DashboardLoop()
         {
-            ServerManager.instance.RequestPlayerListServerRpc();
+            _serverManager.RequestPlayerListServerRpc();
         }
 
         public void UpdateDashboard(ulong[] playerIds)
@@ -47,9 +50,12 @@ namespace UI
             foreach (Transform child in yellowStats)
                 Destroy(child.gameObject);
 
+            StartCoroutine(AddPlayers());
+            return;
+
             IEnumerator AddPlayers()
             {
-                // Wait for next frame to ensure that the garbage collector has destroyed the last game objects
+                // Wait for the next frame to ensure that the garbage collector has destroyed the last game objects
                 yield return null;
                 foreach (var client in playerIds)
                 {
@@ -62,8 +68,6 @@ namespace UI
 
                 yellowStats.GetComponent<Stack>().UpdateUI();
             }
-
-            StartCoroutine(AddPlayers());
         }
     }
 }

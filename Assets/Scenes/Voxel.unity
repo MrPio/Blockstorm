@@ -253,10 +253,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: e5ccba3150114e64fa375de342575fd6, type: 2}
   transparentMaterial: {fileID: 2100000, guid: 56087e1e31432574a9dc39f1bfbd2a0f, type: 2}
-  chunkSize: 18
+  chunkSize: 10
   viewDistance: 192
   atlasCount: 16
   mapName: Harbor
+  counts: 0
 --- !u!114 &958774639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,6 +737,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6180080625161611371, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
     - target: {fileID: 8408558640280020905, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1034,7 +1039,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: LogLevel
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
+      propertyPath: NetworkConfig.PlayerPrefab
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2051934028837435098, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_LocalPosition.x

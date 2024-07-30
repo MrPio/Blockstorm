@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4448862840658705061}
   m_Layer: 0
   m_Name: NetworkManager
-  m_TagString: Untagged
+  m_TagString: NetworkManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 4448862840658705061}
-    PlayerPrefab: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: bf14e47616d35e04da384a520224bebb, type: 2}

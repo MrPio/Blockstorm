@@ -1,25 +1,58 @@
-﻿using System.Collections;
-using System.Threading;
+﻿using Prefabs.Player;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
-using Utils;
 using VoxelEngine;
 
 namespace Network
 {
     public class ClientManager : NetworkBehaviour
     {
-        private Dashboard _dashboard;
-        public static ClientManager instance;
-        private Transform _highlightBlock;
+        [SerializeField] private GameObject playerPrefab;
 
-        private void Start()
+        private Dashboard _dashboard;
+        private Transform _highlightBlock;
+        private WorldManager _wm;
+
+        // Used to update the map status
+        public readonly NetworkVariable<MapStatus> MapStatus = new();
+
+        private void Awake()
         {
-            instance = this;
             _highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
             _dashboard = GameObject.FindWithTag("Dashboard").GetComponent<Dashboard>();
+            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
         }
+
+        public override void OnNetworkSpawn()
+        {
+            if (!IsHost)
+            {
+                // Request the current map status.
+                var mapStatus = MapStatus.Value;
+                Debug.Log($"There have been made {mapStatus.Ids.Length} voxel edits to the original map!");
+                for (var i = 0; i < mapStatus.Ids.Length; i++)
+                    _wm.Map.Blocks[mapStatus.Ys[i], mapStatus.Xs[i], mapStatus.Zs[i]] = mapStatus.Ids[i];
+            }
+
+            // Render the map and spawn the player
+            // TODO: the player should be spawned after team selection
+            _wm.RenderMap();
+            Debug.Log($"The map {_wm.Map.name} was rendered!");
+            GameObject.FindWithTag("NetworkManager").GetComponent<NetworkManager>().OnClientConnectedCallback +=
+                OnClientConnected;
+        }
+
+        private void OnClientConnected(ulong clientId)
+        {
+            Debug.Log("New client connected: " + clientId);
+            if (IsServer)
+            {
+                var player = Instantiate(playerPrefab);
+                player.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
+            }
+        }
+
 
         [ClientRpc]
         public void SendPlayerListClientRpc(ulong[] playerIds, ulong clientId)
@@ -36,8 +69,9 @@ namespace Network
         [ClientRpc]
         public void EditVoxelClientRpc(Vector3 pos, byte newID)
         {
-            if (!IsClient) return;
-            WorldManager.instance.EditVoxel(pos, newID);
+            _wm.EditVoxel(pos, newID);
+            if (IsHost)
+                MapStatus.Value = new MapStatus(_wm.Map);
         }
 
         /// <summary>
@@ -48,9 +82,10 @@ namespace Network
         [ClientRpc]
         public void DamageVoxelClientRpc(Vector3 pos, uint damage)
         {
-            if (!IsClient) return;
-            if (WorldManager.instance.DamageVoxel(pos, damage))
+            if (_wm.DamageVoxel(pos, damage))
                 _highlightBlock.gameObject.SetActive(false);
+            if (IsHost)
+                MapStatus.Value = new MapStatus(_wm.Map);
         }
     }
 }
