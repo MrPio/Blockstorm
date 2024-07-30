@@ -112,7 +112,7 @@ namespace VoxelEngine
             if (_removedBlocks != null) return _removedBlocks.ContainsKey(posNorm);
             var worldPos = posNorm + Coord.WorldPos;
             return _wm.IsVoxelInWorld(worldPos) &&
-                   (WorldManager.BlockTypes[_wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
+                   (VoxelData.BlockTypes[_wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
                     _wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
         }
 
@@ -128,7 +128,7 @@ namespace VoxelEngine
             var blockId = _removedBlocks == null
                 ? _wm.Map.Blocks[(int)pos.y,(int) pos.x + Coord.WorldPos.x, (int)pos.z + Coord.WorldPos.z]
                 : _removedBlocks[ Vector3Int.FloorToInt(pos +ChunkGo.transform.position)];
-            var blockType = WorldManager.BlockTypes[blockId];
+            var blockType = VoxelData.BlockTypes[blockId];
             // Skip if air
             if (blockType.name == "air") return;
             if ((IsSolid && !blockType.isSolid) || (!IsSolid && blockType.isSolid))

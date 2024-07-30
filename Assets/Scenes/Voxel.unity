@@ -277,6 +277,13 @@ MonoBehaviour:
         z: 244
       y: 3
   spawnCameras: []
+  oldIds:
+  - iron
+  newId: iron_white
+  mins:
+  - {x: 150, y: 5, z: 0}
+  maxs:
+  - {x: 171, y: 6, z: 71}
 --- !u!1 &995723952
 GameObject:
   m_ObjectHideFlags: 0

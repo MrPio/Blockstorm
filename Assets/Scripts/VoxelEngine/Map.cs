@@ -60,7 +60,7 @@ namespace VoxelEngine
 
         public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(MapsDir + mapName).DeserializeMap();
 
-        public BlockType GetBlock(Vector3Int pos) => WorldManager.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
+        public BlockType GetBlock(Vector3Int pos) => VoxelData.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
 
         public uint DamageBlock(Vector3Int pos, uint damage)
         {
@@ -76,8 +76,17 @@ namespace VoxelEngine
 
         public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == team).GetRandomSpawnPoint;
 
-        public void Save([CanBeNull] ISerializer serializer = null) =>
+        public void Save([CanBeNull] ISerializer serializer = null)
+        {
+            // Encode the map
+            blocksList.Clear();
+            for (short x = 0; x < size.x; x++)
+            for (short y = 0; y < size.y; y++)
+            for (short z = 0; z < size.z; z++)
+                if (Blocks[y, x, z] != 0)
+                    blocksList.Add(new BlockEncoding(x, y, z, Blocks[y, x, z]));
             (serializer ?? Serializer).Serialize(this, "maps", name);
+        }
     }
 
     [Serializable]

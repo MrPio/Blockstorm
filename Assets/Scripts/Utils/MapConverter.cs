@@ -54,11 +54,9 @@ namespace Utils
     public class MapConverter : MonoBehaviour
     {
         public string mapName = "";
-        public CopyRule[] copyRules;
+        [Header("Map2Voxel")] public CopyRule[] copyRules;
         public CopyRule.RemappingRule[] remappingRules;
-        public GameObject cube;
-        [SerializeField] private Spawn redSpawn;
-        [SerializeField] private List<SpawnCamera> spawnCameras;
+        [Header("Voxel2Map")] public GameObject cube;
         private WorldManager _wm;
 
         private void Awake()
@@ -67,14 +65,14 @@ namespace Utils
         }
 
         /*
-     * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
-     * Instead of dumping the whole 3-dimensional array, which is not even possible, the map is converted
-     * to a smaller list representation that only stores non-air blocks. 
-     */
+         * Convert a map of cubes into a Map class instance and serialise it into a compact JSON file.
+         * Instead of dumping the whole 3-dimensional array, which is not even possible, the map is converted
+         * to a smaller list representation that only stores non-air blocks.
+         */
         [Button]
         private void Map2Voxel()
         {
-            var blockTypesList = WorldManager.BlockTypes.ToList();
+            var blockTypesList = VoxelData.BlockTypes.ToList();
             var cubes = GameObject.FindWithTag("MapGenerator").GetComponentsInChildren<MeshRenderer>();
             var blockTypes = new List<byte>();
             var positionsX = new List<int>();
@@ -150,11 +148,11 @@ namespace Utils
         }
 
         /*
-     * Convert a voxel into a cube map. This became necessary when I lost a good prefab of a map in
-     * progress due to a mistake of mine. So I wrote the following code to retrieve it from the JSON
-     * voxel serialised file that I had luckily saved.
-     * This can be used to avoid storing large prefabs (~10x memory usage compared to the JSON serialised voxel version).
-     */
+         * Convert a voxel into a cube map. This became necessary when I lost a good prefab of a map in
+         * progress due to a mistake of mine. So I wrote the following code to retrieve it from the JSON
+         * voxel serialised file that I had luckily saved.
+         * This can be used to avoid storing large prefabs (~10x memory usage compared to the JSON serialised voxel version).
+         */
         [Button]
         private void Voxel2Map()
         {
@@ -169,9 +167,10 @@ namespace Utils
                     continue;
                 var cubeGo = Instantiate(cube, map);
                 cubeGo.transform.position = new Vector3(x, y, z) + Vector3.one * 0.5f;
-                var textureId = WorldManager.BlockTypes[blocks[y, x, z]].topID;
+                var textureId = VoxelData.BlockTypes[blocks[y, x, z]].topID;
                 cubeGo.GetComponent<MeshRenderer>().material =
-                    Resources.Load($"Textures/texturepacks/blockade/Materials/blockade_{(textureId + 1):D1}") as Material;
+                    Resources.Load($"Textures/texturepacks/blockade/Materials/blockade_{(textureId + 1):D1}") as
+                        Material;
             }
         }
 
@@ -182,11 +181,14 @@ namespace Utils
             BinarySerializer
         }
 
+        [Header("SerializeMap")] [SerializeField]
+        private Spawn redSpawn;
+
         /*
-     * Serialize the map currently loaded in the world manager using the provided serialization method.
-     * This is used to convert JSON encoded maps to binary encoding, which uses much less disk space.
-     * This is also used to add spawn points to a map.
-     */
+         * Serialize the map currently loaded in the world manager using the provided serialization method.
+         * This is used to convert JSON encoded maps to binary encoding, which uses much less disk space.
+         * This is also used to add spawn points to a map.
+         */
         [Button]
         private void SerializeMap(Serializers serializer)
         {
@@ -224,17 +226,52 @@ namespace Utils
             public Nullable<Team> team;
         }
 
+        [Header("AddSpawnCameras")] [SerializeField]
+        private List<SpawnCamera> spawnCameras;
+
         /*
-     * Set a list of spawn camera for the currently loaded map.
-     * Spawn camera is used to show a part of the map in the connection menu instead of a black screen.
-     */
+         * Set a list of spawn camera for the currently loaded map.
+         * Spawn camera is used to show a part of the map in the connection menu instead of a black screen.
+         */
         [Button]
         private void AddSpawnCameras()
         {
             var map = _wm.Map;
             map.cameraSpawns ??= new List<CameraSpawn>();
             map.cameraSpawns.AddRange(spawnCameras.Select(it =>
-                new CameraSpawn(it.camera.transform.position, it.camera.transform.rotation.eulerAngles, it.team)).ToList());
+                    new CameraSpawn(it.camera.transform.position, it.camera.transform.rotation.eulerAngles, it.team))
+                .ToList());
+            map.Save();
+        }
+
+        // Change the type of some map blocks
+        [Header("ChangeBlocks")] [SerializeField]
+        private string[] oldIds;
+
+        [SerializeField] private string newId;
+        [SerializeField] private Vector3Int[] mins;
+        [SerializeField] private Vector3Int[] maxs;
+
+        [Button]
+        private void ChangeBlocks()
+        {
+            var map = _wm.Map;
+            var count = 0;
+            for (var i = 0; i < mins.Length; i++)
+            {
+                var min = mins[i];
+                var max = maxs[i];
+                for (var x = min.x; x < max.x; x++)
+                for (var y = min.y; y < max.y; y++)
+                for (var z = min.z; z < max.z; z++)
+                    if (oldIds.Any(it => it == map.GetBlock(new Vector3Int(x, y, z)).name))
+                    {
+                        count++;
+                        map.Blocks[y, x, z] = VoxelData.Name2Id(newId);
+                    }
+            }
+
+            Debug.Log($"Updated {count} blocks!");
             map.Save();
         }
     }

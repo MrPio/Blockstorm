@@ -17,7 +17,7 @@ namespace Managers
             Tertiary; // Misc
 
         public byte BlockId;
-        public BlockType BlockType => WorldManager.BlockTypes[BlockId];
+        public BlockType BlockType => VoxelData.BlockTypes[BlockId];
 
         private static InventoryManager _instance;
         public static InventoryManager Instance => _instance ??= new InventoryManager();
@@ -31,7 +31,7 @@ namespace Managers
             Block = Model.Weapon.Blocks[0];
             Primary = Model.Weapon.Primaries[0];
             Blocks = 100;
-            BlockId = (byte)WorldManager.BlockTypes.ToList().FindIndex(e => e.name == "player_block_yellow");
+            BlockId = (byte)VoxelData.BlockTypes.ToList().FindIndex(e => e.name == "player_block_yellow");
         }
     }
 }
