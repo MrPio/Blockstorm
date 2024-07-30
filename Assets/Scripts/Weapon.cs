@@ -16,7 +16,9 @@ using Random = UnityEngine.Random;
 /// <remarks> This script is attached only to the owned player and removed from the enemy players. </remarks>
 public class Weapon : MonoBehaviour
 {
-    [Header("Components")] [SerializeField] private AudioClip switchEquippedClip;
+    [Header("Components")] [SerializeField]
+    private AudioClip switchEquippedClip;
+
     [SerializeField] public AudioSource audioSource;
     [SerializeField] public Animator animator;
     [SerializeField] private CameraMovement cameraMovement;
@@ -40,6 +42,7 @@ public class Weapon : MonoBehaviour
     private WorldManager _wm;
     [NonSerialized] public static bool isAiming;
     private Transform _crosshair;
+    private Animator _crosshairAnimator;
 
     [CanBeNull]
     public Model.Weapon WeaponModel
@@ -66,6 +69,7 @@ public class Weapon : MonoBehaviour
     {
         _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
         _crosshair = GameObject.FindWithTag("Crosshair").transform;
+        _crosshairAnimator = _crosshair.Find("CrosshairLines").GetComponent<Animator>();
         _wm = WorldManager.instance;
     }
 
@@ -86,6 +90,7 @@ public class Weapon : MonoBehaviour
         player.lastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         audioSource.PlayOneShot(_fireClip, 0.5f);
         animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
+        _crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
 
         // Check that the current weapon deals damage
         // TODO: Melee weapons also deals damages! Move here the block digging logic and add enemy damage.
