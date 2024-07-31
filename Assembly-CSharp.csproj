@@ -50,7 +50,6 @@
     <Compile Include="Assets\Scripts\UI\NetworkContainerUI.cs" />
     <Compile Include="Assets\Scripts\Partials\Activable.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
-    <Compile Include="Assets\Scripts\Managers\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\Partials\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
@@ -69,10 +68,9 @@
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />
     <Compile Include="Assets\Scripts\UI\LowHpHUD.cs" />
-    <Compile Include="Assets\FollowRotation.cs" />
+    <Compile Include="Assets\Scripts\Partials\FollowRotation.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Player.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
-    <Compile Include="Assets\Collectable.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
@@ -85,11 +83,12 @@
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera\SpawnCamera.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
-    <Compile Include="Assets\Grenade.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Grenade.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />

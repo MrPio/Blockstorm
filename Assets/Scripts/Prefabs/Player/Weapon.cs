@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using Managers;
 using Model;
 using Network;
+using Partials;
 using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
@@ -129,9 +130,10 @@ namespace Prefabs.Player
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
-                    // Spawn the damage text
-                    // GameObject.FindGameObjectsWithTag() TODO: after moving HP to Player script, use it to check if the player is already dead
+                    var attackedPlayer = hit.transform.GetComponentInParent<Player>();
+                    if (!attackedPlayer.Status.Value.IsDead)
                     {
+                        // Spawn the damage text
                         var damageTextGo = Instantiate(damageText, worldCanvas.transform);
                         damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
                                                           cameraTransform.forward * 0.35f;
@@ -143,13 +145,12 @@ namespace Prefabs.Player
                             text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
                         });
                         damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
-                    }
 
-                    // Send the damage to the enemy
-                    var attackedPlayer = hit.transform.GetComponentInParent<Player>();
-                    attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
-                        new NetVector3(cameraTransform.forward),
-                        player.OwnerClientId);
+                        // Send the damage to the enemy
+                        attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
+                            new NetVector3(cameraTransform.forward),
+                            player.OwnerClientId);
+                    }
 
                     // Prevents damaging the ground
                     return;
@@ -191,7 +192,10 @@ namespace Prefabs.Player
         /// <param name="force"> A normalised value of throwing strength</param>
         public void ThrowGrenade(float force)
         {
-            InventoryManager.Instance.LeftGrenades--;
+            var newStatus = player.Status.Value;
+            newStatus.LeftGrenades--;
+            player.Status.Value = newStatus;
+
             StartCoroutine(Throw());
             return;
 
@@ -202,7 +206,7 @@ namespace Prefabs.Player
                 yield return new WaitForSeconds(0.35f);
                 var grenade =
                     Resources.Load<GameObject>(
-                        $"Prefabs/weapons/grenade/{InventoryManager.Instance.Grenade!.Name.ToUpper()}");
+                        $"Prefabs/weapons/grenade/{newStatus.Grenade!.Name.ToUpper()}");
                 var go = Instantiate(grenade,
                     mainCamera.transform.position + mainCamera.transform.forward * 0.5f + Vector3.down * 0.2f,
                     Quaternion.Euler(VectorExtensions.RandomVector3(-180, 180f)));
@@ -214,8 +218,8 @@ namespace Prefabs.Player
                 go.GetComponent<Grenade>().Apply(it =>
                 {
                     it.Delay = force;
-                    it.ExplosionTime = InventoryManager.Instance.Grenade!.ExplosionTime!.Value;
-                    it.ExplosionRange = InventoryManager.Instance.Grenade!.ExplosionRange!.Value;
+                    it.ExplosionTime = newStatus.Grenade!.ExplosionTime!.Value;
+                    it.ExplosionRange = newStatus.Grenade!.ExplosionRange!.Value;
                 });
             }
         }
@@ -236,15 +240,19 @@ namespace Prefabs.Player
                 ToggleAim();
 
             // Find the new weapon in the player's inventory
-            WeaponModel = weaponType switch
+            var status = player.Status.Value;
+            var newWeapon = weaponType switch
             {
-                WeaponType.Block => InventoryManager.Instance.Block,
-                WeaponType.Melee => InventoryManager.Instance.Melee,
-                WeaponType.Primary => InventoryManager.Instance.Primary,
-                WeaponType.Secondary => InventoryManager.Instance.Secondary,
-                WeaponType.Tertiary => InventoryManager.Instance.Tertiary,
+                WeaponType.Block => status.Block,
+                WeaponType.Melee => status.Melee,
+                WeaponType.Primary => status.Primary,
+                WeaponType.Secondary => status.Secondary,
+                WeaponType.Tertiary => status.Tertiary,
                 _ => throw new ArgumentOutOfRangeException(nameof(weaponType), weaponType, null)
             };
+            if (newWeapon is null)
+                return;
+            WeaponModel = newWeapon;
 
             // Play sound and animation
             audioSource.PlayOneShot(switchEquippedClip);
@@ -269,7 +277,7 @@ namespace Prefabs.Player
                 o.AddComponent<WeaponSway>();
                 if (WeaponModel.Type == WeaponType.Block)
                     o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                        $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
+                        $"Textures/texturepacks/blockade/Materials/blockade_{(player.Status.Value.BlockType.sideID + 1):D1}");
             });
         }
 

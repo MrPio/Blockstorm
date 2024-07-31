@@ -80,12 +80,18 @@ namespace Prefabs.Player
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
 
+        public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null));
+
         public override void OnNetworkSpawn()
         {
             _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
             _sm = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ServerManager>();
             if (IsOwner)
+            {
                 Spawn();
+                LoadStatus(Status.Value);
+                Status.OnValueChanged += (_, newStatus) => LoadStatus(newStatus);
+            }
             else
             {
                 _isPlayerWalking.OnValueChanged += (_, newValue) =>
@@ -111,7 +117,7 @@ namespace Prefabs.Player
                         o.AddComponent<WeaponSway>();
                         if (newValue.Message.Value.ToUpper() == "BLOCK")
                             o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                                $"Textures/texturepacks/blockade/Materials/blockade_{(InventoryManager.Instance.BlockType.sideID + 1):D1}");
+                                $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType.sideID + 1):D1}");
                     });
                 };
                 CameraRotationX.OnValueChanged += (_, newValue) =>
@@ -126,10 +132,17 @@ namespace Prefabs.Player
         }
 
         // Owner only
+        private void LoadStatus(PlayerStatus status)
+        {
+            GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(status.Hp, status.HasHelmet);
+            //TODO: update Blocks, LeftGrenades UI
+        }
+
+        // Owner only
         private void Spawn()
         {
             _velocity = new Vector3();
-            var spawnPoint = _wm.Map.GetRandomSpawnPoint(InventoryManager.Instance.Team) + Vector3.up * 2f;
+            var spawnPoint = _wm.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
             GetComponent<ClientNetworkTransform>().Interpolate = true;
@@ -137,7 +150,7 @@ namespace Prefabs.Player
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)
             {
-                var skinName = InventoryManager.Instance.Skin.GetSkinForTeam(InventoryManager.Instance.Team);
+                var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
         }
@@ -262,7 +275,7 @@ namespace Prefabs.Player
                     weapon = WeaponType.Secondary;
                 else if (Input.GetKeyDown(KeyCode.Alpha5) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
                     weapon = WeaponType.Tertiary;
-                if (weapon != null)
+                if (weapon is not null)
                     this.weapon.SwitchEquipped(weapon.Value);
 
                 if (Input.GetMouseButtonDown(1) && this.weapon.WeaponModel!.Type != WeaponType.Block &&
@@ -292,13 +305,14 @@ namespace Prefabs.Player
             float ragdollScale = 1)
         {
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
+            var newStatus = Status.Value;
+            newStatus.Hp -= (int)damage;
 
             // Update player's HP
-            InventoryManager.Instance.Hp -= (int)damage;
-            GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(InventoryManager.Instance.Hp);
+            Status.Value = newStatus;
 
             // Ragdoll
-            if (InventoryManager.Instance.Hp <= 0)
+            if (newStatus.Hp <= 0)
             {
                 RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
                 _sm.RespawnServerRpc();
@@ -329,15 +343,12 @@ namespace Prefabs.Player
             }
             else
             {
-                
                 GetComponent<CharacterController>().enabled = false;
                 GetComponent<CapsuleCollider>().enabled = true;
-                GetComponentInChildren<CameraMovement>().Apply(it =>
-                {
-                    it.enabled = false;
-                });
+                GetComponentInChildren<CameraMovement>().enabled = false;
                 GetComponentInChildren<Weapon>().enabled = false;
                 GetComponentInChildren<WeaponSway>().enabled = false;
+                transform.Find("WeaponCamera").gameObject.SetActive(false);
                 gameObject.AddComponent<Rigidbody>().Apply(rb =>
                     rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
                         _transform.position + Vector3.up * 0.5f));

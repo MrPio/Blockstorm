@@ -55,6 +55,14 @@ namespace Model
                 zoom: 1.75f)
         };
 
+        public static readonly List<Weapon> Secondaries = new()
+        {
+        };
+
+        public static readonly List<Weapon> Tertiaries = new()
+        {
+        };
+
         public static readonly List<Weapon> Grenades = new()
         {
             new Weapon(name: "M61", damage: 100, explosionRange: 2.5f, explosionTime: 3.25f, type: WeaponType.Grenade),

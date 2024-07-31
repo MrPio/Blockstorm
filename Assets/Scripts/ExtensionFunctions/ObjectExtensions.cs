@@ -6,7 +6,7 @@ namespace ExtensionFunctions
     {
         public static T Apply<T>(this T obj, Action<T> configure)
         {
-            configure?.Invoke(obj);
+            configure.Invoke(obj);
             return obj;
         }
 

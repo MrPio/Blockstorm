@@ -8,7 +8,7 @@ namespace Model
     {
         public static readonly List<Skin> Skins = new()
         {
-            new Skin(name: "Soldier")
+            new Skin(name: "soldier")
         };
 
         public string Name;

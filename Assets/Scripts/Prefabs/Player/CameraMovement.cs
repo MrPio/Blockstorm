@@ -57,7 +57,7 @@ namespace Prefabs.Player
             get => _canPlace;
             set
             {
-                _canPlace = InventoryManager.Instance.Blocks > 0 && value;
+                _canPlace = player.Status.Value.Blocks > 0 && value;
                 if (value)
                     _canDig = false;
                 if (_highlightBlock is null || _placeBlock is null) return;
@@ -136,7 +136,7 @@ namespace Prefabs.Player
                     else
                         audioSource.PlayOneShot(blockDamageMediumClip);
                     _clientManager.DamageVoxelRpc(_highlightBlock.transform.position,
-                        InventoryManager.Instance.Melee!.Damage);
+                        player.Status.Value.Melee!.Damage);
                 }
 
                 weapon.Fire();
@@ -149,8 +149,7 @@ namespace Prefabs.Player
             {
                 _lastPlace = Time.time;
                 _clientManager.EditVoxelClientRpc(new[] { _placeBlock.transform.position },
-                    InventoryManager.Instance.BlockId);
-                // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
+                    player.Status.Value.BlockId);
                 _placeBlock.gameObject.SetActive(false);
                 weapon.Fire();
             }
@@ -173,7 +172,7 @@ namespace Prefabs.Player
 
             // Throw the grenade
             if ((_throwingAcc > MaxThrowingAcc || Input.GetKeyUp(KeyCode.G)) &&
-                InventoryManager.Instance.Grenade is not null && InventoryManager.Instance.LeftGrenades > 0)
+                player.Status.Value.Grenade is not null && player.Status.Value.LeftGrenades > 0)
             {
                 _lastFire = Time.time;
                 if (_canThrow)
