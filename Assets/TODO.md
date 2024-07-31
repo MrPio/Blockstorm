@@ -5,7 +5,7 @@
 - Mipmap with positions
 - Reload
 - ~~Damage Text spawn~~
-- Switch weapon wile firing/aiming not changes the weapon
+- Switch the weapon while firing/aiming not change the weapon
 - Move player state from Inventory manager to PLayer
 - Grenades
 - Bazooka

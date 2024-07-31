@@ -96,7 +96,8 @@ namespace Prefabs.Player
         /// </summary>
         public void Fire()
         {
-            if (_weaponModel == null) return;
+            if (_weaponModel == null || Time.time - _lastSwitch < 0.75f)
+                return;
 
             // Play audio effect and animation.
             player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
