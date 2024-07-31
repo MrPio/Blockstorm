@@ -10,6 +10,7 @@ using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using Utils.Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
@@ -60,6 +61,7 @@ namespace Prefabs.Player
         [NonSerialized] public GameObject WeaponPrefab;
         private WorldManager _wm;
         private ServerManager _sm;
+        private bool isDying;
 
         // Used to set the enemy walking animation
         private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
@@ -130,13 +132,13 @@ namespace Prefabs.Player
             var spawnPoint = _wm.Map.GetRandomSpawnPoint(InventoryManager.Instance.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
+            GetComponent<ClientNetworkTransform>().Interpolate = true;
 
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)
             {
                 var skinName = InventoryManager.Instance.Skin.GetSkinForTeam(InventoryManager.Instance.Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
-                print($"Materials/skin/{skinName}");
             }
         }
 
@@ -158,7 +160,12 @@ namespace Prefabs.Player
 
         private void Update()
         {
-            if (!IsOwner) return;
+            if (!IsOwner || isDying) return;
+
+            // Debug
+            if (Input.GetKeyDown(KeyCode.L))
+                DamageClientRpc(150, "chest",
+                    new NetVector3(VectorExtensions.RandomVector3(-1f, 1f).normalized), 0);
 
             // When the player has touched the ground, activate his jump.
             _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.25f, 0.4f), Quaternion.identity,
@@ -308,13 +315,33 @@ namespace Prefabs.Player
             circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
         }
 
-        [Rpc(SendTo.NotOwner)]
+        [Rpc(SendTo.Everyone)]
         private void RagdollRpc(uint damage, string bodyPart, NetVector3 direction)
         {
-            print($"{OwnerClientId} - I'm dead!");
-            ragdoll.ApplyForce(bodyPart,
-                Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3 * math.clamp(damage * 2, 10, 200));
-            gameObject.AddComponent<Destroyable>().lifespan = 10;
+            isDying = true;
+            print($"{OwnerClientId} is dead!");
+            if (!IsOwner)
+            {
+                ragdoll.ApplyForce(bodyPart,
+                    Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3.normalized *
+                    math.clamp(damage * 2, 10, 200));
+                gameObject.AddComponent<Destroyable>().lifespan = 10;
+            }
+            else
+            {
+                
+                GetComponent<CharacterController>().enabled = false;
+                GetComponent<CapsuleCollider>().enabled = true;
+                GetComponentInChildren<CameraMovement>().Apply(it =>
+                {
+                    it.enabled = false;
+                });
+                GetComponentInChildren<Weapon>().enabled = false;
+                GetComponentInChildren<WeaponSway>().enabled = false;
+                gameObject.AddComponent<Rigidbody>().Apply(rb =>
+                    rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
+                        _transform.position + Vector3.up * 0.5f));
+            }
         }
     }
 }

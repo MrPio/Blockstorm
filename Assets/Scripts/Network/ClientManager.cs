@@ -13,7 +13,8 @@ namespace Network
         [SerializeField] private GameObject playerPrefab;
 
         private Dashboard _dashboard;
-        private Transform _highlightBlock;
+        [NonSerialized] public Transform HighlightBlock;
+        [NonSerialized] public Transform PlaceBlock;
         private WorldManager _wm;
 
         // Used to update the map status
@@ -24,7 +25,9 @@ namespace Network
 
         private void Awake()
         {
-            _highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
+            HighlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
+            PlaceBlock = GameObject.FindWithTag("PlaceBlock").transform;
+
             _dashboard = GameObject.FindWithTag("Dashboard").GetComponent<Dashboard>();
             _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
         }
@@ -88,7 +91,7 @@ namespace Network
         public void DamageVoxelRpc(Vector3 pos, uint damage)
         {
             if (_wm.DamageVoxel(pos, damage))
-                _highlightBlock.gameObject.SetActive(false);
+                HighlightBlock.gameObject.SetActive(false);
             if (IsHost)
                 MapStatus.Value = new MapStatus(_wm.Map);
         }

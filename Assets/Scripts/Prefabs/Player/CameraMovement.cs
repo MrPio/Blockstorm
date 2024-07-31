@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
@@ -67,12 +68,12 @@ namespace Prefabs.Player
 
         private void Start()
         {
-            _highlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
-            _highlightBlock.gameObject.SetActive(false);
-            _placeBlock = GameObject.FindWithTag("PlaceBlock").transform;
-            _placeBlock.gameObject.SetActive(false);
             _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
             _clientManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
+            _highlightBlock = _clientManager.HighlightBlock;
+            _placeBlock = _clientManager.PlaceBlock;
+            _highlightBlock.gameObject.SetActive(false);
+            _placeBlock.gameObject.SetActive(false);
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -127,7 +128,7 @@ namespace Prefabs.Player
                         Resources.Load<Material>(
                             $"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
                     _blockDigEffect.Play();
-                    if (new List<string>() { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
+                    if (new List<string> { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
                             block.name.Contains(it)))
                         audioSource.PlayOneShot(blockDamageLightClip);
                     else if (block.blockHealth == BlockHealth.Indestructible)

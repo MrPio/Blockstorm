@@ -39,7 +39,7 @@ namespace Network
 
             IEnumerator Respawn()
             {
-                yield return new WaitForSeconds(5f/5f);
+                yield return new WaitForSeconds(5f/2f);
                 Destroy(GameObject.FindGameObjectsWithTag("Player").First(it =>
                     it.GetComponent<NetworkObject>().OwnerClientId == rpcParams.Receive.SenderClientId));
                 yield return new WaitForSeconds(0.5f);
