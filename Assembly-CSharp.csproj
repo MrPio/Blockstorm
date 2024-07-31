@@ -71,9 +71,11 @@
     <Compile Include="Assets\FollowRotation.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Player.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
+    <Compile Include="Assets\Collectable.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
+    <Compile Include="Assets\Scripts\Model\Collectable.cs" />
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
