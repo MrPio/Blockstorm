@@ -32,7 +32,7 @@ namespace Managers
             Melee = Model.Weapon.Melees[0];
             Block = Model.Weapon.Blocks[0];
             Primary = Model.Weapon.Primaries[0];
-            Grenade = Model.Weapon.Grenades[0];
+            Grenade = Model.Weapon.Grenades[1];
             Blocks = 100;
             BlockId = (byte)VoxelData.BlockTypes.ToList().FindIndex(e => e.name == "player_block_yellow");
         }

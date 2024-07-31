@@ -207,10 +207,15 @@ namespace Prefabs.Player
                     Quaternion.Euler(VectorExtensions.RandomVector3(-180, 180f)));
                 go.GetComponent<NetworkObject>().Spawn();
                 var rb = go.GetComponent<Rigidbody>();
-                rb.AddForce(mainCamera.transform.forward * math.clamp(5f * force, 1.5f, 5f),
+                rb.AddForce(mainCamera.transform.forward * math.clamp(6.5f * force, 2.25f, 6.5f),
                     ForceMode.Impulse);
                 rb.angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
-                go.GetComponent<Grenade>().Delay = force;
+                go.GetComponent<Grenade>().Apply(it =>
+                {
+                    it.Delay = force;
+                    it.ExplosionTime = InventoryManager.Instance.Grenade!.ExplosionTime!.Value;
+                    it.ExplosionRange = InventoryManager.Instance.Grenade!.ExplosionRange!.Value;
+                });
             }
         }
 

@@ -24,17 +24,16 @@ namespace Model
             ["Head"] = 1.5f,
             ["Body"] = 0.85f,
             ["Chest"] = 1f,
-            
+
             ["Arm:Left:Upper"] = 0.85f,
             ["Arm:Left:Lower"] = 0.75f,
             ["Arm:Right:Upper"] = 0.85f,
             ["Arm:Right:Lower"] = 0.75f,
-            
+
             ["Leg:Left:Upper"] = 0.65f,
             ["Leg:Left:Lower"] = 0.5f,
             ["Leg:Right:Upper"] = 0.65f,
             ["Leg:Right:Lower"] = 0.5f,
-
         };
 
         public static readonly List<Weapon> Blocks = new()
@@ -51,26 +50,28 @@ namespace Model
 
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24*10, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
+            new Weapon(name: "ak47", damage: 24 * 10, rof: 100, distance: 72, type: WeaponType.Primary,
+                fireAnimation: "gun",
                 zoom: 1.75f)
         };
-        
+
         public static readonly List<Weapon> Grenades = new()
         {
-            new Weapon(name: "M61", damage: 100, rof: 0, distance: 0, type: WeaponType.Grenade),
-            new Weapon(name: "M61_NY", damage: 150, rof: 0, distance: 0, type: WeaponType.Grenade),
+            new Weapon(name: "M61", damage: 100, explosionRange: 2.5f, explosionTime: 3.25f, type: WeaponType.Grenade),
+            new Weapon(name: "M61_NY", damage: 150, explosionRange: 2f, explosionTime: 2.25f, type: WeaponType.Grenade),
         };
 
         public string Name, Audio, FireAnimation;
         public uint Damage, Rof, Distance;
         public uint? Magazine, Ammo, ReloadTime;
+        public float? ExplosionRange, ExplosionTime;
         public float Zoom; // ex: 1.5x
         public WeaponType Type;
 
-        public Weapon(string name, uint damage, uint rof, uint distance, [CanBeNull] string audio = null,
+        public Weapon(string name, uint damage, uint rof = 0, uint distance = 0, [CanBeNull] string audio = null,
             [CanBeNull] string fireAnimation = null,
             uint? magazine = null, uint? ammo = null, uint? reloadTime = null, WeaponType type = WeaponType.Primary,
-            float zoom = 1.0f)
+            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0)
         {
             Name = name;
             Audio = audio ?? name;
@@ -83,6 +84,8 @@ namespace Model
             ReloadTime = reloadTime;
             Type = type;
             Zoom = zoom;
+            ExplosionRange = explosionRange;
+            ExplosionTime = explosionTime;
         }
 
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec

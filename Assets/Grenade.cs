@@ -14,10 +14,10 @@ using VoxelEngine;
 public class Grenade : MonoBehaviour
 {
     public GameObject[] explosions;
-    [SerializeField] private float explosionTime = 2.5f;
-    [SerializeField] private float explosionRange = 2.5f;
-    [SerializeField] private float delayFactor = 1f;
+    [SerializeField] public float delayFactor = 1f;
     [SerializeField] private GameObject damageText;
+    [NonSerialized] public float ExplosionTime;
+    [NonSerialized] public float ExplosionRange;
     private WorldManager _wm;
     private ClientManager _cm;
     private Transform _worldCanvas;
@@ -26,7 +26,7 @@ public class Grenade : MonoBehaviour
 
     private void Start()
     {
-        InvokeRepeating(nameof(Explode), explosionTime - delayFactor * Delay, 9999);
+        InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
         _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
         _cm = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
         _worldCanvas = GameObject.FindWithTag("WorldCanvas").transform;
@@ -46,13 +46,13 @@ public class Grenade : MonoBehaviour
         GetComponent<AudioSource>().Play();
 
         // Destroy blocks
-        var destroyedVoxels = transform.position.GetNeighborVoxels(explosionRange);
+        var destroyedVoxels = transform.position.GetNeighborVoxels(ExplosionRange);
         _cm.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
 
         // Checks if there was a hit on an enemy
         var colliders = new Collider[100];
-        Physics.OverlapSphereNonAlloc(transform.position, explosionRange, colliders,
+        Physics.OverlapSphereNonAlloc(transform.position, ExplosionRange, colliders,
             1 << LayerMask.NameToLayer("Enemy"));
         var hitEnemies = new List<ulong>();
         foreach (var enemy in colliders.Where(it => it is not null))
@@ -61,7 +61,7 @@ public class Grenade : MonoBehaviour
             if (hitEnemies.Contains(attackedPlayer.OwnerClientId))
                 continue;
             var distanceFactor =
-                1 - Vector3.Distance(enemy.transform.position, transform.position) / (explosionRange * 2.5f);
+                1 - Vector3.Distance(enemy.transform.position, transform.position) / (ExplosionRange * 2.5f);
             var damage = (uint)(InventoryManager.Instance.Grenade!.Damage * distanceFactor);
 
             // Spawn the damage text
@@ -89,7 +89,7 @@ public class Grenade : MonoBehaviour
         // Check if the player hit himself
         {
             var distanceFactor = 1 - Vector3.Distance(player.transform.position, transform.position) /
-                (explosionRange * 2.5f);
+                (ExplosionRange * 2.5f);
             if (distanceFactor > 0)
             {
                 var damage = (uint)(InventoryManager.Instance.Grenade!.Damage * distanceFactor);
