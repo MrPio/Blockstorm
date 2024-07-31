@@ -126,21 +126,26 @@ namespace Prefabs.Player
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
                     // Spawn the damage text
-                    var damageTextGo = Instantiate(damageText, worldCanvas.transform);
-                    damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                                                      cameraTransform.forward * 0.45f;
-                    damageTextGo.transform.rotation = player.transform.rotation;
-                    damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
-                    damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                    // GameObject.FindGameObjectsWithTag() TODO: after moving HP to Player script, use it to check if the player is already dead
                     {
-                        text.text = damage.ToString();
-                        text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
-                    });
-                    damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+                        var damageTextGo = Instantiate(damageText, worldCanvas.transform);
+                        damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                                                          cameraTransform.forward * 0.45f;
+                        damageTextGo.transform.rotation = player.transform.rotation;
+                        damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
+                        damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                        {
+                            text.text = damage.ToString();
+                            text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                        });
+                        damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+                    }
 
                     // Send the damage to the enemy
                     var attackedPlayer = hit.transform.GetComponentInParent<Player>();
-                    attackedPlayer.DamageClientRpc(damage, player.OwnerClientId);
+                    attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
+                        new NetVector3(cameraTransform.forward),
+                        player.OwnerClientId);
 
                     // Prevents damaging the ground
                     return;

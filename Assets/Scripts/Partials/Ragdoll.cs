@@ -13,7 +13,7 @@ namespace Partials
             ragdollBodies = GetComponentsInChildren<Rigidbody>();
             SetRagdollState(false);
         }
-    
+
         private void SetRagdollState(bool state)
         {
             animator.enabled = !state;
@@ -21,10 +21,11 @@ namespace Partials
                 body.isKinematic = !state;
         }
 
-        private void ApplyForce(Vector3 force)
+        public void ApplyForce(string bodyPart, Vector3 force)
         {
+            SetRagdollState(true);
             foreach (var body in ragdollBodies)
-                body.AddForce(force,ForceMode.Impulse);
+                body.AddForce(force * (body.gameObject.name == bodyPart ? 1f : 0.5f), ForceMode.Impulse);
         }
     }
 }

@@ -360,6 +360,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 8653038877929598625}
   head: {fileID: 5335098393155266812}
   belly: {fileID: 7874659249209723408}
+  ragdoll: {fileID: 6189725142076711082}
   muzzles:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
   - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
@@ -1055,6 +1056,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6255765631732340211, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
   m_PrefabInstance: {fileID: 2079222711640800527}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6189725142076711082 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5277286594826427813, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+  m_PrefabInstance: {fileID: 2079222711640800527}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1738308956513005653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 914a072cf97b17b4390cc5273e9f7645, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &6789867817577817733 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 4819017370025794442, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}

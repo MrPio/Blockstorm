@@ -6,10 +6,12 @@ using ExtensionFunctions;
 using Managers;
 using Model;
 using Network;
+using Partials;
 using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using Utils;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
@@ -38,6 +40,7 @@ namespace Prefabs.Player
         [SerializeField] private Transform cameraTransform;
         [SerializeField] private Transform head;
         [SerializeField] private Transform belly;
+        [SerializeField] private Ragdoll ragdoll;
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public List<GameObject> smokes;
@@ -123,7 +126,7 @@ namespace Prefabs.Player
         private void Spawn()
         {
             _velocity = new Vector3();
-            var spawnPoint = _wm.Map.GetRandomSpawnPoint(InventoryManager.Instance.Team) + Vector3.up * 1.05f;
+            var spawnPoint = _wm.Map.GetRandomSpawnPoint(InventoryManager.Instance.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
         }
@@ -197,7 +200,7 @@ namespace Prefabs.Player
                     MathF.Max(0.5f, Mathf.Min(pos.y, mapSize.y - 0.5f)),
                     MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
-            if (pos.y < -1)
+            if (pos.y < 0.85)
                 Spawn();
 
             // Play walk sound
@@ -269,7 +272,7 @@ namespace Prefabs.Player
         private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
 
         [Rpc(SendTo.Owner)]
-        public void DamageClientRpc(uint damage, ulong attackerID)
+        public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID)
         {
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
 
@@ -277,17 +280,28 @@ namespace Prefabs.Player
             InventoryManager.Instance.Hp -= (int)damage;
             GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(InventoryManager.Instance.Hp);
 
+            // Ragdoll
+            if (InventoryManager.Instance.Hp <= 0)
+                RagdollRpc(damage, bodyPart, direction);
+
             // Spawn damage circle
             var circleDamageContainer = GameObject.FindWithTag("CircleDamageContainer");
             var attacker = GameObject.FindGameObjectsWithTag("Player")
                 .First(it => it.GetComponent<Player>().OwnerClientId == attackerID);
-
             var directionToEnemy = attacker.transform.position - cameraTransform.position;
             var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
             var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
-
             var circleDamageGo = Instantiate(circleDamage, circleDamageContainer.transform);
             circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
+        }
+
+        [Rpc(SendTo.NotOwner)]
+        private void RagdollRpc(uint damage, string bodyPart, NetVector3 direction)
+        {
+            print($"{OwnerClientId} - I'm dead!");
+            ragdoll.ApplyForce(bodyPart,
+                Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3 * math.clamp(damage*2, 10, 200));
+            gameObject.AddComponent<Destroyable>().lifespan = 10;
         }
     }
 }

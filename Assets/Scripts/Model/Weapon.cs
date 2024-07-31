@@ -27,7 +27,7 @@ namespace Model
             ["Arm:Left:Upper"] = 0.85f,
             ["Arm:Left:Lower"] = 0.75f,
             ["Arm:Right:Upper"] = 0.85f,
-            ["Arm:Right:Upper"] = 0.75f,
+            ["Arm:Right:Lower"] = 0.75f,
             
             ["Leg:Left:Upper"] = 0.65f,
             ["Leg:Left:Lower"] = 0.5f,
@@ -50,7 +50,7 @@ namespace Model
 
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
+            new Weapon(name: "ak47", damage: 24*10, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
                 zoom: 1.75f)
         };
 

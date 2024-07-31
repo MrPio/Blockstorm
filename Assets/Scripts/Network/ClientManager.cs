@@ -73,7 +73,6 @@ namespace Network
         [Rpc(SendTo.Everyone)]
         public void EditVoxelClientRpc(Vector3 pos, byte newID)
         {
-            print("EditVoxelClientRpc");
             _wm.EditVoxel(pos, newID);
             if (IsHost)
                 MapStatus.Value = new MapStatus(_wm.Map);

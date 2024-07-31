@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -47,5 +48,26 @@ namespace Network
             Zs = positions.Select(it => (short)it.z).ToArray();
             Ids = ids.ToArray();
         }
+    }
+
+    public struct NetVector3 : INetworkSerializable
+    {
+        public float X, Y, Z;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref X);
+            serializer.SerializeValue(ref Y);
+            serializer.SerializeValue(ref Z);
+        }
+
+        public NetVector3(Vector3 vector3)
+        {
+            X = vector3.x;
+            Y = vector3.y;
+            Z = vector3.z;
+        }
+
+        public Vector3 ToVector3 => new(X, Y, Z);
     }
 }
