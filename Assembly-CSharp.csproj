@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
+    <Compile Include="Assets\Scripts\Model\Skin.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />

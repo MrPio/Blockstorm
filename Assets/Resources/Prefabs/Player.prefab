@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1893801084
+  GlobalObjectIdHash: 519613176
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -394,13 +394,15 @@ MonoBehaviour:
   head: {fileID: 5335098393155266812}
   belly: {fileID: 7874659249209723408}
   ragdoll: {fileID: 6189725142076711082}
+  bodyMeshes:
+  - {fileID: 7995740220784036517}
+  - {fileID: 5500786744037264870}
   muzzles:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
   - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
   smokes:
   - {fileID: 8503936026029454668, guid: 7050b4bcf0be2734d9c4c7e8bfb5602b, type: 3}
   circleDamage: {fileID: 6303431667206910316, guid: 95b857bfeb59ff24a85579362964d179, type: 3}
-  playerPrefab: {fileID: 4172920852534759685}
   walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
   walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
@@ -1311,6 +1313,10 @@ PrefabInstance:
       propertyPath: m_ConnectedAnchor.z
       value: 6.9849193e-10
       objectReference: {fileID: 0}
+    - target: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a072f07108eb8b641836d255d4baca92, type: 2}
     - target: {fileID: 6011965183293141907, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_ConnectedAnchor.x
       value: 0.0060000014
@@ -1341,6 +1347,11 @@ GameObject:
 --- !u!4 &5335098393155266812 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6255765631732340211, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+  m_PrefabInstance: {fileID: 2079222711640800527}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &5500786744037264870 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
   m_PrefabInstance: {fileID: 2079222711640800527}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &6189725142076711082 stripped

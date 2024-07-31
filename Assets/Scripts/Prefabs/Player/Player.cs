@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
@@ -10,9 +9,7 @@ using Partials;
 using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using Utils;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
@@ -42,6 +39,7 @@ namespace Prefabs.Player
         [SerializeField] private Transform head;
         [SerializeField] private Transform belly;
         [SerializeField] private Ragdoll ragdoll;
+        [SerializeField] private SkinnedMeshRenderer[] bodyMeshes;
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public List<GameObject> smokes;
@@ -132,6 +130,14 @@ namespace Prefabs.Player
             var spawnPoint = _wm.Map.GetRandomSpawnPoint(InventoryManager.Instance.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
+
+            // Load the body skin
+            foreach (var bodyMesh in bodyMeshes)
+            {
+                var skinName = InventoryManager.Instance.Skin.GetSkinForTeam(InventoryManager.Instance.Team);
+                bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
+                print($"Materials/skin/{skinName}");
+            }
         }
 
         private void Start()
