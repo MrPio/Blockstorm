@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 519613176
+  GlobalObjectIdHash: 1893801084
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -400,6 +400,7 @@ MonoBehaviour:
   smokes:
   - {fileID: 8503936026029454668, guid: 7050b4bcf0be2734d9c4c7e8bfb5602b, type: 3}
   circleDamage: {fileID: 6303431667206910316, guid: 95b857bfeb59ff24a85579362964d179, type: 3}
+  playerPrefab: {fileID: 4172920852534759685}
   walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
   walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
@@ -759,7 +760,7 @@ SkinnedMeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6581410823146069789}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0

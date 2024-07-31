@@ -9,6 +9,7 @@ using Model;
 using Network;
 using TMPro;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 using VoxelEngine;
 using Random = UnityEngine.Random;
@@ -132,7 +133,7 @@ namespace Prefabs.Player
                     {
                         var damageTextGo = Instantiate(damageText, worldCanvas.transform);
                         damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                                                          cameraTransform.forward * 0.45f;
+                                                          cameraTransform.forward * 0.35f;
                         damageTextGo.transform.rotation = player.transform.rotation;
                         damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
                         damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
@@ -183,6 +184,10 @@ namespace Prefabs.Player
                 }
         }
 
+        /// <summary>
+        /// Throw a grenade with a certain strength amount
+        /// </summary>
+        /// <param name="force"> A normalised value of throwing strength</param>
         public void ThrowGrenade(float force)
         {
             InventoryManager.Instance.LeftGrenades--;
@@ -200,9 +205,12 @@ namespace Prefabs.Player
                 var go = Instantiate(grenade,
                     mainCamera.transform.position + mainCamera.transform.forward * 0.5f + Vector3.down * 0.2f,
                     Quaternion.Euler(VectorExtensions.RandomVector3(-180, 180f)));
-                go.GetComponent<Rigidbody>().AddForce(mainCamera.transform.forward * math.clamp(5f * force, 1.5f, 5f),
+                go.GetComponent<NetworkObject>().Spawn();
+                var rb = go.GetComponent<Rigidbody>();
+                rb.AddForce(mainCamera.transform.forward * math.clamp(5f * force, 1.5f, 5f),
                     ForceMode.Impulse);
-                go.GetComponent<Rigidbody>().angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
+                rb.angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
+                go.GetComponent<Grenade>().Delay = force;
             }
         }
 

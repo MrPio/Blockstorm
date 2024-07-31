@@ -130,6 +130,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 995723953}
     m_Modifications:
+    - target: {fileID: 859926405249268054, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
+      propertyPath: playerPrefab
+      value: 
+      objectReference: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
     - target: {fileID: 3006782948519643556, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1931877512
@@ -249,7 +253,6 @@ MonoBehaviour:
   viewDistance: 192
   atlasCount: 16
   mapName: Harbor
-  counts: 0
 --- !u!114 &958774639
 MonoBehaviour:
   m_ObjectHideFlags: 0

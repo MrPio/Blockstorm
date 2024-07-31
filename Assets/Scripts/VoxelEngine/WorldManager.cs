@@ -92,7 +92,8 @@ namespace VoxelEngine
 
         public void EditVoxels(List<Vector3> positions, byte newID)
         {
-            foreach (var posNorm in positions.Select(Vector3Int.FloorToInt))
+            var posNorms = positions.Select(Vector3Int.FloorToInt).ToList();
+            foreach (var posNorm in posNorms)
             {
                 if (VoxelData.BlockTypes[Map.Blocks[posNorm.y, posNorm.x, posNorm.z]].blockHealth !=
                     BlockHealth.Indestructible)
@@ -101,9 +102,8 @@ namespace VoxelEngine
             }
 
             var chunks = new List<Chunk>();
-            foreach (var position in positions)
+            foreach (var posNorm in posNorms)
             {
-                var posNorm = Vector3Int.FloorToInt(position);
                 if (newID == 0)
                     CheckForFlyingMesh(posNorm);
                 var chunk = GetChunk(posNorm);
@@ -111,7 +111,7 @@ namespace VoxelEngine
                 {
                     chunks.Add(chunk);
                     chunk!.UpdateMesh();
-                    chunks.AddRange(chunk.UpdateAdjacentChunks(posNorm));
+                    chunks.AddRange(chunk!.UpdateAdjacentChunks(posNorms.ToArray()));
                 }
             }
         }

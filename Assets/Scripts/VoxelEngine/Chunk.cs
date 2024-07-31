@@ -209,25 +209,24 @@ namespace VoxelEngine
             _uvs.Clear();
         }
 
-        public List<Chunk> UpdateAdjacentChunks(Vector3Int posNorm)
+        public List<Chunk> UpdateAdjacentChunks(Vector3Int[] posNorms)
         {
             var updatedChunks = new List<Chunk>();
-            var processedChunks = new List<ChunkCoord>();
-            for (var p = 0; p < 6; p++)
-            {
-                var currentVoxel = posNorm + VoxelData.FaceChecks[p];
-                if (!IsVoxelInChunk(currentVoxel))
+            foreach (var posNorm in posNorms)
+                for (var p = 0; p < 6; p++)
                 {
-                    // Debug.Log($"Update {currentVoxel}, p={p}");
-                    var chunk = _wm.GetChunk(currentVoxel);
-                    if (chunk != null && !processedChunks.Contains(chunk.Coord))
+                    var currentVoxel = posNorm + VoxelData.FaceChecks[p];
+                    if (!IsVoxelInChunk(currentVoxel))
                     {
-                        chunk.UpdateMesh();
-                        processedChunks.Add(chunk.Coord);
-                        updatedChunks.Add(chunk);
+                        var chunk = _wm.GetChunk(currentVoxel);
+                        if (chunk is not null && !updatedChunks.Contains(chunk))
+                        {
+                            Debug.Log($"Update {currentVoxel}, p={p}, chunk={chunk.Coord.WorldPos.ToString()}");
+                            chunk.UpdateMesh();
+                            updatedChunks.Add(chunk);
+                        }
                     }
                 }
-            }
 
             return updatedChunks;
         }

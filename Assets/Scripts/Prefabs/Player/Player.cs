@@ -10,6 +10,7 @@ using Partials;
 using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using Utils;
 using VoxelEngine;
@@ -37,7 +38,7 @@ namespace Prefabs.Player
         [SerializeField] private Transform enemyWeaponContainer;
         [SerializeField] private Weapon weapon;
         [SerializeField] public AudioSource audioSource;
-        [SerializeField] private Transform cameraTransform;
+        [SerializeField] public Transform cameraTransform;
         [SerializeField] private Transform head;
         [SerializeField] private Transform belly;
         [SerializeField] private Ragdoll ragdoll;
@@ -60,6 +61,7 @@ namespace Prefabs.Player
         private float _lastWalkCheck;
         [NonSerialized] public GameObject WeaponPrefab;
         private WorldManager _wm;
+        private ServerManager _sm;
 
         // Used to set the enemy walking animation
         private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
@@ -81,6 +83,7 @@ namespace Prefabs.Player
         public override void OnNetworkSpawn()
         {
             _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
+            _sm = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ServerManager>();
             if (IsOwner)
                 Spawn();
             else
@@ -272,7 +275,8 @@ namespace Prefabs.Player
         private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
 
         [Rpc(SendTo.Owner)]
-        public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID)
+        public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
+            float ragdollScale = 1)
         {
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
 
@@ -282,7 +286,10 @@ namespace Prefabs.Player
 
             // Ragdoll
             if (InventoryManager.Instance.Hp <= 0)
-                RagdollRpc(damage, bodyPart, direction);
+            {
+                RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
+                _sm.RespawnServerRpc();
+            }
 
             // Spawn damage circle
             var circleDamageContainer = GameObject.FindWithTag("CircleDamageContainer");
@@ -300,7 +307,7 @@ namespace Prefabs.Player
         {
             print($"{OwnerClientId} - I'm dead!");
             ragdoll.ApplyForce(bodyPart,
-                Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3 * math.clamp(damage*2, 10, 200));
+                Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3 * math.clamp(damage * 2, 10, 200));
             gameObject.AddComponent<Destroyable>().lifespan = 10;
         }
     }
