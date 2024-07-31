@@ -33,6 +33,9 @@ namespace Prefabs.Player
         private ClientManager _clientManager;
         private Vector2 _mouseLook;
         private Vector2 _smoothV;
+        private float _throwingAcc;
+        private bool _canThrow = true;
+        private const float MaxThrowingAcc = 0.5f;
 
         public bool CanDig
         {
@@ -144,7 +147,7 @@ namespace Prefabs.Player
                      Time.time - _lastPlace > weapon.WeaponModel.Delay)
             {
                 _lastPlace = Time.time;
-                _clientManager.EditVoxelClientRpc(_placeBlock.transform.position,
+                _clientManager.EditVoxelClientRpc(new[] { _placeBlock.transform.position },
                     InventoryManager.Instance.BlockId);
                 // _wm.EditVoxel(_placeBlock.transform.position, InventoryManager.Instance.blockId);
                 _placeBlock.gameObject.SetActive(false);
@@ -159,6 +162,27 @@ namespace Prefabs.Player
                 _lastFire = Time.time;
                 weapon.Fire();
             }
+
+            // If I am throwing a grenade
+            else if (Input.GetKey(KeyCode.G))
+            {
+                _lastFire = Time.time;
+                _throwingAcc += Time.deltaTime;
+            }
+
+            // Throw the grenade
+            if ((_throwingAcc > MaxThrowingAcc || Input.GetKeyUp(KeyCode.G)) &&
+                InventoryManager.Instance.Grenade is not null && InventoryManager.Instance.LeftGrenades > 0)
+            {
+                _lastFire = Time.time;
+                if (_canThrow)
+                    weapon.ThrowGrenade(_throwingAcc / MaxThrowingAcc);
+                _canThrow = false;
+                _throwingAcc = 0;
+            }
+
+            if (Input.GetKeyUp(KeyCode.G))
+                _canThrow = true;
 
             if (weapon.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
                 _lastPlace -= weapon.WeaponModel.Delay * 0.65f;

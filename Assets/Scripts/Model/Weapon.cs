@@ -11,7 +11,8 @@ namespace Model
         Melee,
         Primary,
         Secondary,
-        Tertiary
+        Tertiary,
+        Grenade
     }
 
     public class Weapon
@@ -52,6 +53,12 @@ namespace Model
         {
             new Weapon(name: "ak47", damage: 24*10, rof: 100, distance: 72, type: WeaponType.Primary, fireAnimation: "gun",
                 zoom: 1.75f)
+        };
+        
+        public static readonly List<Weapon> Grenades = new()
+        {
+            new Weapon(name: "M61", damage: 100, rof: 0, distance: 0, type: WeaponType.Grenade),
+            new Weapon(name: "M61_NY", damage: 150, rof: 0, distance: 0, type: WeaponType.Grenade),
         };
 
         public string Name, Audio, FireAnimation;

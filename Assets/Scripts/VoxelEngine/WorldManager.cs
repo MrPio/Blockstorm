@@ -11,7 +11,7 @@ namespace VoxelEngine
     public class WorldManager : MonoBehaviour
     {
         public static ushort maxPlayers = 32;
-        
+
         public byte BlockTypeIndex(string blockName) =>
             (byte)VoxelData.BlockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 
@@ -54,6 +54,7 @@ namespace VoxelEngine
                     _nonSolidChunks[x, z] = null;
                 }
             }
+
             _hasRendered = true;
         }
 
@@ -89,27 +90,30 @@ namespace VoxelEngine
             return null;
         }
 
-        public int counts;
-        public void EditVoxel(Vector3 pos, byte newID)
+        public void EditVoxels(List<Vector3> positions, byte newID)
         {
-            var posNorm = Vector3Int.FloorToInt(pos);
-            Map.Blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
-            Map.BlocksEdits[posNorm] = newID;
-            // var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            counts = 0;
-            if (newID == 0)
-                CheckForFlyingMesh(posNorm);
-            // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
-
-            GetChunk(posNorm)?.Apply(chunk =>
+            foreach (var posNorm in positions.Select(Vector3Int.FloorToInt))
             {
-                chunk.UpdateMesh();
-                // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
-                chunk.UpdateAdjacentChunks(posNorm);
-            });
-            // Debug.Log(DateTimeOffset.Now.ToUnixTimeMilliseconds() - start);
-            // Debug.Log(counts);
+                if (VoxelData.BlockTypes[Map.Blocks[posNorm.y, posNorm.x, posNorm.z]].blockHealth !=
+                    BlockHealth.Indestructible)
+                    Map.Blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
+                Map.BlocksEdits[posNorm] = newID;
+            }
 
+            var chunks = new List<Chunk>();
+            foreach (var position in positions)
+            {
+                var posNorm = Vector3Int.FloorToInt(position);
+                if (newID == 0)
+                    CheckForFlyingMesh(posNorm);
+                var chunk = GetChunk(posNorm);
+                if (!chunks.Contains(chunk))
+                {
+                    chunks.Add(chunk);
+                    chunk!.UpdateMesh();
+                    chunks.AddRange(chunk.UpdateAdjacentChunks(posNorm));
+                }
+            }
         }
 
         public bool DamageVoxel(Vector3 pos, uint damage)
@@ -117,7 +121,7 @@ namespace VoxelEngine
             var posNorm = Vector3Int.FloorToInt(pos);
             if (Map.DamageBlock(Vector3Int.FloorToInt(pos), damage) <= 0)
             {
-                EditVoxel(posNorm, 0);
+                EditVoxels(new() { posNorm }, 0);
                 return true;
             }
 
@@ -147,7 +151,6 @@ namespace VoxelEngine
             // Explore all the neighbouring voxels.
             foreach (var adjacent in VoxelData.AdjacentVoxels)
             {
-                counts++;
                 var newPos = posNorm + adjacent;
 
                 // Skip this voxel if already visited or terminate if is a stop voxel.
@@ -227,6 +230,7 @@ namespace VoxelEngine
                 // Spawn a falling group of voxels.
                 _brokenChunks!.Add(new Chunk(removedBlocks, this));
             }
+
             foreach (var chunk in chunksToUpdate)
                 chunk.UpdateMesh();
         }

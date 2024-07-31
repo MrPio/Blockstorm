@@ -16,10 +16,10 @@ namespace Partials
         {
             _startTime = Time.time;
         }
-
+        
         private void FixedUpdate()
         {
-            if(Time.time-_startTime>lifespan)
+            if(lifespan>0.001f && Time.time-_startTime>lifespan)
                 Destroy(gameObject);
         }
     }

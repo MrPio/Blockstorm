@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
@@ -28,6 +29,7 @@ namespace Prefabs.Player
         [SerializeField] private CameraMovement cameraMovement;
         [SerializeField] private Camera mainCamera;
         [SerializeField] private Camera weaponCamera;
+        [SerializeField] public GameObject RightArm;
 
         [Header("AudioClips")] [SerializeField]
         private AudioClip blockDamageLightClip;
@@ -179,6 +181,29 @@ namespace Prefabs.Player
                     // Broadcast the damage action
                     _clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
                 }
+        }
+
+        public void ThrowGrenade(float force)
+        {
+            InventoryManager.Instance.LeftGrenades--;
+            StartCoroutine(Throw());
+            return;
+
+            IEnumerator Throw()
+            {
+                animator.SetTrigger(Animator.StringToHash("inventory_switch"));
+                RightArm.SetActive(true);
+                yield return new WaitForSeconds(0.35f);
+                var grenade =
+                    Resources.Load<GameObject>(
+                        $"Prefabs/weapons/grenade/{InventoryManager.Instance.Grenade!.Name.ToUpper()}");
+                var go = Instantiate(grenade,
+                    mainCamera.transform.position + mainCamera.transform.forward * 0.5f + Vector3.down * 0.2f,
+                    Quaternion.Euler(VectorExtensions.RandomVector3(-180, 180f)));
+                go.GetComponent<Rigidbody>().AddForce(mainCamera.transform.forward * math.clamp(5f * force, 1.5f, 5f),
+                    ForceMode.Impulse);
+                go.GetComponent<Rigidbody>().angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
+            }
         }
 
         /// <summary>

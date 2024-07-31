@@ -7,3 +7,6 @@
 - ~~Damage Text spawn~~
 - Switch weapon wile firing/aiming not changes the weapon
 - Move player state from Inventory manager to PLayer
+- Grenades
+- Bazooka
+- Collectables weapons

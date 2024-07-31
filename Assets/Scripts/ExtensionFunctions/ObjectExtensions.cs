@@ -10,7 +10,7 @@ namespace ExtensionFunctions
             return obj;
         }
 
-        public static TR Select<T, TR>(this T obj, Func<T, TR> select)
-            => select.Invoke(obj);
+        // public static TR Select<T, TR>(this T obj, Func<T, TR> select)
+            // => select.Invoke(obj);
     }
 }

@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera\SpawnCamera.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
+    <Compile Include="Assets\Grenade.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />

@@ -126,8 +126,8 @@ namespace VoxelEngine
         private void AddVoxel(Vector3 pos)
         {
             var blockId = _removedBlocks == null
-                ? _wm.Map.Blocks[(int)pos.y,(int) pos.x + Coord.WorldPos.x, (int)pos.z + Coord.WorldPos.z]
-                : _removedBlocks[ Vector3Int.FloorToInt(pos +ChunkGo.transform.position)];
+                ? _wm.Map.Blocks[(int)pos.y, (int)pos.x + Coord.WorldPos.x, (int)pos.z + Coord.WorldPos.z]
+                : _removedBlocks[Vector3Int.FloorToInt(pos + ChunkGo.transform.position)];
             var blockType = VoxelData.BlockTypes[blockId];
             // Skip if air
             if (blockType.name == "air") return;
@@ -209,8 +209,9 @@ namespace VoxelEngine
             _uvs.Clear();
         }
 
-        public void UpdateAdjacentChunks(Vector3Int posNorm)
+        public List<Chunk> UpdateAdjacentChunks(Vector3Int posNorm)
         {
+            var updatedChunks = new List<Chunk>();
             var processedChunks = new List<ChunkCoord>();
             for (var p = 0; p < 6; p++)
             {
@@ -223,9 +224,12 @@ namespace VoxelEngine
                     {
                         chunk.UpdateMesh();
                         processedChunks.Add(chunk.Coord);
+                        updatedChunks.Add(chunk);
                     }
                 }
             }
+
+            return updatedChunks;
         }
 
         private bool IsVoxelInChunk(Vector3Int pos) =>

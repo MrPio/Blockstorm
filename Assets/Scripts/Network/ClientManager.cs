@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Prefabs.Player;
 using UI;
 using Unity.Netcode;
@@ -71,9 +72,9 @@ namespace Network
         /// <param name="pos">The position of the new voxel.</param>
         /// <param name="newID">The type of the new voxel.</param>
         [Rpc(SendTo.Everyone)]
-        public void EditVoxelClientRpc(Vector3 pos, byte newID)
+        public void EditVoxelClientRpc(Vector3[] positions, byte newID)
         {
-            _wm.EditVoxel(pos, newID);
+            _wm.EditVoxels(positions.ToList(), newID);
             if (IsHost)
                 MapStatus.Value = new MapStatus(_wm.Map);
         }
