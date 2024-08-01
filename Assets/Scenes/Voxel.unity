@@ -1241,46 +1241,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ReloadingBarContainer
       objectReference: {fileID: 0}
-    - target: {fileID: 2798172902952138870, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_Color.b
-      value: 0.30457446
-      objectReference: {fileID: 0}
-    - target: {fileID: 2798172902952138870, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_Color.g
-      value: 0.16447124
-      objectReference: {fileID: 0}
-    - target: {fileID: 2798172902952138870, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_Color.r
-      value: 0.8301887
-      objectReference: {fileID: 0}
-    - target: {fileID: 3599272221398568198, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_Color.a
-      value: 0.6509804
-      objectReference: {fileID: 0}
-    - target: {fileID: 6333884257718822367, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6333884257718822367, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6938551410740603165, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 240
-      objectReference: {fileID: 0}
-    - target: {fileID: 6938551410740603165, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 36
-      objectReference: {fileID: 0}
-    - target: {fileID: 6938551410740603165, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8350722937994742924, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8898780374545500750, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

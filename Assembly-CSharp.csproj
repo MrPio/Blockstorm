@@ -49,6 +49,7 @@
     <Compile Include="Assets\Scripts\Managers\Serializer\BinarySerializer.cs" />
     <Compile Include="Assets\Scripts\UI\NetworkContainerUI.cs" />
     <Compile Include="Assets\Scripts\Partials\Activable.cs" />
+    <Compile Include="Assets\Scripts\Model\BlockType.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Scripts\Partials\Ragdoll.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
     <Compile Include="Assets\Scripts\Utils\Vector2XZ.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
+    <Compile Include="Assets\Scripts\Model\Team.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Model\Skin.cs" />

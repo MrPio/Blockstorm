@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
@@ -8,19 +9,32 @@ using VoxelEngine;
 
 namespace Prefabs.Player
 {
+    /// <summary>
+    /// Manage camera movement and place & dig block placements.
+    /// Calls the Fire() Weapon method based on the type of the equipped weapon.
+    /// </summary>
+    /// <seealso cref="Weapon"/>
     public class CameraMovement : MonoBehaviour
     {
         public const float FOVMain = 68, FOVWeapon = 44;
         private SceneManager _sm;
 
-        [SerializeField] private CharacterController characterController;
-        public float sensitivity, smoothing;
-        public Transform playerTransform;
+        [Header("Params")] [SerializeField] public float sensitivity, smoothing;
+        [SerializeField] public float checkIncrement = 0.1f;
+
+        [Header("Components")] [SerializeField]
+        private CharacterController characterController;
+
+        [SerializeField] public Transform playerTransform;
         [SerializeField] private Player player;
-        public float checkIncrement = 0.1f;
-        public Weapon weapon;
-        [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
+        [SerializeField] public Weapon weapon;
         [SerializeField] private AudioSource audioSource;
+
+        [Header("AudioClips")] [SerializeField]
+        private AudioClip blockDamageLightClip;
+
+        [SerializeField] private AudioClip blockDamageMediumClip;
+        [SerializeField] private AudioClip noBlockDamageClip;
 
         private Transform _transform;
         private bool _canDig, _canPlace;
@@ -40,7 +54,7 @@ namespace Prefabs.Player
                 _canDig = value;
                 if (value)
                     _canPlace = false;
-                if (_sm.highlightBlock is null || _sm.placeBlock is null) return;
+                if (_sm is null) return;
                 _sm.highlightBlock.gameObject.SetActive(false);
                 _sm.placeBlock.gameObject.SetActive(false);
             }
@@ -55,15 +69,19 @@ namespace Prefabs.Player
                     : Model.Weapon.Blocks[0].Magazine) > 0 && value;
                 if (value)
                     _canDig = false;
-                if (_sm.highlightBlock is null || _sm.placeBlock is null) return;
+                if (_sm is null) return;
                 _sm.highlightBlock.gameObject.SetActive(false);
                 _sm.placeBlock.gameObject.SetActive(false);
             }
         }
 
-        private void Start()
+        private void Awake()
         {
             _sm = FindObjectOfType<SceneManager>();
+        }
+
+        private void Start()
+        {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _transform = transform;
@@ -106,29 +124,6 @@ namespace Prefabs.Player
                 Time.time - _lastDig > weapon.WeaponModel.Delay)
             {
                 _lastDig = Time.time;
-
-                // Spawn block dig effect and play sound according to the damaged block type
-                if (_sm.highlightBlock.gameObject.activeSelf)
-                {
-                    var highlightBlockPos = _sm.highlightBlock.transform.position;
-                    var pos = Vector3Int.FloorToInt(highlightBlockPos);
-                    var block = _sm.worldManager.Map.GetBlock(pos);
-                    _sm.blockDigEffect.transform.position = highlightBlockPos;
-                    _sm.blockDigEffect.GetComponent<Renderer>().material =
-                        Resources.Load<Material>(
-                            $"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
-                    _sm.blockDigEffect.Play();
-                    if (new List<string> { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
-                            block.name.Contains(it)))
-                        audioSource.PlayOneShot(blockDamageLightClip);
-                    else if (block.blockHealth == BlockHealth.Indestructible)
-                        audioSource.PlayOneShot(noBlockDamageClip);
-                    else
-                        audioSource.PlayOneShot(blockDamageMediumClip);
-                    _sm.clientManager.DamageVoxelRpc(_sm.highlightBlock.transform.position,
-                        player.Status.Value.Melee!.Damage);
-                }
-
                 weapon.Fire();
             }
 
@@ -187,13 +182,10 @@ namespace Prefabs.Player
      */
         private void PlaceCursorBlocks()
         {
-            var angleFactor = Mathf.Sin(Mathf.Deg2Rad * transform.eulerAngles.x);
-            var headOffset = angleFactor < 0 ? -angleFactor * .3f : 0;
-            // angleFactor = angleFactor < 0 ? 0 : angleFactor;
             var lastPos = Vector3Int.FloorToInt(_transform.position);
-            for (var lenght = checkIncrement; lenght < Reach; lenght += checkIncrement)
+            for (var length = checkIncrement; length < Reach; length += checkIncrement)
             {
-                var pos = Vector3Int.FloorToInt(_transform.position + _transform.forward * (lenght));
+                var pos = Vector3Int.FloorToInt(_transform.position + _transform.forward * (length));
                 var blockType = _sm.worldManager.GetVoxel(pos);
                 if (_canDig && blockType != null && blockType.name != "air")
                 {

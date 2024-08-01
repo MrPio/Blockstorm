@@ -3,21 +3,14 @@ using System.Collections.Generic;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers.Serializer;
+using Model;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Utils;
 using Random = UnityEngine.Random;
 
 namespace VoxelEngine
 {
-    public enum Team
-    {
-        Red,
-        Blue,
-        Green,
-        Yellow
-    }
 
     [Serializable]
     public class Map

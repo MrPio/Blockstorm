@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EasyButtons;
 using Managers.Serializer;
+using Model;
 using UnityEngine;
 using VoxelEngine;
 
@@ -196,17 +197,17 @@ namespace Utils
             map.spawns = new List<Spawn>
             {
                 redSpawn,
-                new Spawn(Team.Blue,
+                new(Team.Blue,
                     redSpawn.spawnLayers.Select(it =>
                             new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, it.bottomLeft.z),
                                 new Vector2XZ(map.size.x - it.bottomLeft.x, it.topRight.z), it.y))
                         .ToList()),
-                new Spawn(Team.Green,
+                new(Team.Green,
                     redSpawn.spawnLayers.Select(it =>
                             new SpawnArea(new Vector2XZ(it.bottomLeft.x, map.size.z - it.topRight.z),
                                 new Vector2XZ(it.topRight.x, map.size.z - it.bottomLeft.z), it.y))
                         .ToList()),
-                new Spawn(Team.Yellow,
+                new(Team.Yellow,
                     redSpawn.spawnLayers.Select(it =>
                             new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, map.size.z - it.topRight.z),
                                 new Vector2XZ(map.size.x - it.bottomLeft.x, map.size.z - it.bottomLeft.z), it.y))

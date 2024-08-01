@@ -428,7 +428,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.75
+  m_Height: 1.55
   m_Radius: 0.375
   m_SlopeLimit: 45
   m_StepOffset: 0.5
@@ -958,17 +958,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d84ba996b6480449f0bd82c828633d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characterController: {fileID: 6541506331053138863}
   sensitivity: 100
   smoothing: 1
+  checkIncrement: 0.1
+  characterController: {fileID: 6541506331053138863}
   playerTransform: {fileID: 1263851460940361170}
   player: {fileID: 5505040103345985529}
-  checkIncrement: 0.1
   weapon: {fileID: 7821993980020846379}
+  audioSource: {fileID: 7999131348516531350}
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}
-  audioSource: {fileID: 7999131348516531350}
 --- !u!114 &3407597305520257956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1322,6 +1322,70 @@ PrefabInstance:
     - target: {fileID: 1120978973499594720, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1212892492185414722, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_Swing1Limit.limit
+      value: 4.7955513
+      objectReference: {fileID: 0}
+    - target: {fileID: 2977205886575092015, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_Swing2Limit.limit
+      value: 41.57316
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0016297508
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0040678047
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0017654374
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.7179835
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.6955737
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.018002415
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.018788293
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -86.509
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -58.622
+      objectReference: {fileID: 0}
+    - target: {fileID: 7118231479394435672, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 58.686
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951124850868129504, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_Swing1Limit.limit
+      value: 24.579725
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951124850868129504, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_Swing2Limit.limit
+      value: 18.46478
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951124850868129504, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_LowTwistLimit.limit
+      value: -39.460846
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951124850868129504, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
+      propertyPath: m_HighTwistLimit.limit
+      value: 47.231
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

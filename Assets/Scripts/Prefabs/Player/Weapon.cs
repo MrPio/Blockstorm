@@ -12,8 +12,6 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
-using VoxelEngine;
 using Random = UnityEngine.Random;
 
 namespace Prefabs.Player
@@ -95,10 +93,12 @@ namespace Prefabs.Player
 
         /// <summary>
         /// Fire the current weapon and check if any enemy or ground block has been hit.
+        /// This is called from CameraMovement for Block, Melee and Guns
         /// </summary>
+        /// <seealso cref="CameraMovement"/>
         public void Fire()
         {
-            if (_weaponModel == null || Time.time - _lastSwitch < 0.75f || _reloadingCoroutine is not null)
+            if (_weaponModel == null || Time.time - _lastSwitch < 0.25f || _reloadingCoroutine is not null)
                 return;
 
             // Play audio effect and animation.
@@ -108,39 +108,34 @@ namespace Prefabs.Player
                 audioSource.PlayOneShot(_fireClip, 0.5f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
                 _sm.crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
-                if (_weaponModel.Type is WeaponType.Block)
-                {
-                    // Check if the player has enough ammo
-                    if (Magazine[_weaponModel.Name] <= 0)
-                    {
-                        audioSource.PlayOneShot(noAmmoClip);
-                        return;
-                    }
-
-                    Magazine[_weaponModel.Name]--;
-                    _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
-                    _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
-                        player.Status.Value.BlockId);
-                }
             }
 
-            // Check that the current weapon deals damage
-            // TODO: Melee weapons also deals damages! Move here the block digging logic and add enemy damage.
-            if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee) return;
-
-            // Check if the player has enough ammo
-            if (Magazine[_weaponModel.Name] <= 0)
+            // Handle ammo
+            if (_weaponModel.Type is WeaponType.Block || _weaponModel.IsGun)
             {
-                audioSource.PlayOneShot(noAmmoClip);
+                // Check if the player has enough ammo
+                if (Magazine[_weaponModel.Name] <= 0)
+                {
+                    audioSource.PlayOneShot(noAmmoClip);
+                    return;
+                }
+
+                // Subtract ammo
+                Magazine[_weaponModel.Name]--;
+                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
+            }
+
+            // Add block to map
+            if (_weaponModel.Type is WeaponType.Block)
+            {
+                _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
+                    player.Status.Value.BlockId);
                 return;
             }
-
-            // Subtract ammo
-            Magazine[_weaponModel.Name]--;
-            _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
-
+            
             // Spawn the weapon effect
-            player.SpawnWeaponEffect(_weaponModel!.Type);
+            if (_weaponModel.IsGun)
+                player.SpawnWeaponEffect(_weaponModel!.Type);
 
             // Cast a ray to check for collisions
             var cameraTransform = cameraMovement.transform;
@@ -164,8 +159,9 @@ namespace Prefabs.Player
                     {
                         // Spawn the damage text
                         var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                        damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                                                          cameraTransform.forward * 0.35f;
+                        damageTextGo.transform.position =
+                            hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                            cameraTransform.forward * 0.35f;
                         damageTextGo.transform.rotation = player.transform.rotation;
                         damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
                         damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
@@ -191,24 +187,16 @@ namespace Prefabs.Player
                 {
                     // Check if the hit block is solid
                     var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
-                    var blockType = _sm.worldManager.GetVoxel(pos);
-                    if (blockType is not { isSolid: true }) return;
+                    var block = _sm.worldManager.GetVoxel(pos);
+                    if (block is not { isSolid: true }) return;
 
                     // Spawn damage effect on the block
                     _sm.blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
                     _sm.blockDigEffect.GetComponent<Renderer>().material =
                         Resources.Load<Material>(
-                            $"Textures/texturepacks/blockade/Materials/blockade_{blockType.topID + 1:D1}");
+                            $"Textures/texturepacks/blockade/Materials/blockade_{block.topID + 1:D1}");
                     _sm.blockDigEffect.Play();
-
-                    // Play the audio effect
-                    if (new List<string> { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
-                            blockType.name.Contains(it)))
-                        audioSource.PlayOneShot(blockDamageLightClip, 1);
-                    else if (blockType.blockHealth == BlockHealth.Indestructible)
-                        audioSource.PlayOneShot(noBlockDamageClip, 1);
-                    else
-                        audioSource.PlayOneShot(blockDamageMediumClip, 1);
+                    audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/blocks/{block.AudioClip}"));
 
                     // Broadcast the damage action
                     _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);

@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace Partials
@@ -24,8 +25,9 @@ namespace Partials
         public void ApplyForce(string bodyPart, Vector3 force)
         {
             SetRagdollState(true);
-            foreach (var body in ragdollBodies)
-                body.AddForce(force * (body.gameObject.name == bodyPart ? 1f : 0.5f), ForceMode.Impulse);
+            print(force);
+            foreach (var body in ragdollBodies.Where(it => it.gameObject.name == bodyPart))
+                body.AddForce(force, ForceMode.Impulse);
         }
     }
 }

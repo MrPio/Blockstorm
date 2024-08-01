@@ -39,12 +39,12 @@ namespace Model
         public static readonly List<Weapon> Blocks = new()
         {
             new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block,
-                fireAnimation: "shovel", magazine: 3),
+                fireAnimation: "shovel", magazine: 100),
         };
 
         public static readonly List<Weapon> Melees = new()
         {
-            new Weapon(name: "shovel", damage: 35, rof: 42, distance: 4, type: WeaponType.Melee,
+            new Weapon(name: "shovel", damage: 35, rof: 50, distance: 4, type: WeaponType.Melee,
                 fireAnimation: "shovel")
         };
 

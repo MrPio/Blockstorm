@@ -78,10 +78,10 @@ namespace Prefabs.Player
 
         // Used to update the enemy's weapon prefab
         public readonly NetworkVariable<NetString> EquippedWeapon = new(new NetString { Message = "" },
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Owner);
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null));
+        public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null),
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         public override void OnNetworkSpawn()
         {
@@ -122,8 +122,8 @@ namespace Prefabs.Player
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {
                     var rotation = (float)(newValue - 128);
-                    var headRotation = Mathf.Clamp(rotation, -50, 20f) - 20f;
-                    var bellyRotation = Mathf.Clamp(rotation, -25f, 25f);
+                    var headRotation = Mathf.Clamp(rotation + 20f, -38, 20f) - 20f;
+                    var bellyRotation = Mathf.Clamp(rotation - 15f, -30f, 30f);
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
@@ -173,10 +173,11 @@ namespace Prefabs.Player
         {
             if (!IsOwner || isDying) return;
 
-            // Debug
+            // Debug: Kill everyone when pressing L key
             if (Input.GetKeyDown(KeyCode.L))
-                DamageClientRpc(150, "chest",
-                    new NetVector3(VectorExtensions.RandomVector3(-1f, 1f).normalized), 0);
+                foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
+                    enemy.DamageClientRpc(999, "chest",
+                        new NetVector3(Vector3.up), OwnerClientId);
 
             // When the player has touched the ground, activate his jump.
             _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.25f, 0.4f), Quaternion.identity,
@@ -339,10 +340,9 @@ namespace Prefabs.Player
             print($"{OwnerClientId} is dead!");
             if (!IsOwner)
             {
-                ragdoll.ApplyForce(bodyPart,
-                    Quaternion.AngleAxis(0, Vector3.up) * direction.ToVector3.normalized *
-                    math.clamp(damage * 2, 10, 200));
+                ragdoll.ApplyForce(bodyPart, direction.ToVector3.normalized * math.clamp(damage * 5, 50f, 500f));
                 gameObject.AddComponent<Destroyable>().lifespan = 10;
+                gameObject.GetComponent<ClientNetworkTransform>().enabled = false;
             }
             else
             {
