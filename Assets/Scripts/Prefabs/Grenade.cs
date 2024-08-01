@@ -9,29 +9,25 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using VoxelEngine;
 
 namespace Prefabs
 {
     public class Grenade : MonoBehaviour
     {
+        private SceneManager _sm;
+
         public GameObject[] explosions;
         [SerializeField] public float delayFactor = 1f;
         [SerializeField] private GameObject damageText;
         [NonSerialized] public float ExplosionTime;
         [NonSerialized] public float ExplosionRange;
-        private WorldManager _wm;
-        private ClientManager _cm;
-        private Transform _worldCanvas;
         private Player.Player player;
         [NonSerialized] public float Delay;
 
         private void Start()
         {
+            _sm = FindObjectOfType<SceneManager>();
             InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
-            _cm = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
-            _worldCanvas = GameObject.FindWithTag("WorldCanvas").transform;
             player = GameObject.FindGameObjectsWithTag("Player").First(it => it.GetComponent<NetworkObject>().IsOwner)
                 .GetComponent<Player.Player>();
         }
@@ -49,7 +45,7 @@ namespace Prefabs
 
             // Destroy blocks
             var destroyedVoxels = transform.position.GetNeighborVoxels(ExplosionRange);
-            _cm.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
+            _sm.clientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
 
             // Checks if there was a hit on an enemy
@@ -69,7 +65,7 @@ namespace Prefabs
                 if (!attackedPlayer.Status.Value.IsDead)
                 {
                     // Spawn the damage text
-                    var damageTextGo = Instantiate(damageText, _worldCanvas);
+                    var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
                     damageTextGo.transform.position = enemy.transform.position - player.cameraTransform.forward * 0.35f;
                     damageTextGo.transform.rotation = player.transform.rotation;
                     damageTextGo.GetComponent<FollowRotation>().follow = player.transform;

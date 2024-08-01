@@ -1,5 +1,8 @@
 using System;
+using ExtensionFunctions;
+using Model;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using Weapon = Model.Weapon;
 
 namespace Prefabs
@@ -12,16 +15,19 @@ namespace Prefabs
         [SerializeField] private GameObject collectableContainer;
         [SerializeField] private AudioClip lootAudioClip;
 
-        [NonSerialized]
-        public Model.Collectable Model = new(global::Model.Collectable.CollectableType.Weapon, Weapon.Primaries[0]);
+        [NonSerialized] public Model.Collectable Model = new(CollectableType.Weapon, Weapon.Primaries[0]);
 
         private void Start()
         {
-            ammoLight.SetActive(Model.Type is global::Model.Collectable.CollectableType.Ammo);
-            hpLight.SetActive(Model.Type is global::Model.Collectable.CollectableType.Hp);
-            weaponLight.SetActive(Model.Type is global::Model.Collectable.CollectableType.Weapon);
+            ammoLight.SetActive(Model.Type is CollectableType.Ammo);
+            hpLight.SetActive(Model.Type is CollectableType.Hp);
+            weaponLight.SetActive(Model.Type is CollectableType.Weapon);
             var item = Resources.Load<GameObject>($"Prefabs/weapons/collectable/{Model.Item.Name.ToUpper()}");
-            Instantiate(item, collectableContainer.transform);
+            Instantiate(item,
+                Vector3.zero,
+                Quaternion.Euler(0f, 0f, Random.Range(-180, 180f)),
+                collectableContainer.transform);
+
             // TODO: spawn with random Z rotation
         }
 

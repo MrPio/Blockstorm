@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
 using Model;
-using Network;
 using Unity.Mathematics;
 using UnityEngine;
 using VoxelEngine;
@@ -13,6 +11,7 @@ namespace Prefabs.Player
     public class CameraMovement : MonoBehaviour
     {
         public const float FOVMain = 68, FOVWeapon = 44;
+        private SceneManager _sm;
 
         [SerializeField] private CharacterController characterController;
         public float sensitivity, smoothing;
@@ -23,15 +22,11 @@ namespace Prefabs.Player
         [SerializeField] private AudioClip blockDamageLightClip, blockDamageMediumClip, noBlockDamageClip;
         [SerializeField] private AudioSource audioSource;
 
-        private Transform _highlightBlock, _placeBlock;
-        private WorldManager _wm;
         private Transform _transform;
         private bool _canDig, _canPlace;
         private float _lastDig, _lastPlace, _lastFire;
-        private ParticleSystem _blockDigEffect;
         private bool _isPlaceCursorBlocksStarted;
         private float Reach => weapon.WeaponModel?.Distance ?? 0f;
-        private ClientManager _clientManager;
         private Vector2 _mouseLook;
         private Vector2 _smoothV;
         private float _throwingAcc;
@@ -40,21 +35,19 @@ namespace Prefabs.Player
 
         public bool CanDig
         {
-            get => _canDig;
             set
             {
                 _canDig = value;
                 if (value)
                     _canPlace = false;
-                if (_highlightBlock is null || _placeBlock is null) return;
-                _highlightBlock.gameObject.SetActive(false);
-                _placeBlock.gameObject.SetActive(false);
+                if (_sm.highlightBlock is null || _sm.placeBlock is null) return;
+                _sm.highlightBlock.gameObject.SetActive(false);
+                _sm.placeBlock.gameObject.SetActive(false);
             }
         }
 
         public bool CanPlace
         {
-            get => _canPlace;
             set
             {
                 _canPlace = (player.weapon.Magazine.TryGetValue("block", out var value1)
@@ -62,24 +55,17 @@ namespace Prefabs.Player
                     : Model.Weapon.Blocks[0].Magazine) > 0 && value;
                 if (value)
                     _canDig = false;
-                if (_highlightBlock is null || _placeBlock is null) return;
-                _highlightBlock.gameObject.SetActive(false);
-                _placeBlock.gameObject.SetActive(false);
+                if (_sm.highlightBlock is null || _sm.placeBlock is null) return;
+                _sm.highlightBlock.gameObject.SetActive(false);
+                _sm.placeBlock.gameObject.SetActive(false);
             }
         }
 
         private void Start()
         {
-            _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
-            _clientManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
-            _highlightBlock = _clientManager.HighlightBlock;
-            _placeBlock = _clientManager.PlaceBlock;
-            _highlightBlock.gameObject.SetActive(false);
-            _placeBlock.gameObject.SetActive(false);
-
+            _sm = FindObjectOfType<SceneManager>();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
             _transform = transform;
         }
 
@@ -120,16 +106,16 @@ namespace Prefabs.Player
                 Input.GetMouseButton(0) && Time.time - _lastDig > weapon.WeaponModel.Delay)
             {
                 _lastDig = Time.time;
-                if (_highlightBlock.gameObject.activeSelf)
+                if (_sm.highlightBlock.gameObject.activeSelf)
                 {
-                    var highlightBlockPos = _highlightBlock.transform.position;
+                    var highlightBlockPos = _sm.highlightBlock.transform.position;
                     var pos = Vector3Int.FloorToInt(highlightBlockPos);
-                    var block = _wm.Map.GetBlock(pos);
-                    _blockDigEffect.transform.position = highlightBlockPos;
-                    _blockDigEffect.GetComponent<Renderer>().material =
+                    var block = _sm.worldManager.Map.GetBlock(pos);
+                    _sm.blockDigEffect.transform.position = highlightBlockPos;
+                    _sm.blockDigEffect.GetComponent<Renderer>().material =
                         Resources.Load<Material>(
                             $"Textures/texturepacks/blockade/Materials/blockade_{(block.topID + 1):D1}");
-                    _blockDigEffect.Play();
+                    _sm.blockDigEffect.Play();
                     if (new List<string> { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
                             block.name.Contains(it)))
                         audioSource.PlayOneShot(blockDamageLightClip);
@@ -137,7 +123,7 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(noBlockDamageClip);
                     else
                         audioSource.PlayOneShot(blockDamageMediumClip);
-                    _clientManager.DamageVoxelRpc(_highlightBlock.transform.position,
+                    _sm.clientManager.DamageVoxelRpc(_sm.highlightBlock.transform.position,
                         player.Status.Value.Melee!.Damage);
                 }
 
@@ -145,14 +131,14 @@ namespace Prefabs.Player
             }
 
             // If I am placing with an equipped block
-            else if (weapon.WeaponModel is { Type: WeaponType.Block } && _placeBlock.gameObject.activeSelf &&
+            else if (weapon.WeaponModel is { Type: WeaponType.Block } && _sm.placeBlock.gameObject.activeSelf &&
                      Input.GetMouseButton(0) &&
                      Time.time - _lastPlace > weapon.WeaponModel.Delay)
             {
                 _lastPlace = Time.time;
-                _clientManager.EditVoxelClientRpc(new[] { _placeBlock.transform.position },
+                _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
                     player.Status.Value.BlockId);
-                _placeBlock.gameObject.SetActive(false);
+                _sm.placeBlock.gameObject.SetActive(false);
                 weapon.Fire();
             }
 
@@ -189,8 +175,8 @@ namespace Prefabs.Player
             if (weapon.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
                 _lastPlace -= weapon.WeaponModel.Delay * 0.65f;
 
-            if (_blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
-                _blockDigEffect.Stop();
+            if (_sm.blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
+                _sm.blockDigEffect.Stop();
         }
 
         /**
@@ -207,20 +193,20 @@ namespace Prefabs.Player
             for (var lenght = checkIncrement; lenght < Reach; lenght += checkIncrement)
             {
                 var pos = Vector3Int.FloorToInt(_transform.position + _transform.forward * (lenght));
-                var blockType = _wm.GetVoxel(pos);
+                var blockType = _sm.worldManager.GetVoxel(pos);
                 if (_canDig && blockType != null && blockType.name != "air")
                 {
                     if (!blockType.isSolid) return;
-                    _highlightBlock.position = pos + Vector3.one * 0.5f;
-                    _highlightBlock.gameObject.SetActive(true);
-                    _placeBlock.gameObject.SetActive(false);
+                    _sm.highlightBlock.position = pos + Vector3.one * 0.5f;
+                    _sm.highlightBlock.gameObject.SetActive(true);
+                    _sm.placeBlock.gameObject.SetActive(false);
                     return;
                 }
 
                 if (_canPlace && blockType is { isSolid: true })
                 {
                     var newPos = lastPos + Vector3.one * 0.5f;
-                    if (_wm.GetVoxel(Vector3Int.FloorToInt(newPos))?.name != "air")
+                    if (_sm.worldManager.GetVoxel(Vector3Int.FloorToInt(newPos))?.name != "air")
                         return;
                     var characterPos = characterController.transform.position;
                     var distanceXZ = Vector3.Distance(new Vector3(newPos.x, 0, newPos.z),
@@ -228,26 +214,26 @@ namespace Prefabs.Player
                     var distanceY = math.abs(newPos.y - characterPos.y);
                     var intersect = distanceXZ < characterController.radius + 0.25f &&
                                     distanceY < characterController.height - 0.2f;
-                    _placeBlock.position = newPos;
+                    _sm.placeBlock.position = newPos;
 
                     // Check enemy intersection
                     if (Physics.CheckSphere(newPos, 0.5f, 1 << LayerMask.NameToLayer("Enemy")))
                     {
-                        _placeBlock.gameObject.SetActive(false);
-                        _highlightBlock.gameObject.SetActive(false);
+                        _sm.placeBlock.gameObject.SetActive(false);
+                        _sm.highlightBlock.gameObject.SetActive(false);
                         return;
                     }
 
-                    _placeBlock.gameObject.SetActive(!intersect);
-                    _highlightBlock.gameObject.SetActive(false);
+                    _sm.placeBlock.gameObject.SetActive(!intersect);
+                    _sm.highlightBlock.gameObject.SetActive(false);
                     return;
                 }
 
                 lastPos = pos;
             }
 
-            _highlightBlock.gameObject.SetActive(false);
-            _placeBlock.gameObject.SetActive(false);
+            _sm.highlightBlock.gameObject.SetActive(false);
+            _sm.placeBlock.gameObject.SetActive(false);
         }
     }
 }

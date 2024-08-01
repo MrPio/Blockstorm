@@ -1,12 +1,14 @@
 ﻿namespace Model
 {
+    public enum CollectableType
+    {
+        Weapon,
+        Ammo,
+        Hp
+    }
+
     public class Collectable
     {
-        public enum CollectableType
-        {
-            Weapon, Ammo, Hp
-        }
-
         public CollectableType Type;
         public Weapon Item;
 

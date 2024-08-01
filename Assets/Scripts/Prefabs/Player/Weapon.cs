@@ -12,18 +12,20 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
 namespace Prefabs.Player
 {
+
     /// <summary>
     /// Handle the player's weapon.
     /// </summary>
     /// <remarks> This script is attached only to the owned player and removed from the enemy players. </remarks>
     public class Weapon : MonoBehaviour
     {
+        private SceneManager _sm;
+
         [Header("Components")] [SerializeField]
         private AudioClip switchEquippedClip;
 
@@ -50,15 +52,10 @@ namespace Prefabs.Player
         [CanBeNull] private Model.Weapon _weaponModel;
         private AudioClip _fireClip;
         private float _lastSwitch = -99;
-        private ParticleSystem _blockDigEffect;
-        private WorldManager _wm;
         [NonSerialized] public static bool isAiming;
-        private Transform _crosshair;
-        private Animator _crosshairAnimator;
-        private ClientManager _clientManager;
-        private Canvas worldCanvas;
         public readonly Dictionary<string, int> LeftAmmo = new();
         public readonly Dictionary<string, int> Magazine = new();
+        [CanBeNull] private Coroutine _reloadingCoroutine;
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -89,18 +86,9 @@ namespace Prefabs.Player
             }
         }
 
-        private void Awake()
-        {
-            _blockDigEffect = GameObject.FindWithTag("BlockDigEffect").GetComponent<ParticleSystem>();
-            _crosshair = GameObject.FindWithTag("Crosshair").transform;
-            _crosshairAnimator = _crosshair.Find("CrosshairLines").GetComponent<Animator>();
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
-            _clientManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
-            worldCanvas = GameObject.FindWithTag("WorldCanvas").GetComponent<Canvas>();
-        }
-
         private void Start()
         {
+            _sm = FindObjectOfType<SceneManager>();
             isAiming = false;
             SwitchEquipped(WeaponType.Block);
         }
@@ -119,7 +107,7 @@ namespace Prefabs.Player
             {
                 audioSource.PlayOneShot(_fireClip, 0.5f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
-                _crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
+                _sm.crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
                 if (_weaponModel.Type is WeaponType.Block)
                 {
                     Magazine[_weaponModel.Name]--;
@@ -166,7 +154,7 @@ namespace Prefabs.Player
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
                         // Spawn the damage text
-                        var damageTextGo = Instantiate(damageText, worldCanvas.transform);
+                        var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
                         damageTextGo.transform.position = hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
                                                           cameraTransform.forward * 0.35f;
                         damageTextGo.transform.rotation = player.transform.rotation;
@@ -194,15 +182,15 @@ namespace Prefabs.Player
                 {
                     // Check if the hit block is solid
                     var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
-                    var blockType = _wm.GetVoxel(pos);
+                    var blockType = _sm.worldManager.GetVoxel(pos);
                     if (blockType is not { isSolid: true }) return;
 
                     // Spawn damage effect on the block
-                    _blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
-                    _blockDigEffect.GetComponent<Renderer>().material =
+                    _sm.blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
+                    _sm.blockDigEffect.GetComponent<Renderer>().material =
                         Resources.Load<Material>(
                             $"Textures/texturepacks/blockade/Materials/blockade_{blockType.topID + 1:D1}");
-                    _blockDigEffect.Play();
+                    _sm.blockDigEffect.Play();
 
                     // Play the audio effect
                     if (new List<string> { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it =>
@@ -214,8 +202,12 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(blockDamageMediumClip, 1);
 
                     // Broadcast the damage action
-                    _clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
+                    _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
                 }
+
+            // Handle weapon reloading
+            if (Input.GetKeyDown(KeyCode.R) && Magazine[_weaponModel.Name] < _weaponModel.Magazine)
+                Reload();
         }
 
         /// <summary>
@@ -266,6 +258,11 @@ namespace Prefabs.Player
             if (Time.time - _lastSwitch < 0.25f)
                 return;
             _lastSwitch = Time.time;
+            if (_reloadingCoroutine is not null)
+            {
+                StopCoroutine(_reloadingCoroutine);
+                animator.speed = 1;
+            }
 
             // Disable any aiming
             if (isAiming)
@@ -285,14 +282,14 @@ namespace Prefabs.Player
             if (newWeapon is null)
                 return;
             WeaponModel = newWeapon;
-            
+
             // Update Ammo HUD
             if (weaponType is WeaponType.Block)
                 GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
                     .SetBlocks(Magazine[_weaponModel!.Name]);
             else if (weaponType is WeaponType.Melee)
                 GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetMelee();
-            else 
+            else
                 GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
                     .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name]);
 
@@ -311,17 +308,23 @@ namespace Prefabs.Player
         /// <remarks> This is called in the middle of the <b>inventory_switch</b> animation </remarks>
         public void ChangeWeaponPrefab()
         {
-            foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
-                Destroy(child.gameObject);
-            var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}");
-            player.WeaponPrefab = Instantiate(go, transform).Apply(o =>
+            if (_reloadingCoroutine is null)
+                animator.speed = 0;
+            else
             {
-                o.layer = LayerMask.NameToLayer("WeaponCamera");
-                o.AddComponent<WeaponSway>();
-                if (WeaponModel.Type == WeaponType.Block)
-                    o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                        $"Textures/texturepacks/blockade/Materials/blockade_{(player.Status.Value.BlockType.sideID + 1):D1}");
-            });
+                // Load the new weapon prefab
+                foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
+                    Destroy(child.gameObject);
+                var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}");
+                player.WeaponPrefab = Instantiate(go, transform).Apply(o =>
+                {
+                    o.layer = LayerMask.NameToLayer("WeaponCamera");
+                    o.AddComponent<WeaponSway>();
+                    if (WeaponModel.Type == WeaponType.Block)
+                        o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
+                            $"Textures/texturepacks/blockade/Materials/blockade_{(player.Status.Value.BlockType.sideID + 1):D1}");
+                });
+            }
         }
 
         /// <summary>
@@ -332,7 +335,7 @@ namespace Prefabs.Player
             isAiming = !isAiming;
 
             // Disable the crosshair
-            _crosshair.gameObject.SetActive(!isAiming);
+            _sm.crosshair.gameObject.SetActive(!isAiming);
 
             // Destroy the current weapon prefab
             foreach (var child in transform.parent.GetComponentsInChildren<Transform>()
@@ -352,19 +355,40 @@ namespace Prefabs.Player
             weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.Zoom : 1);
         }
 
+        /// <summary>
+        /// Reload the current weapon if it is a gun.
+        /// The weapon's magazine will be restored by subtracting the left ammo and the HUD will be updated.
+        /// </summary>
+        /// <remarks> While reloading, if the player switches weapons, the reload will be canceled. </remarks>
         private void Reload()
         {
-            if (_weaponModel is null || _weaponModel.Type is WeaponType.Block or WeaponType.Melee)
+            if (_reloadingCoroutine is not null || _weaponModel is null ||
+                _weaponModel.Type is WeaponType.Block or WeaponType.Melee)
                 return;
             var leftAmmo = LeftAmmo[_weaponModel!.Name];
             if (leftAmmo <= 0) return;
+
+            // Update the magazine and notify the HUD
             var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
-            // TODO: reload anim
-            audioSource.PlayOneShot(reloadingClip);
             LeftAmmo[_weaponModel!.Name] -= takenAmmo;
             Magazine[_weaponModel!.Name] += takenAmmo;
             GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
                 .SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name]);
+
+            // Play audio clip and animation
+            audioSource.PlayOneShot(reloadingClip);
+            animator.SetTrigger(Animator.StringToHash("inventory_switch"));
+
+            // Make the animation last for the entire reloading time.
+            _reloadingCoroutine = StartCoroutine(BringWeaponUp());
+            return;
+
+            IEnumerator BringWeaponUp()
+            {
+                yield return new WaitForSeconds(_weaponModel!.ReloadTime!.Value / 100f);
+                animator.speed = 1;
+                _reloadingCoroutine = null;
+            }
         }
     }
 }

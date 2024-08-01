@@ -19,6 +19,8 @@ namespace Prefabs.Player
 {
     public class Player : NetworkBehaviour
     {
+        private SceneManager _sm;
+
         [Header("Params")] [SerializeField] public float speed = 8f;
         [SerializeField] public float fallSpeed = 2f;
         [SerializeField] public float gravity = 9.18f;
@@ -59,8 +61,6 @@ namespace Prefabs.Player
         private Vector3 _cameraInitialLocalPosition;
         private float _lastWalkCheck;
         [NonSerialized] public GameObject WeaponPrefab;
-        private WorldManager _wm;
-        private ServerManager _sm;
         private bool isDying;
 
         // Used to set the enemy walking animation
@@ -84,8 +84,6 @@ namespace Prefabs.Player
 
         public override void OnNetworkSpawn()
         {
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
-            _sm = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ServerManager>();
             if (IsOwner)
             {
                 Spawn();
@@ -142,7 +140,7 @@ namespace Prefabs.Player
         private void Spawn()
         {
             _velocity = new Vector3();
-            var spawnPoint = _wm.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
+            var spawnPoint = _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
             GetComponent<ClientNetworkTransform>().Interpolate = true;
@@ -157,18 +155,16 @@ namespace Prefabs.Player
 
         private void Start()
         {
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
+            _sm = FindObjectOfType<SceneManager>();
             if (!IsOwner) return;
             _transform = transform;
             _cameraInitialLocalPosition = cameraTransform.localPosition;
 
             // Update the view distance. Render new chunks if needed.
             InvokeRepeating(nameof(UpdateChunks), 0, 1);
-        }
+            return;
 
-        private void UpdateChunks()
-        {
-            _wm.UpdatePlayerPos(_transform.position);
+            void UpdateChunks() => _sm.worldManager.UpdatePlayerPos(_transform.position);
         }
 
         private void Update()
@@ -220,7 +216,7 @@ namespace Prefabs.Player
                 _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
 
             // Invisible walls on map edges
-            var mapSize = _wm.Map.size;
+            var mapSize = _sm.worldManager.Map.size;
             var pos = _transform.position;
             if (pos.x > mapSize.x || pos.y > mapSize.y ||
                 pos.z > mapSize.z || pos.x > 0 || pos.y > 0 ||
@@ -239,9 +235,9 @@ namespace Prefabs.Player
                 if (_isGrounded && move.magnitude > 0.1f)
                 {
                     var terrainType =
-                        _wm.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 2));
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 2));
                     var hasWater =
-                        _wm.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 1))!
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 1))!
                             .name.Contains("water");
 
                     if (terrainType == null)
@@ -315,7 +311,7 @@ namespace Prefabs.Player
             if (newStatus.Hp <= 0)
             {
                 RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
-                _sm.RespawnServerRpc();
+                _sm.serverManager.RespawnServerRpc();
             }
 
             // Spawn damage circle

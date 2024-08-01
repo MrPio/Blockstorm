@@ -1,35 +1,24 @@
 ﻿using System;
 using System.Linq;
-using Prefabs.Player;
-using UI;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
-using VoxelEngine;
 
 namespace Network
 {
     public class ClientManager : NetworkBehaviour
     {
-        [SerializeField] private GameObject playerPrefab;
-
-        private Dashboard _dashboard;
-        [NonSerialized] public Transform HighlightBlock;
-        [NonSerialized] public Transform PlaceBlock;
-        private WorldManager _wm;
+        private SceneManager _sm;
 
         // Used to update the map status
-        private readonly NetworkVariable<MapStatus> MapStatus = new(new MapStatus
+        private readonly NetworkVariable<MapStatus> mapStatus = new(new MapStatus
         {
             Xs = Array.Empty<short>(), Ys = Array.Empty<short>(), Zs = Array.Empty<short>(), Ids = Array.Empty<byte>()
         });
 
         private void Awake()
         {
-            HighlightBlock = GameObject.FindWithTag("HighlightBlock").transform;
-            PlaceBlock = GameObject.FindWithTag("PlaceBlock").transform;
-
-            _dashboard = GameObject.FindWithTag("Dashboard").GetComponent<Dashboard>();
-            _wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
+            _sm = FindObjectOfType<SceneManager>();
         }
 
         public override void OnNetworkSpawn()
@@ -37,16 +26,16 @@ namespace Network
             if (!IsHost)
             {
                 // Request the current map status.
-                var mapStatus = MapStatus.Value;
-                Debug.Log($"There have been made {mapStatus.Ids.Length} voxel edits to the original map!");
-                for (var i = 0; i < mapStatus.Ids.Length; i++)
-                    _wm.Map.Blocks[mapStatus.Ys[i], mapStatus.Xs[i], mapStatus.Zs[i]] = mapStatus.Ids[i];
+                var status = mapStatus.Value;
+                Debug.Log($"There have been made {status.Ids.Length} voxel edits to the original map!");
+                for (var i = 0; i < status.Ids.Length; i++)
+                    _sm.worldManager.Map.Blocks[status.Ys[i], status.Xs[i], status.Zs[i]] = status.Ids[i];
             }
 
             // Render the map and spawn the player
             // TODO: the player should be spawned after team selection
-            _wm.RenderMap();
-            Debug.Log($"The map {_wm.Map.name} was rendered!");
+            _sm.worldManager.RenderMap();
+            Debug.Log($"The map {_sm.worldManager.Map.name} was rendered!");
             GameObject.FindWithTag("NetworkManager").GetComponent<NetworkManager>().OnClientConnectedCallback +=
                 OnClientConnected;
         }
@@ -56,7 +45,7 @@ namespace Network
             Debug.Log("New client connected: " + clientId);
             if (IsServer)
             {
-                var player = Instantiate(playerPrefab);
+                var player = Instantiate(_sm.playerPrefab);
                 player.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
             }
         }
@@ -66,20 +55,20 @@ namespace Network
         public void SendPlayerListRpc(ulong[] playerIds, ulong clientId)
         {
             if (NetworkManager.Singleton.LocalClientId != clientId) return;
-            _dashboard.UpdateDashboard(playerIds);
+            _sm.dashboard.UpdateDashboard(playerIds);
         }
 
         /// <summary>
         /// Used to propagate the placement of a block through the network.
         /// </summary>
-        /// <param name="pos">The position of the new voxel.</param>
+        /// <param name="positions">The position of the new voxel.</param>
         /// <param name="newID">The type of the new voxel.</param>
         [Rpc(SendTo.Everyone)]
         public void EditVoxelClientRpc(Vector3[] positions, byte newID)
         {
-            _wm.EditVoxels(positions.ToList(), newID);
+            _sm.worldManager.EditVoxels(positions.ToList(), newID);
             if (IsHost)
-                MapStatus.Value = new MapStatus(_wm.Map);
+                mapStatus.Value = new MapStatus(_sm.worldManager.Map);
         }
 
         /// <summary>
@@ -90,10 +79,10 @@ namespace Network
         [Rpc(SendTo.Everyone)]
         public void DamageVoxelRpc(Vector3 pos, uint damage)
         {
-            if (_wm.DamageVoxel(pos, damage))
-                HighlightBlock.gameObject.SetActive(false);
+            if (_sm.worldManager.DamageVoxel(pos, damage))
+                _sm.highlightBlock.gameObject.SetActive(false);
             if (IsHost)
-                MapStatus.Value = new MapStatus(_wm.Map);
+                mapStatus.Value = new MapStatus(_sm.worldManager.Map);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Model
         public static readonly List<Weapon> Primaries = new()
         {
             new Weapon(name: "ak47", damage: 24 * 10, rof: 100, distance: 72, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 30)
+                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 30, reloadTime:400)
         };
 
         public static readonly List<Weapon> Secondaries = new()
