@@ -39,7 +39,7 @@ namespace Model
         public static readonly List<Weapon> Blocks = new()
         {
             new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block,
-                fireAnimation: "shovel"),
+                fireAnimation: "shovel", magazine: 100),
         };
 
         public static readonly List<Weapon> Melees = new()
@@ -51,8 +51,7 @@ namespace Model
         public static readonly List<Weapon> Primaries = new()
         {
             new Weapon(name: "ak47", damage: 24 * 10, rof: 100, distance: 72, type: WeaponType.Primary,
-                fireAnimation: "gun",
-                zoom: 1.75f)
+                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 30)
         };
 
         public static readonly List<Weapon> Secondaries = new()
@@ -71,14 +70,15 @@ namespace Model
 
         public string Name, Audio, FireAnimation;
         public uint Damage, Rof, Distance;
-        public uint? Magazine, Ammo, ReloadTime;
+        public ushort? Magazine, Ammo, ReloadTime;
         public float? ExplosionRange, ExplosionTime;
         public float Zoom; // ex: 1.5x
         public WeaponType Type;
 
         public Weapon(string name, uint damage, uint rof = 0, uint distance = 0, [CanBeNull] string audio = null,
             [CanBeNull] string fireAnimation = null,
-            uint? magazine = null, uint? ammo = null, uint? reloadTime = null, WeaponType type = WeaponType.Primary,
+            ushort? magazine = null, ushort? ammo = null, ushort? reloadTime = null,
+            WeaponType type = WeaponType.Primary,
             float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0)
         {
             Name = name;

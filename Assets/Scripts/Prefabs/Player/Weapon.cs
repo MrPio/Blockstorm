@@ -12,6 +12,7 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
@@ -38,6 +39,8 @@ namespace Prefabs.Player
 
         [SerializeField] private AudioClip blockDamageMediumClip;
         [SerializeField] private AudioClip noBlockDamageClip;
+        [SerializeField] private AudioClip noAmmoClip;
+        [SerializeField] private AudioClip reloadingClip;
 
         [Header("Prefabs")] [SerializeField] private GameObject bodyBlood;
         [SerializeField] private GameObject headBlood;
@@ -54,6 +57,8 @@ namespace Prefabs.Player
         private Animator _crosshairAnimator;
         private ClientManager _clientManager;
         private Canvas worldCanvas;
+        public readonly Dictionary<string, int> LeftAmmo = new();
+        public readonly Dictionary<string, int> Magazine = new();
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -65,13 +70,21 @@ namespace Prefabs.Player
                 if (value == null) return;
                 _fireClip = Resources.Load<AudioClip>($"Audio/weapons/{value.Audio.ToUpper()}");
                 if (value.Type == WeaponType.Block)
+                {
                     cameraMovement.CanPlace = true;
+                    if (!Magazine.ContainsKey(_weaponModel.Name))
+                        Magazine[_weaponModel.Name] = _weaponModel.Magazine!.Value;
+                }
                 else if (value.Type == WeaponType.Melee)
                     cameraMovement.CanDig = true;
                 else
                 {
                     cameraMovement.CanPlace = false;
                     cameraMovement.CanDig = false;
+                    if (!LeftAmmo.ContainsKey(_weaponModel.Name))
+                        LeftAmmo[_weaponModel.Name] = _weaponModel.Ammo!.Value;
+                    if (!Magazine.ContainsKey(_weaponModel.Name))
+                        Magazine[_weaponModel.Name] = _weaponModel.Magazine!.Value;
                 }
             }
         }
@@ -102,13 +115,32 @@ namespace Prefabs.Player
 
             // Play audio effect and animation.
             player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            audioSource.PlayOneShot(_fireClip, 0.5f);
-            animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
-            _crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
+            if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.Name] > 0)
+            {
+                audioSource.PlayOneShot(_fireClip, 0.5f);
+                animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
+                _crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
+                if (_weaponModel.Type is WeaponType.Block)
+                {
+                    Magazine[_weaponModel.Name]--;
+                    GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                        .SetBlocks(Magazine[_weaponModel.Name]);
+                }
+            }
 
             // Check that the current weapon deals damage
             // TODO: Melee weapons also deals damages! Move here the block digging logic and add enemy damage.
             if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee) return;
+
+            // Subtract ammo
+            if (Magazine[_weaponModel.Name] <= 0)
+            {
+                audioSource.PlayOneShot(noAmmoClip);
+                return;
+            }
+
+            Magazine[_weaponModel.Name]--;
+            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetAmmo(Magazine[_weaponModel.Name]);
 
             // Spawn the weapon effect
             player.SpawnWeaponEffect(_weaponModel!.Type);
@@ -253,6 +285,17 @@ namespace Prefabs.Player
             if (newWeapon is null)
                 return;
             WeaponModel = newWeapon;
+            
+            // Update Ammo HUD
+            if (weaponType is WeaponType.Block)
+                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                    .SetBlocks(Magazine[_weaponModel!.Name]);
+            else if (weaponType is WeaponType.Melee)
+                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetMelee();
+            else 
+                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name]);
+
 
             // Play sound and animation
             audioSource.PlayOneShot(switchEquippedClip);
@@ -307,6 +350,21 @@ namespace Prefabs.Player
             // Set the camera zoom according to the weapon scope
             mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.Zoom : 1);
             weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.Zoom : 1);
+        }
+
+        private void Reload()
+        {
+            if (_weaponModel is null || _weaponModel.Type is WeaponType.Block or WeaponType.Melee)
+                return;
+            var leftAmmo = LeftAmmo[_weaponModel!.Name];
+            if (leftAmmo <= 0) return;
+            var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
+            // TODO: reload anim
+            audioSource.PlayOneShot(reloadingClip);
+            LeftAmmo[_weaponModel!.Name] -= takenAmmo;
+            Magazine[_weaponModel!.Name] += takenAmmo;
+            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                .SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name]);
         }
     }
 }

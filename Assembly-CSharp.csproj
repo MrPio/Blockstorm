@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera\SpawnCamera.cs" />
+    <Compile Include="Assets\AmmoHUD.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />

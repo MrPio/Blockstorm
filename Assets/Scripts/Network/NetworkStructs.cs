@@ -81,7 +81,7 @@ namespace Network
     public struct PlayerStatus : INetworkSerializable
     {
         public Team Team;
-        public int Hp, Armor, Blocks;
+        public int Hp, Armor;
         public bool HasHelmet; // TODO: handle helmet removal
         public byte LeftGrenades;
         public bool HasArmoredBlock;
@@ -90,7 +90,7 @@ namespace Network
             skinName, blockName, meleeName, primaryName, secondaryName, tertiaryName, grenadeName;
 
 
-        public PlayerStatus(Team? team = null, int? hp = null, int? armor = null, int? blocks = null,
+        public PlayerStatus(Team? team = null, int? hp = null, int? armor = null,
             bool? hasHelmet = null,
             byte? leftGrenades = null, bool? hasArmoredBlock = null, FixedString32Bytes? skinName = null,
             FixedString32Bytes? blockName = null,
@@ -102,7 +102,6 @@ namespace Network
             Team = team ?? Team.Yellow;
             Hp = hp ?? 100;
             Armor = armor ?? 0;
-            Blocks = blocks ?? 100;
             HasHelmet = hasHelmet ?? false;
             LeftGrenades = leftGrenades ?? 5;
             HasArmoredBlock = hasArmoredBlock ?? false;
@@ -210,7 +209,6 @@ namespace Network
             serializer.SerializeValue(ref Team);
             serializer.SerializeValue(ref Hp);
             serializer.SerializeValue(ref Armor);
-            serializer.SerializeValue(ref Blocks);
             serializer.SerializeValue(ref HasHelmet);
             serializer.SerializeValue(ref LeftGrenades);
             serializer.SerializeValue(ref HasArmoredBlock);

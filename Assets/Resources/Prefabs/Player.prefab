@@ -111,6 +111,8 @@ MonoBehaviour:
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}
+  noAmmoClip: {fileID: 8300000, guid: bc3e21e145bb5da41845946ae96d9e09, type: 3}
+  reloadingClip: {fileID: 8300000, guid: 532526ac3acda614b902c9f38d6a6f86, type: 3}
   bodyBlood: {fileID: 614115134421451849, guid: 073f95ed3978e444fa53e631a9c607d8, type: 3}
   headBlood: {fileID: 1327947280328091902, guid: 05b1ab6389f259143984bcd439d1e3d8, type: 3}
   player: {fileID: 5505040103345985529}

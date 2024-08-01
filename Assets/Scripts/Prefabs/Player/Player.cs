@@ -34,7 +34,7 @@ namespace Prefabs.Player
         [SerializeField] private Transform groundCheck;
         [SerializeField] private Animator bodyAnimator;
         [SerializeField] private Transform enemyWeaponContainer;
-        [SerializeField] private Weapon weapon;
+        [SerializeField] public Weapon weapon;
         [SerializeField] public AudioSource audioSource;
         [SerializeField] public Transform cameraTransform;
         [SerializeField] private Transform head;
@@ -135,7 +135,7 @@ namespace Prefabs.Player
         private void LoadStatus(PlayerStatus status)
         {
             GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(status.Hp, status.HasHelmet);
-            //TODO: update Blocks, LeftGrenades UI
+            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetGrenades(status.LeftGrenades);
         }
 
         // Owner only

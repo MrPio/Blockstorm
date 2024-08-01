@@ -30,10 +30,5 @@ namespace UI
             if (hasHelmet is not null)
                 helmetIcon.SetActive(hasHelmet.Value);
         }
-
-        public bool HasHelmet
-        {
-            set => helmetIcon.SetActive(value);
-        }
     }
 }

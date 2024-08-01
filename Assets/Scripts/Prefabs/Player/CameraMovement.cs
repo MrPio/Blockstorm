@@ -57,7 +57,9 @@ namespace Prefabs.Player
             get => _canPlace;
             set
             {
-                _canPlace = player.Status.Value.Blocks > 0 && value;
+                _canPlace = (player.weapon.Magazine.TryGetValue("block", out var value1)
+                    ? value1
+                    : Model.Weapon.Blocks[0].Magazine) > 0 && value;
                 if (value)
                     _canDig = false;
                 if (_highlightBlock is null || _placeBlock is null) return;
