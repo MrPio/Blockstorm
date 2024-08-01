@@ -254,7 +254,7 @@ namespace Prefabs.Player
             if (_reloadingCoroutine is not null)
             {
                 StopCoroutine(_reloadingCoroutine);
-                _sm.ReloadBar.Stop();
+                _sm.reloadBar.Stop();
                 _reloadingCoroutine = null;
                 animator.speed = 1;
             }
@@ -366,7 +366,7 @@ namespace Prefabs.Player
             // Play audio clip and animation
             audioSource.PlayOneShot(reloadingClip);
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
-            _sm.ReloadBar.Reload(_weaponModel!.ReloadTime!.Value / 100f);
+            _sm.reloadBar.Reload(_weaponModel!.ReloadTime!.Value / 100f);
 
             // Make the animation last for the entire reloading time.
             _reloadingCoroutine = StartCoroutine(BringWeaponUp());

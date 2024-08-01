@@ -79,9 +79,11 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
     <Compile Include="Assets\Scripts\Model\Collectable.cs" />
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />
+    <Compile Include="Assets\PlayerMarker.cs" />
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
+    <Compile Include="Assets\Mipmap.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />

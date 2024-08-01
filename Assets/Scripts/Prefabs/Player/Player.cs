@@ -85,6 +85,7 @@ namespace Prefabs.Player
 
         public override void OnNetworkSpawn()
         {
+            // Listen to network variables based on ownership
             if (IsOwner)
             {
                 Spawn();
@@ -128,6 +129,11 @@ namespace Prefabs.Player
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
             }
+
+            print($"Player {OwnerClientId} joined the session!");
+
+            // Add the player to the mipmap
+            _sm.mipmap.AddPlayerMarker(Status.Value.Team, transform);
         }
 
         // Owner only
@@ -140,7 +146,6 @@ namespace Prefabs.Player
         // Owner only
         private void Spawn()
         {
-            _sm = FindObjectOfType<SceneManager>();
             _velocity = new Vector3();
             var spawnPoint = _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
@@ -154,6 +159,11 @@ namespace Prefabs.Player
                 var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
+        }
+
+        private void Awake()
+        {
+            _sm = FindObjectOfType<SceneManager>();
         }
 
         private void Start()

@@ -2,6 +2,7 @@
 using UI;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 
 namespace Managers
@@ -20,8 +21,9 @@ namespace Managers
         public Dashboard dashboard;
         public HpHUD hpHUD;
         public AmmoHUD ammoHUD;
-        public ReloadBar ReloadBar;
+        public ReloadBar reloadBar;
         public Transform circleDamageContainer;
+        public Mipmap mipmap;
 
         [Header("Managers")] public WorldManager worldManager;
         public ClientManager clientManager;

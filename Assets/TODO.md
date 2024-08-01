@@ -4,7 +4,7 @@
 - Bazooka weapon
 - Click to respawn, load spawn camera.
 - Helmet removal on first head Hit + sound
-- `Melee should deal enemy damage`
+- ~~Melee should deal enemy damage~~
 - `Collectables weapons`
 - ~~Player death (~~ragdoll~~, respawn)~~
 - ~~Weapon Reload~~
