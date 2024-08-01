@@ -1,11 +1,16 @@
 ﻿# TODO
 - React on host disconnect
-- Mipmap with positions
 - Bazooka weapon
 - Click to respawn, load spawn camera.
 - Helmet removal on first head Hit + sound
-- ~~Melee should deal enemy damage~~
+- Integrate Lobby service
+- Integrate Relay service
+- Lobby menu
+- Team selector
+- Take kills & deaths into consideration in dashboard
 - `Collectables weapons`
+- ~~Mipmap with positions~~
+- ~~Melee should deal enemy damage~~
 - ~~Player death (~~ragdoll~~, respawn)~~
 - ~~Weapon Reload~~
 - ~~Damage Text spawn~~

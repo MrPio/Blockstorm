@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Managers;
 using Network;
 using TMPro;
@@ -15,13 +16,12 @@ namespace UI
         [SerializeField] private GameObject playerStat;
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
-
-        private ServerManager _serverManager;
+        private ulong[] _lastPlayerIds;
 
         private void Start()
         {
             _sm = FindObjectOfType<SceneManager>();
-            _sm.dashboard.gameObject.SetActive(false);
+            transform.GetChild(0).gameObject.SetActive(false);
         }
 
         private void Update()
@@ -31,24 +31,26 @@ namespace UI
 
             if (Input.GetKeyDown(KeyCode.Tab))
             {
-                _sm.dashboard.gameObject.SetActive(true);
+                transform.GetChild(0).gameObject.SetActive(true);
                 InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
             }
 
             if (Input.GetKeyUp(KeyCode.Tab))
             {
-                _sm.dashboard.gameObject.SetActive(false);
+                transform.GetChild(0).gameObject.SetActive(false);
                 CancelInvoke(nameof(DashboardLoop));
             }
         }
 
-        private void DashboardLoop()
-        {
-            _serverManager.RequestPlayerListServerRpc();
-        }
+        private void DashboardLoop() =>
+            _sm.serverManager.RequestPlayerListServerRpc();
 
         public void UpdateDashboard(ulong[] playerIds)
         {
+            // Prevent useless update // TODO: also take Kill&Death into consideration!
+            if (playerIds.Length == _lastPlayerIds.Length && playerIds.All(it => _lastPlayerIds.Contains(it)))
+                return;
+            _lastPlayerIds = playerIds;
             foreach (Transform child in yellowStats)
                 Destroy(child.gameObject);
 
