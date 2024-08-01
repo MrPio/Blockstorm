@@ -1,14 +1,15 @@
 ﻿# TODO
 - React on host disconnect
-- Melee should deal enemy damage
-- ~~Player death (~~ragdoll~~, respawn)~~
 - Mipmap with positions
-- `Reload -- in progress`
+- Bazooka weapon
+- Click to respawn, load spawn camera.
+- Helmet removal on first head Hit + sound
+- `Melee should deal enemy damage`
+- `Collectables weapons`
+- ~~Player death (~~ragdoll~~, respawn)~~
+- ~~Weapon Reload~~
 - ~~Damage Text spawn~~
 - ~~Switch the weapon while firing/aiming not change the weapon~~
 - ~~Move player state from Inventory manager to PLayer~~
-- ~~Grenades~~
-- Bazooka
-- Collectables weapons
-- Click to respawn, load spawn camera.
+- ~~Grenades + explosions~~
 - ~~Self ragdoll~~
