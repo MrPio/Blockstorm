@@ -9,6 +9,7 @@ using Partials;
 using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using Utils.Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using VoxelEngine;
@@ -132,13 +133,14 @@ namespace Prefabs.Player
         // Owner only
         private void LoadStatus(PlayerStatus status)
         {
-            GameObject.FindWithTag("HpContainer").GetComponent<HpHUD>().SetHp(status.Hp, status.HasHelmet);
-            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetGrenades(status.LeftGrenades);
+            _sm.hpHUD.SetHp(status.Hp, status.HasHelmet);
+            _sm.ammoHUD.SetGrenades(status.LeftGrenades);
         }
 
         // Owner only
         private void Spawn()
         {
+            _sm = FindObjectOfType<SceneManager>();
             _velocity = new Vector3();
             var spawnPoint = _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
@@ -148,6 +150,7 @@ namespace Prefabs.Player
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)
             {
+                if (bodyMesh.IsDestroyed()) continue;
                 var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
@@ -155,17 +158,16 @@ namespace Prefabs.Player
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
             if (!IsOwner) return;
             _transform = transform;
             _cameraInitialLocalPosition = cameraTransform.localPosition;
 
             // Update the view distance. Render new chunks if needed.
             InvokeRepeating(nameof(UpdateChunks), 0, 1);
-            return;
-
-            void UpdateChunks() => _sm.worldManager.UpdatePlayerPos(_transform.position);
         }
+
+        private void UpdateChunks() =>
+            _sm.worldManager.UpdatePlayerPos(_transform.position);
 
         private void Update()
         {
@@ -278,6 +280,12 @@ namespace Prefabs.Player
                     this.weapon.WeaponModel!.Type != WeaponType.Melee)
                     this.weapon.ToggleAim();
             }
+
+            // Handle weapon reloading
+            if (Input.GetKeyDown(KeyCode.R) && (weapon.WeaponModel?.IsGun ?? false))
+                if (weapon.Magazine[weapon.WeaponModel!.Name] < weapon.WeaponModel.Magazine)
+                    weapon.Reload();
+                else weapon.audioSource.PlayOneShot(weapon.noAmmoClip);
         }
 
         public void SpawnWeaponEffect(WeaponType weaponType)
@@ -315,13 +323,12 @@ namespace Prefabs.Player
             }
 
             // Spawn damage circle
-            var circleDamageContainer = GameObject.FindWithTag("CircleDamageContainer");
             var attacker = GameObject.FindGameObjectsWithTag("Player")
                 .First(it => it.GetComponent<Player>().OwnerClientId == attackerID);
             var directionToEnemy = attacker.transform.position - cameraTransform.position;
             var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
             var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
-            var circleDamageGo = Instantiate(circleDamage, circleDamageContainer.transform);
+            var circleDamageGo = Instantiate(circleDamage, _sm.circleDamageContainer.transform);
             circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
         }
 

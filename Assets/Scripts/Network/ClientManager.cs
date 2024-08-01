@@ -36,8 +36,7 @@ namespace Network
             // TODO: the player should be spawned after team selection
             _sm.worldManager.RenderMap();
             Debug.Log($"The map {_sm.worldManager.Map.name} was rendered!");
-            GameObject.FindWithTag("NetworkManager").GetComponent<NetworkManager>().OnClientConnectedCallback +=
-                OnClientConnected;
+            _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
         }
 
         private void OnClientConnected(ulong clientId)

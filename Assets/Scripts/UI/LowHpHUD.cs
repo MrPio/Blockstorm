@@ -8,7 +8,7 @@ namespace UI
     /// </summary>
     public class LowHpHUD : MonoBehaviour
     {
-        private const float LowHealthLimit = 0.4f;
+        private const float LowHealthLimit = 0.33f;
         [SerializeField] private CanvasGroup canvasGroup;
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace UI
         {
             transform.GetChild(0).gameObject.SetActive(hp < LowHealthLimit);
             if (hp < LowHealthLimit)
-                canvasGroup.alpha = 1f - hp * (1f / LowHealthLimit);
+                canvasGroup.alpha = (1f - hp / LowHealthLimit) / 1.5f;
             else
                 canvasGroup.alpha = 0;
         }

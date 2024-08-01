@@ -12,12 +12,12 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
 namespace Prefabs.Player
 {
-
     /// <summary>
     /// Handle the player's weapon.
     /// </summary>
@@ -34,14 +34,14 @@ namespace Prefabs.Player
         [SerializeField] private CameraMovement cameraMovement;
         [SerializeField] private Camera mainCamera;
         [SerializeField] private Camera weaponCamera;
-        [SerializeField] public GameObject RightArm;
+        [SerializeField] public GameObject rightArm;
 
         [Header("AudioClips")] [SerializeField]
         private AudioClip blockDamageLightClip;
 
         [SerializeField] private AudioClip blockDamageMediumClip;
         [SerializeField] private AudioClip noBlockDamageClip;
-        [SerializeField] private AudioClip noAmmoClip;
+        [SerializeField] public AudioClip noAmmoClip;
         [SerializeField] private AudioClip reloadingClip;
 
         [Header("Prefabs")] [SerializeField] private GameObject bodyBlood;
@@ -98,7 +98,7 @@ namespace Prefabs.Player
         /// </summary>
         public void Fire()
         {
-            if (_weaponModel == null || Time.time - _lastSwitch < 0.75f)
+            if (_weaponModel == null || Time.time - _lastSwitch < 0.75f || _reloadingCoroutine is not null)
                 return;
 
             // Play audio effect and animation.
@@ -110,9 +110,17 @@ namespace Prefabs.Player
                 _sm.crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
                 if (_weaponModel.Type is WeaponType.Block)
                 {
+                    // Check if the player has enough ammo
+                    if (Magazine[_weaponModel.Name] <= 0)
+                    {
+                        audioSource.PlayOneShot(noAmmoClip);
+                        return;
+                    }
+
                     Magazine[_weaponModel.Name]--;
-                    GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
-                        .SetBlocks(Magazine[_weaponModel.Name]);
+                    _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
+                    _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
+                        player.Status.Value.BlockId);
                 }
             }
 
@@ -120,15 +128,16 @@ namespace Prefabs.Player
             // TODO: Melee weapons also deals damages! Move here the block digging logic and add enemy damage.
             if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee) return;
 
-            // Subtract ammo
+            // Check if the player has enough ammo
             if (Magazine[_weaponModel.Name] <= 0)
             {
                 audioSource.PlayOneShot(noAmmoClip);
                 return;
             }
 
+            // Subtract ammo
             Magazine[_weaponModel.Name]--;
-            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetAmmo(Magazine[_weaponModel.Name]);
+            _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
 
             // Spawn the weapon effect
             player.SpawnWeaponEffect(_weaponModel!.Type);
@@ -204,10 +213,6 @@ namespace Prefabs.Player
                     // Broadcast the damage action
                     _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
                 }
-
-            // Handle weapon reloading
-            if (Input.GetKeyDown(KeyCode.R) && Magazine[_weaponModel.Name] < _weaponModel.Magazine)
-                Reload();
         }
 
         /// <summary>
@@ -226,7 +231,7 @@ namespace Prefabs.Player
             IEnumerator Throw()
             {
                 animator.SetTrigger(Animator.StringToHash("inventory_switch"));
-                RightArm.SetActive(true);
+                rightArm.SetActive(true);
                 yield return new WaitForSeconds(0.35f);
                 var grenade =
                     Resources.Load<GameObject>(
@@ -261,6 +266,8 @@ namespace Prefabs.Player
             if (_reloadingCoroutine is not null)
             {
                 StopCoroutine(_reloadingCoroutine);
+                _sm.ReloadBar.Stop();
+                _reloadingCoroutine = null;
                 animator.speed = 1;
             }
 
@@ -285,12 +292,12 @@ namespace Prefabs.Player
 
             // Update Ammo HUD
             if (weaponType is WeaponType.Block)
-                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                _sm.ammoHUD
                     .SetBlocks(Magazine[_weaponModel!.Name]);
             else if (weaponType is WeaponType.Melee)
-                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>().SetMelee();
+                _sm.ammoHUD.SetMelee();
             else
-                GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
+                _sm.ammoHUD
                     .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name]);
 
 
@@ -308,7 +315,7 @@ namespace Prefabs.Player
         /// <remarks> This is called in the middle of the <b>inventory_switch</b> animation </remarks>
         public void ChangeWeaponPrefab()
         {
-            if (_reloadingCoroutine is null)
+            if (_reloadingCoroutine is not null)
                 animator.speed = 0;
             else
             {
@@ -360,7 +367,7 @@ namespace Prefabs.Player
         /// The weapon's magazine will be restored by subtracting the left ammo and the HUD will be updated.
         /// </summary>
         /// <remarks> While reloading, if the player switches weapons, the reload will be canceled. </remarks>
-        private void Reload()
+        public void Reload()
         {
             if (_reloadingCoroutine is not null || _weaponModel is null ||
                 _weaponModel.Type is WeaponType.Block or WeaponType.Melee)
@@ -368,16 +375,10 @@ namespace Prefabs.Player
             var leftAmmo = LeftAmmo[_weaponModel!.Name];
             if (leftAmmo <= 0) return;
 
-            // Update the magazine and notify the HUD
-            var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
-            LeftAmmo[_weaponModel!.Name] -= takenAmmo;
-            Magazine[_weaponModel!.Name] += takenAmmo;
-            GameObject.FindWithTag("AmmoContainer").GetComponent<AmmoHUD>()
-                .SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name]);
-
             // Play audio clip and animation
             audioSource.PlayOneShot(reloadingClip);
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
+            _sm.ReloadBar.Reload(_weaponModel!.ReloadTime!.Value / 100f);
 
             // Make the animation last for the entire reloading time.
             _reloadingCoroutine = StartCoroutine(BringWeaponUp());
@@ -386,6 +387,14 @@ namespace Prefabs.Player
             IEnumerator BringWeaponUp()
             {
                 yield return new WaitForSeconds(_weaponModel!.ReloadTime!.Value / 100f);
+
+                // Update the magazine and notify the HUD
+                var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
+                LeftAmmo[_weaponModel!.Name] -= takenAmmo;
+                Magazine[_weaponModel!.Name] += takenAmmo;
+                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name]);
+
+                // Unpause the animator
                 animator.speed = 1;
                 _reloadingCoroutine = null;
             }

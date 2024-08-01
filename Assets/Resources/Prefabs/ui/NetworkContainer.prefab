@@ -588,15 +588,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab229ce337c844e1b654e94250018085, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  children:
-  - {fileID: 323554038700931353}
-  - {fileID: 2166360494382511753}
-  - {fileID: 5426113711946924266}
   gap: 0
-  offset: 0
   vertical: 1
   inverse: 1
-  force: 0
   refreshOnActivateChange: 0
 --- !u!114 &3116810229137527208
 MonoBehaviour:

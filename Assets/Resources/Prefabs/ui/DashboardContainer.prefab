@@ -755,7 +755,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1ae2a0137fab184798e2b62327983e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dashboard: {fileID: 2831387509390794439}
   playerStat: {fileID: 7328935960461221943, guid: 7d1ca361a4bd64846b16bcab98d509a6, type: 3}
   blueStats: {fileID: 2126173531644107425}
   redStats: {fileID: 8302981839970904623}

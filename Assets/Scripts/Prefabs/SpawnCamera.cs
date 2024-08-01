@@ -1,16 +1,17 @@
 using ExtensionFunctions;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
-using VoxelEngine;
 
-namespace Prefabs.SpawnCamera
+namespace Prefabs
 {
     public class SpawnCamera : MonoBehaviour
     {
+        private SceneManager _sm;
         private void Start()
         {
-            var wm = GameObject.FindWithTag("WorldManager").GetComponent<WorldManager>();
-            var cameraSpawn = wm.Map.cameraSpawns.RandomItem();
+            _sm = FindObjectOfType<SceneManager>();
+            var cameraSpawn = _sm.worldManager.Map.cameraSpawns.RandomItem();
             transform.position = cameraSpawn.position;
             transform.rotation = Quaternion.Euler(cameraSpawn.rotation);
 

@@ -107,7 +107,7 @@ MonoBehaviour:
   cameraMovement: {fileID: 2753835092349440889}
   mainCamera: {fileID: 783449516086253421}
   weaponCamera: {fileID: 3434581067932685962}
-  RightArm: {fileID: 4233275833591035670}
+  rightArm: {fileID: 4233275833591035670}
   blockDamageLightClip: {fileID: 8300000, guid: 8b1b6a45d0dcaeb4dae095f81ed892a9, type: 3}
   blockDamageMediumClip: {fileID: 8300000, guid: 9729636c22b11a148a51c59f0786b422, type: 3}
   noBlockDamageClip: {fileID: 8300000, guid: e196c789a6debbc478539f88abf4ecde, type: 3}
@@ -1283,10 +1283,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerBody
       objectReference: {fileID: 0}
-    - target: {fileID: 343774145048235354, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1120978973499594720, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1326,34 +1322,6 @@ PrefabInstance:
     - target: {fileID: 1120978973499594720, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212892492185414722, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.x
-      value: -4.656613e-10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212892492185414722, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.y
-      value: 0.0040000025
-      objectReference: {fileID: 0}
-    - target: {fileID: 1212892492185414722, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.z
-      value: 6.9849193e-10
-      objectReference: {fileID: 0}
-    - target: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: a072f07108eb8b641836d255d4baca92, type: 2}
-    - target: {fileID: 6011965183293141907, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.x
-      value: 0.0060000014
-      objectReference: {fileID: 0}
-    - target: {fileID: 6011965183293141907, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.y
-      value: 0.004000006
-      objectReference: {fileID: 0}
-    - target: {fileID: 6011965183293141907, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_ConnectedAnchor.z
-      value: 2.793968e-10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,4 +1,5 @@
 using System.Collections;
+using Managers;
 using Network;
 using TMPro;
 using Unity.Netcode;
@@ -9,7 +10,8 @@ namespace UI
 {
     public class Dashboard : MonoBehaviour
     {
-        [SerializeField] private GameObject dashboard;
+        private SceneManager _sm;
+
         [SerializeField] private GameObject playerStat;
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
@@ -18,8 +20,8 @@ namespace UI
 
         private void Start()
         {
-            _serverManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ServerManager>();
-            dashboard.SetActive(false);
+            _sm = FindObjectOfType<SceneManager>();
+            _sm.dashboard.gameObject.SetActive(false);
         }
 
         private void Update()
@@ -29,13 +31,13 @@ namespace UI
 
             if (Input.GetKeyDown(KeyCode.Tab))
             {
-                dashboard.SetActive(true);
+                _sm.dashboard.gameObject.SetActive(true);
                 InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
             }
 
             if (Input.GetKeyUp(KeyCode.Tab))
             {
-                dashboard.SetActive(false);
+                _sm.dashboard.gameObject.SetActive(false);
                 CancelInvoke(nameof(DashboardLoop));
             }
         }

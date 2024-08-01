@@ -102,10 +102,12 @@ namespace Prefabs.Player
             }
 
             // If I am digging with a melee weapon
-            if (weapon.WeaponModel is { Type: WeaponType.Melee } &&
-                Input.GetMouseButton(0) && Time.time - _lastDig > weapon.WeaponModel.Delay)
+            if (Input.GetMouseButton(0) && weapon.WeaponModel is { Type: WeaponType.Melee } &&
+                Time.time - _lastDig > weapon.WeaponModel.Delay)
             {
                 _lastDig = Time.time;
+
+                // Spawn block dig effect and play sound according to the damaged block type
                 if (_sm.highlightBlock.gameObject.activeSelf)
                 {
                     var highlightBlockPos = _sm.highlightBlock.transform.position;
@@ -131,24 +133,23 @@ namespace Prefabs.Player
             }
 
             // If I am placing with an equipped block
-            else if (weapon.WeaponModel is { Type: WeaponType.Block } && _sm.placeBlock.gameObject.activeSelf &&
-                     Input.GetMouseButton(0) &&
+            else if (Input.GetMouseButton(0) && weapon.WeaponModel is { Type: WeaponType.Block } &&
+                     _sm.placeBlock.gameObject.activeSelf &&
                      Time.time - _lastPlace > weapon.WeaponModel.Delay)
             {
                 _lastPlace = Time.time;
-                _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
-                    player.Status.Value.BlockId);
+                if (weapon.Magazine[weapon.WeaponModel.Name] > 0 || Input.GetMouseButtonDown(0))
+                    weapon.Fire();
                 _sm.placeBlock.gameObject.SetActive(false);
-                weapon.Fire();
             }
 
             // If I am firing with a weapon
-            else if (weapon.WeaponModel is { Type: WeaponType.Primary } or { Type: WeaponType.Secondary } or
-                         { Type: WeaponType.Tertiary } && Input.GetMouseButton(0) &&
+            else if (Input.GetMouseButton(0) && (weapon.WeaponModel?.IsGun ?? false) &&
                      Time.time - _lastFire > weapon.WeaponModel.Delay)
             {
                 _lastFire = Time.time;
-                weapon.Fire();
+                if (weapon.Magazine[weapon.WeaponModel.Name] > 0 || Input.GetMouseButtonDown(0))
+                    weapon.Fire();
             }
 
             // If I am throwing a grenade
@@ -159,7 +160,7 @@ namespace Prefabs.Player
             }
 
             // Throw the grenade
-            if ((_throwingAcc > MaxThrowingAcc || Input.GetKeyUp(KeyCode.G)) &&
+            if ((Input.GetKeyUp(KeyCode.G) || _throwingAcc > MaxThrowingAcc) &&
                 player.Status.Value.Grenade is not null && player.Status.Value.LeftGrenades > 0)
             {
                 _lastFire = Time.time;
@@ -172,10 +173,10 @@ namespace Prefabs.Player
             if (Input.GetKeyUp(KeyCode.G))
                 _canThrow = true;
 
-            if (weapon.WeaponModel is { Type: WeaponType.Block } && _canPlace && Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && weapon.WeaponModel is { Type: WeaponType.Block } && _canPlace)
                 _lastPlace -= weapon.WeaponModel.Delay * 0.65f;
 
-            if (_sm.blockDigEffect.isPlaying && Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && _sm.blockDigEffect.isPlaying)
                 _sm.blockDigEffect.Stop();
         }
 

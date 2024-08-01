@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,12 +15,13 @@ namespace Network
     /// </summary>
     public class ServerManager : NetworkBehaviour
     {
-        private ClientManager _clientManager;
+        private SceneManager _sm;
+
         [SerializeField] private GameObject playerPrefab;
 
         private void Awake()
         {
-            _clientManager = GameObject.FindWithTag("ClientServerManagers").GetComponentInChildren<ClientManager>();
+            _sm = FindObjectOfType<SceneManager>();
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -27,7 +29,7 @@ namespace Network
         {
             if (!IsServer) return;
             var players = NetworkManager.Singleton.ConnectedClientsList.Select(it => it.ClientId);
-            _clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
+            _sm.clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
