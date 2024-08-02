@@ -10,17 +10,17 @@ namespace UI
 
         private void Start()
         {
-            hostBtn.onClick.AddListener(() =>
+            hostBtn?.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.StartHost();
                 gameObject.SetActive(false);
             });
-            serverBtn.onClick.AddListener(() =>
+            serverBtn?.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.StartServer();
                 gameObject.SetActive(false);
             });
-            clientBtn.onClick.AddListener(() =>
+            clientBtn?.onClick.AddListener(() =>
             {
                 NetworkManager.Singleton.StartClient();
                 gameObject.SetActive(false);

@@ -9,13 +9,14 @@
 - Take kills & deaths into consideration in dashboard
 - Shift to run with stamina bar
 - Ctrl to crunch and avoid falling
-- ~~Friendly fire must be disabled~~
+- Introduce a secondary weapon
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
 - `Collectables weapons`
 - ~~Bazooka weapon~~
-  - Automatically switch to previous weapon when ammo runs over
+  - ~~Automatically switch to the previous weapon when ammo runs over~~
+- ~~Friendly fire must be disabled~~
 - ~~Scopes~~
 - ~~Mipmap with positions~~
 - ~~Melee should deal enemy damage~~

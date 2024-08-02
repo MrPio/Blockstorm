@@ -55,9 +55,7 @@ namespace Prefabs
                     Quaternion.identity.eulerAngles
                 );
             HideRpc();
-            Destroy(gameObject, 5f);
-            // GetComponent<NetworkObject>().Despawn();
-
+            Destroy(gameObject, 8f);
 
             // Destroy blocks
             var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);

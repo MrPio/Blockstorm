@@ -56,6 +56,7 @@ namespace Prefabs.Player
         public readonly Dictionary<string, int> LeftAmmo = new();
         public readonly Dictionary<string, int> Magazine = new();
         [CanBeNull] private Coroutine _reloadingCoroutine;
+        private WeaponType _lastWeapon = WeaponType.Primary;
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -153,6 +154,10 @@ namespace Prefabs.Player
                     _weaponModel.ExplosionTime!.Value,
                     _weaponModel.ExplosionRange!.Value
                 );
+                
+                // Switch to the previous weapon if ran out of ammo
+                if (LeftAmmo[_weaponModel.Name] <= 0)
+                    SwitchEquipped(_lastWeapon);
                 return;
             }
 
@@ -161,6 +166,7 @@ namespace Prefabs.Player
             var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
 
             // Checks if there was a hit on an enemy
+            var hasHitEnemy=false;
             if (Physics.Raycast(ray, out var hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                 if (hit.collider is not null)
                 {
@@ -202,11 +208,11 @@ namespace Prefabs.Player
                     }
 
                     // Prevents damaging the ground
-                    return;
+                    hasHitEnemy = true;
                 }
 
             // Checks if there was a hit on the ground
-            if (Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
+            if (!hasHitEnemy && Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
                 if (hit.collider is not null)
                 {
                     // Check if the hit block is solid
@@ -224,7 +230,7 @@ namespace Prefabs.Player
 
                     // Broadcast the damage action
                     _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
-                }
+                } 
         }
 
         /// <summary>
@@ -294,6 +300,8 @@ namespace Prefabs.Player
             if (newWeapon is null)
                 return;
             WeaponModel = newWeapon;
+            if (newWeapon.Type is not WeaponType.Grenade and not WeaponType.Tertiary)
+                _lastWeapon = newWeapon.Type;
 
             // Update Ammo HUD
             if (weaponType is WeaponType.Block)
