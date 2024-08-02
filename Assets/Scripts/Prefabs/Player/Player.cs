@@ -225,7 +225,7 @@ namespace Prefabs.Player
                 _isPlayerWalking.Value = isWalking;
 
             // Handle jump
-            if (Input.GetButtonDown("Jump") && _isGrounded && !Weapon.isAiming)
+            if (Input.GetButtonDown("Jump") && _isGrounded /*&& !Weapon.isAiming*/)
                 _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
 
             // Invisible walls on map edges
@@ -304,9 +304,8 @@ namespace Prefabs.Player
             var mouth = WeaponPrefab.transform.Find("mouth");
             if (mouth)
             {
-                Instantiate(
-                    weaponType == WeaponType.Tertiary ? smokes.RandomItem() : muzzles.RandomItem(),
-                    mouth).Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
+                Instantiate(muzzles.RandomItem(), mouth)
+                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
                 if (IsOwner)
                     SpawnWeaponEffectRpc(weapon.WeaponModel!.Type);
             }

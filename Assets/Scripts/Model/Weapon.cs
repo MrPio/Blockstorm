@@ -60,14 +60,14 @@ namespace Model
 
         public static readonly List<Weapon> Tertiaries = new()
         {
-            new Weapon(name: "shmel", damage: 175, zoom: 1.5f, explosionRange: 3f, type: WeaponType.Tertiary, ammo: 5,
-                reloadTime: 200, magazine: 1, scope:"shmel"),
+            new Weapon(name: "shmel", damage: 175, rof:10, zoom: 2.75f, explosionRange: 2f, type: WeaponType.Tertiary, ammo: 1,
+                reloadTime: 200, magazine: 1, scope:"shmel", fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()
         {
-            new Weapon(name: "M61", damage: 100, explosionRange: 2.5f, explosionTime: 3.25f, type: WeaponType.Grenade),
-            new Weapon(name: "M61_NY", damage: 150, explosionRange: 2f, explosionTime: 2.25f, type: WeaponType.Grenade),
+            new Weapon(name: "M61", damage: 100, explosionRange: 1.65f, explosionTime: 3.25f, type: WeaponType.Grenade),
+            new Weapon(name: "M61_NY", damage: 150, explosionRange: 1.4f, explosionTime: 2.25f, type: WeaponType.Grenade),
         };
 
         public string Name, Audio, FireAnimation;

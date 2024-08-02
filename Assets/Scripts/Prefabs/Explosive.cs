@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
+using JetBrains.Annotations;
 using Managers;
 using Network;
 using Partials;
@@ -24,9 +25,11 @@ namespace Prefabs
         [Range(1, 100)] [SerializeField] private float speed;
         [SerializeField] private MeshRenderer[] meshes;
         [SerializeField] private bool isMissile;
+        [SerializeField] private ParticleSystem smoke = null;
 
         [NonSerialized] public float Damage, ExplosionTime, ExplosionRange, Delay;
         private Player.Player player;
+        private bool _hasExploded;
 
         private void Start()
         {
@@ -43,7 +46,7 @@ namespace Prefabs
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!isMissile) return;
+            if (!isMissile || _hasExploded) return;
 
             // Prevent the missile to explode on the player itself
             if (!other.gameObject.GetComponent<Player.Player>()?.IsOwner ?? true)
@@ -52,6 +55,7 @@ namespace Prefabs
 
         private void Explode()
         {
+            _hasExploded = true;
             foreach (var explosion in explosions)
             {
                 var go = Instantiate(explosion, transform.position, Quaternion.identity);
@@ -60,17 +64,20 @@ namespace Prefabs
 
             foreach (var meshRenderer in meshes)
                 meshRenderer.enabled = false;
-            Destroy(gameObject, 10f);
+            Destroy(gameObject, 5f);
+            if (smoke != null)
+                smoke.Stop();
             GetComponent<AudioSource>().Play();
 
             // Destroy blocks
-            var destroyedVoxels = transform.position.GetNeighborVoxels(ExplosionRange);
+            var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);
+            print(destroyedVoxels.Count);
             _sm.clientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
 
             // Checks if there was a hit on an enemy
             var colliders = new Collider[100];
-            Physics.OverlapSphereNonAlloc(transform.position, ExplosionRange, colliders,
+            Physics.OverlapSphereNonAlloc(transform.position, ExplosionRange * 4f, colliders,
                 1 << LayerMask.NameToLayer("Enemy"));
             var hitEnemies = new List<ulong>();
             foreach (var enemy in colliders.Where(it => it is not null))
@@ -79,7 +86,7 @@ namespace Prefabs
                 if (hitEnemies.Contains(attackedPlayer.OwnerClientId))
                     continue;
                 var distanceFactor =
-                    1 - Vector3.Distance(enemy.transform.position, transform.position) / (ExplosionRange * 2.5f);
+                    1 - Vector3.Distance(enemy.transform.position, transform.position) / (ExplosionRange * 4f);
                 var damage = (uint)(Damage * distanceFactor);
 
                 if (!attackedPlayer.Status.Value.IsDead)
@@ -108,7 +115,7 @@ namespace Prefabs
             if (!player.Status.Value.IsDead)
             {
                 var distanceFactor = 1 - Vector3.Distance(player.transform.position, transform.position) /
-                    (ExplosionRange * 2.5f);
+                    (ExplosionRange * 4f);
                 if (distanceFactor > 0)
                 {
                     var damage = (uint)(player.Status.Value.Grenade!.Damage * distanceFactor);

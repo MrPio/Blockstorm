@@ -1,9 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Managers;
 using Network;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using Stack = Partials.Stack;
 
@@ -16,7 +18,7 @@ namespace UI
         [SerializeField] private GameObject playerStat;
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
-        private ulong[] _lastPlayerIds;
+        private List<ulong> _lastPlayerIds = new();
 
         private void Start()
         {
@@ -48,11 +50,12 @@ namespace UI
         public void UpdateDashboard(ulong[] playerIds)
         {
             // Prevent useless update // TODO: also take Kill&Death into consideration!
-            if (playerIds.Length == _lastPlayerIds.Length && playerIds.All(it => _lastPlayerIds.Contains(it)))
+            if (playerIds.Length == _lastPlayerIds.Count && playerIds.All(it => _lastPlayerIds.Contains(it)))
                 return;
-            _lastPlayerIds = playerIds;
+            _lastPlayerIds = playerIds.ToList();
             foreach (Transform child in yellowStats)
-                Destroy(child.gameObject);
+                if (child is not null && !child.IsDestroyed())
+                    Destroy(child.gameObject);
 
             StartCoroutine(AddPlayers());
             return;

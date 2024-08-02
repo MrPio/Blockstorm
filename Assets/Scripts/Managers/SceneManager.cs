@@ -24,6 +24,7 @@ namespace Managers
         public ReloadBar reloadBar;
         public Transform circleDamageContainer;
         public Mipmap mipmap;
+        public GameObject scopeContainer;
 
         [Header("Managers")] public WorldManager worldManager;
         public ClientManager clientManager;

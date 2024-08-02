@@ -12,6 +12,7 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace Prefabs.Player
@@ -46,6 +47,7 @@ namespace Prefabs.Player
         [SerializeField] private GameObject headBlood;
         [SerializeField] private Player player;
         [SerializeField] private GameObject damageText;
+        [SerializeField] private GameObject missile;
 
         [CanBeNull] private Model.Weapon _weaponModel;
         private AudioClip _fireClip;
@@ -139,6 +141,20 @@ namespace Prefabs.Player
             // Spawn the weapon effect
             if (_weaponModel.IsGun)
                 player.SpawnWeaponEffect(_weaponModel!.Type);
+
+            if (_weaponModel.Type is WeaponType.Tertiary)
+            {
+                var mouth = player.WeaponPrefab.transform.Find("mouth");
+                var go = Instantiate(missile, mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
+                    mainCamera.transform.rotation);
+                go.GetComponent<Explosive>().Apply(it =>
+                {
+                    it.Damage = _weaponModel.Damage;
+                    it.ExplosionTime = _weaponModel.ExplosionTime!.Value;
+                    it.ExplosionRange = _weaponModel.ExplosionRange!.Value;
+                });
+                return;
+            }
 
             // Cast a ray to check for collisions
             var cameraTransform = cameraMovement.transform;
@@ -336,18 +352,31 @@ namespace Prefabs.Player
             // Disable the crosshair
             _sm.crosshair.gameObject.SetActive(!isAiming);
 
-            // Destroy the current weapon prefab
-            foreach (var child in transform.parent.GetComponentsInChildren<Transform>()
-                         .Where(it => it != transform && it != transform.parent))
-                Destroy(child.gameObject);
-
-            var go = Resources.Load<GameObject>(
-                $"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}" + (isAiming ? "_aim" : ""));
-            player.WeaponPrefab = Instantiate(go, isAiming ? transform.parent : transform).Apply(o =>
+            if (_weaponModel?.Scope is not null)
             {
-                o.layer = LayerMask.NameToLayer("WeaponCamera");
-                o.AddComponent<WeaponSway>();
-            });
+                _sm.scopeContainer.SetActive(isAiming);
+                if (isAiming)
+                    _sm.scopeContainer.transform.Find("Scope").GetComponent<Image>().sprite =
+                        Resources.Load<Sprite>($"Textures/scope/{_weaponModel!.Scope}");
+                foreach (var child in transform.parent.GetComponentsInChildren<Transform>(true)
+                             .Where(it => it != transform && it != transform.parent))
+                    child.gameObject.SetActive(!isAiming);
+            }
+            else
+            {
+                // Destroy the current weapon prefab
+                foreach (var child in transform.parent.GetComponentsInChildren<Transform>()
+                             .Where(it => it != transform && it != transform.parent))
+                    Destroy(child.gameObject);
+
+                var go = Resources.Load<GameObject>(
+                    $"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}" + (isAiming ? "_aim" : ""));
+                player.WeaponPrefab = Instantiate(go, isAiming ? transform.parent : transform).Apply(o =>
+                {
+                    o.layer = LayerMask.NameToLayer("WeaponCamera");
+                    o.AddComponent<WeaponSway>();
+                });
+            }
 
             // Set the camera zoom according to the weapon scope
             mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.Zoom : 1);

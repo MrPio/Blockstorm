@@ -8,6 +8,7 @@
 - Lobby menu
 - Team selector
 - Take kills & deaths into consideration in dashboard
+- Scopes
 - `Collectables weapons`
 - ~~Mipmap with positions~~
 - ~~Melee should deal enemy damage~~

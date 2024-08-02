@@ -59,12 +59,13 @@ namespace VoxelEngine
             _hasRendered = true;
         }
 
-        public bool IsVoxelInWorld(Vector3Int pos) =>
-            pos.x >= 0 && pos.x < Map.size.x && pos.y >= 0 && pos.y < Map.size.y && pos.z >= 0 && pos.z < Map.size.z;
+        public bool IsVoxelInWorld(Vector3Int posNorm) =>
+            posNorm.x >= 0 && posNorm.x < Map.size.x && posNorm.y >= 0 && posNorm.y < Map.size.y && posNorm.z >= 0 &&
+            posNorm.z < Map.size.z;
 
         [CanBeNull]
-        public BlockType GetVoxel(Vector3Int pos) =>
-            IsVoxelInWorld(pos) ? VoxelData.BlockTypes[Map.Blocks[pos.y, pos.x, pos.z]] : null;
+        public BlockType GetVoxel(Vector3Int posNorm) =>
+            IsVoxelInWorld(posNorm) ? VoxelData.BlockTypes[Map.Blocks[posNorm.y, posNorm.x, posNorm.z]] : null;
 
         // This is used to update the rendered chunks
         public void UpdatePlayerPos(Vector3 playerPos)
@@ -96,6 +97,7 @@ namespace VoxelEngine
             var posNorms = positions.Select(Vector3Int.FloorToInt).ToList();
             foreach (var posNorm in posNorms)
             {
+                if (!IsVoxelInWorld(posNorm)) continue;
                 if (VoxelData.BlockTypes[Map.Blocks[posNorm.y, posNorm.x, posNorm.z]].blockHealth !=
                     BlockHealth.Indestructible)
                     Map.Blocks[posNorm.y, posNorm.x, posNorm.z] = newID;
@@ -234,6 +236,25 @@ namespace VoxelEngine
 
             foreach (var chunk in chunksToUpdate)
                 chunk.UpdateMesh();
+        }
+
+        public List<Vector3Int> GetNeighborVoxels(Vector3 position, float range)
+        {
+            var voxels = new List<Vector3Int>();
+            for (var x = position.x - range; x < position.x + range; x++)
+            for (var y = position.y - range; y < position.y + range; y++)
+            for (var z = position.z - range; z < position.z + range; z++)
+            {
+                var pos = new Vector3(x, y, z);
+                if (Vector3.Distance(position + Vector3.one * 0.5f, pos) <= range)
+                {
+                    var posNorm = Vector3Int.FloorToInt(pos);
+                    if (GetVoxel(posNorm) is { isSolid: true })
+                        voxels.Add(posNorm);
+                }
+            }
+
+            return voxels;
         }
     }
 }
