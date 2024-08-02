@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 6470603158820552342}
   - component: {fileID: 2429469167269700545}
   - component: {fileID: 4030478550957208368}
+  - component: {fileID: 1641777736854642045}
   m_Layer: 0
   m_Name: M61
   m_TagString: Untagged
@@ -155,10 +156,14 @@ MonoBehaviour:
   explosions:
   - {fileID: 1060015339853634, guid: cd3fce5c6ea5f804eb28d67d9fac28d8, type: 3}
   - {fileID: 1571455291051028, guid: f84738953b9a07840970a8b878d90590, type: 3}
-  explosionTime: 3.25
-  explosionRange: 2.5
   delayFactor: 1
   damageText: {fileID: 4646960138804390006, guid: f24e2d73143facd49a1c875c1f13ec2e, type: 3}
+  speed: 0
+  meshes:
+  - {fileID: 938556036756794619}
+  - {fileID: 6475257989654577399}
+  - {fileID: 701068874479286416}
+  isMissile: 0
 --- !u!82 &6470603158820552342
 AudioSource:
   m_ObjectHideFlags: 0
@@ -267,7 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1663247929
+  GlobalObjectIdHash: 2835154637
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -307,6 +312,19 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!114 &1641777736854642045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5352948451120039043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b59630bc4f7f44a39035feb750f234ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifespan: 10
 --- !u!1 &6393973885581187149
 GameObject:
   m_ObjectHideFlags: 0

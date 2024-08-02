@@ -50,7 +50,7 @@ namespace Model
 
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24 * 10, rof: 100, distance: 72, type: WeaponType.Primary,
+            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 72, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 30, reloadTime: 250)
         };
 
@@ -60,6 +60,8 @@ namespace Model
 
         public static readonly List<Weapon> Tertiaries = new()
         {
+            new Weapon(name: "shmel", damage: 175, zoom: 1.5f, explosionRange: 3f, type: WeaponType.Tertiary, ammo: 5,
+                reloadTime: 200, magazine: 1, scope:"shmel"),
         };
 
         public static readonly List<Weapon> Grenades = new()
@@ -74,12 +76,13 @@ namespace Model
         public float? ExplosionRange, ExplosionTime;
         public float Zoom; // ex: 1.5x
         public WeaponType Type;
+        [CanBeNull] public string Scope;
 
         public Weapon(string name, uint damage, uint rof = 0, uint distance = 0, [CanBeNull] string audio = null,
             [CanBeNull] string fireAnimation = null,
             ushort? magazine = null, ushort? ammo = null, ushort? reloadTime = null,
             WeaponType type = WeaponType.Primary,
-            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0)
+            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope=null)
         {
             Name = name;
             Audio = audio ?? name;
@@ -94,6 +97,7 @@ namespace Model
             Zoom = zoom;
             ExplosionRange = explosionRange;
             ExplosionTime = explosionTime;
+            Scope = scope;
         }
 
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec

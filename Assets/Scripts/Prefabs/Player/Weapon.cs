@@ -122,7 +122,10 @@ namespace Prefabs.Player
 
                 // Subtract ammo
                 Magazine[_weaponModel.Name]--;
-                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
+                if (_weaponModel.Type is WeaponType.Block)
+                    _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
+                else
+                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
             }
 
             // Add block to map
@@ -132,7 +135,7 @@ namespace Prefabs.Player
                     player.Status.Value.BlockId);
                 return;
             }
-            
+
             // Spawn the weapon effect
             if (_weaponModel.IsGun)
                 player.SpawnWeaponEffect(_weaponModel!.Type);
@@ -232,9 +235,10 @@ namespace Prefabs.Player
                 rb.AddForce(mainCamera.transform.forward * math.clamp(6.5f * force, 2.25f, 6.5f),
                     ForceMode.Impulse);
                 rb.angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
-                go.GetComponent<Grenade>().Apply(it =>
+                go.GetComponent<Explosive>().Apply(it =>
                 {
                     it.Delay = force;
+                    it.Damage = newStatus.Grenade!.Damage;
                     it.ExplosionTime = newStatus.Grenade!.ExplosionTime!.Value;
                     it.ExplosionRange = newStatus.Grenade!.ExplosionRange!.Value;
                 });

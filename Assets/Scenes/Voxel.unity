@@ -1764,6 +1764,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlaceBlock
       objectReference: {fileID: 0}
+    - target: {fileID: 5155796115253397638, guid: 729deaed0329cbc4ea39fa93acd83a2f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2199,6 +2203,10 @@ PrefabInstance:
     - target: {fileID: 6251907633706501205, guid: c5006d2c4d9b75841a53d4a022b9c1be, type: 3}
       propertyPath: m_Name
       value: HighlightBlock
+      objectReference: {fileID: 0}
+    - target: {fileID: 6251907633706501205, guid: c5006d2c4d9b75841a53d4a022b9c1be, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

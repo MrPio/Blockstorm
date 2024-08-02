@@ -2,9 +2,10 @@
 
 namespace Partials
 {
-    public class Destroyable:MonoBehaviour
+    public class Destroyable : MonoBehaviour
     {
-        public float lifespan;
+        public float lifespan = 100;
+
         public Destroyable(float lifespan)
         {
             this.lifespan = lifespan;
@@ -16,10 +17,10 @@ namespace Partials
         {
             _startTime = Time.time;
         }
-        
+
         private void FixedUpdate()
         {
-            if(lifespan>0.001f && Time.time-_startTime>lifespan)
+            if (lifespan > 0.001f && Time.time - _startTime > lifespan)
                 Destroy(gameObject);
         }
     }

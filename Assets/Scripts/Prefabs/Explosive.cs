@@ -12,24 +12,42 @@ using UnityEngine;
 
 namespace Prefabs
 {
-    public class Grenade : MonoBehaviour
+    [RequireComponent(typeof(AudioSource))]
+    [RequireComponent(typeof(Destroyable))]
+    public class Explosive : MonoBehaviour
     {
         private SceneManager _sm;
 
         public GameObject[] explosions;
         [SerializeField] public float delayFactor = 1f;
         [SerializeField] private GameObject damageText;
-        [NonSerialized] public float ExplosionTime;
-        [NonSerialized] public float ExplosionRange;
+        [Range(1, 100)] [SerializeField] private float speed;
+        [SerializeField] private MeshRenderer[] meshes;
+        [SerializeField] private bool isMissile;
+
+        [NonSerialized] public float Damage, ExplosionTime, ExplosionRange, Delay;
         private Player.Player player;
-        [NonSerialized] public float Delay;
 
         private void Start()
         {
             _sm = FindObjectOfType<SceneManager>();
-            InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
             player = GameObject.FindGameObjectsWithTag("Player").First(it => it.GetComponent<NetworkObject>().IsOwner)
                 .GetComponent<Player.Player>();
+
+            // Set explosion condition
+            if (isMissile)
+                GetComponent<Rigidbody>().velocity = transform.forward * speed;
+            else
+                InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!isMissile) return;
+
+            // Prevent the missile to explode on the player itself
+            if (!other.gameObject.GetComponent<Player.Player>()?.IsOwner ?? true)
+                Explode();
         }
 
         private void Explode()
@@ -40,7 +58,9 @@ namespace Prefabs
                 go.GetComponent<NetworkObject>().Spawn();
             }
 
-            Destroy(gameObject, 1f);
+            foreach (var meshRenderer in meshes)
+                meshRenderer.enabled = false;
+            Destroy(gameObject, 10f);
             GetComponent<AudioSource>().Play();
 
             // Destroy blocks
@@ -60,7 +80,7 @@ namespace Prefabs
                     continue;
                 var distanceFactor =
                     1 - Vector3.Distance(enemy.transform.position, transform.position) / (ExplosionRange * 2.5f);
-                var damage = (uint)(player.Status.Value.Grenade!.Damage * distanceFactor);
+                var damage = (uint)(Damage * distanceFactor);
 
                 if (!attackedPlayer.Status.Value.IsDead)
                 {

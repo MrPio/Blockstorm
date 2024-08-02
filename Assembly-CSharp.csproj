@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Managers\SceneManager.cs" />
     <Compile Include="Assets\Scripts\Partials\FollowRotation.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Player.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Explosive.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />
-    <Compile Include="Assets\Scripts\Prefabs\Grenade.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />

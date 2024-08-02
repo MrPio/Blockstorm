@@ -282,7 +282,7 @@ namespace Prefabs.Player
                     weapon = WeaponType.Primary;
                 else if (Input.GetKeyDown(KeyCode.Alpha4) && this.weapon.WeaponModel!.Type != WeaponType.Secondary)
                     weapon = WeaponType.Secondary;
-                else if (Input.GetKeyDown(KeyCode.Alpha5) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
+                else if (Input.GetKeyDown(KeyCode.Q) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
                     weapon = WeaponType.Tertiary;
                 if (weapon is not null)
                     this.weapon.SwitchEquipped(weapon.Value);

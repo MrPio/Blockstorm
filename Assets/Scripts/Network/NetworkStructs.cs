@@ -110,7 +110,7 @@ namespace Network
             this.meleeName = meleeName ?? "shovel";
             this.primaryName = primaryName ?? "ak47";
             this.secondaryName = secondaryName ?? "";
-            this.tertiaryName = tertiaryName ?? "";
+            this.tertiaryName = tertiaryName ?? "shmel";
             this.grenadeName = grenadeName ?? "M61_NY";
         }
 
