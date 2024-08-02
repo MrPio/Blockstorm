@@ -277,8 +277,9 @@ namespace Prefabs.Player
                 Spawn();
 
             // Play walk sound
-            if (Time.time - _lastWalkCheck > 0.075f)
+            if (Time.time - _lastWalkCheck > 0.1f)
             {
+                audioSource.pitch = _isRunning.Value ? runMultiplier : 1f;
                 _lastWalkCheck = Time.time;
                 if (_isGrounded && move.magnitude > 0.1f)
                 {
