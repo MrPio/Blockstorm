@@ -26,6 +26,7 @@ namespace Prefabs.Player
         [SerializeField] public float stamina = 5f;
         [SerializeField] public float staminaRecoverSpeed = 1f;
         [SerializeField] public float runMultiplier = 1.5f;
+        [SerializeField] public float crouchMultiplier = 0.65f;
         [SerializeField] public float fallSpeed = 2f;
         [SerializeField] public float gravity = 9.18f;
         [SerializeField] public float jumpHeight = 1.25f;
@@ -76,6 +77,9 @@ namespace Prefabs.Player
         private readonly NetworkVariable<bool> _isRunning = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        private readonly NetworkVariable<bool> _isCrouching = new(false,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         // Used to disable the enemy walking animation
         public readonly NetworkVariable<long> LastShot = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -112,9 +116,17 @@ namespace Prefabs.Player
                 _isRunning.OnValueChanged += (_, newValue) =>
                 {
                     var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - LastShot.Value < 400;
-                    bodyAnimator.speed = newValue && _isWalking.Value && !isShooting
-                        ? 1.4f
-                        : 1f;
+                    bodyAnimator.speed = (newValue && _isWalking.Value && !isShooting
+                        ? runMultiplier
+                        : 1f) * (_isCrouching.Value ? crouchMultiplier : 1f);
+                };
+                _isCrouching.OnValueChanged += (_, newValue) =>
+                {
+                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - LastShot.Value < 400;
+                    bodyAnimator.speed = (newValue && _isWalking.Value && !isShooting
+                        ? crouchMultiplier
+                        : 1f) * (_isRunning.Value ? runMultiplier : 1f);
+                    bodyAnimator.SetTrigger(Animator.StringToHash(newValue ? "crouch" : "no_crouch"));
                 };
                 LastShot.OnValueChanged += (_, _) =>
                 {
@@ -198,7 +210,7 @@ namespace Prefabs.Player
         {
             if (!IsOwner || isDying) return;
 
-            // Debug: Kill everyone when pressing L key
+            // Debug: Kill everyone except myself when pressing the L key
             if (Input.GetKeyDown(KeyCode.L))
                 foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
                     enemy.DamageClientRpc(999, "chest",
@@ -220,10 +232,11 @@ namespace Prefabs.Player
                 _velocity.y = -fallSpeed;
             }
 
-            // Move the camera down when hitting the ground after an high fall.
+            // Move the camera down when hitting the ground after a high fall.
             var bounceTime = (Time.time - _cameraBounceStart) / cameraBounceDuration;
             cameraTransform.transform.localPosition = _cameraInitialLocalPosition + Vector3.down *
-                ((bounceTime > 1 ? 0 : cameraBounceCurve.Evaluate(bounceTime)) * _cameraBounceIntensity);
+                ((bounceTime > 1 ? 0 : cameraBounceCurve.Evaluate(bounceTime)) * _cameraBounceIntensity +
+                 (_isCrouching.Value ? 0.4f : 0f));
 
             // Handle XZ movement
             var x = Input.GetAxis("Horizontal");
@@ -231,8 +244,15 @@ namespace Prefabs.Player
             var move = _transform.right * x + _transform.forward * z;
             _velocity.y -= gravity * Time.deltaTime;
             _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
+
+            // If crunching prevent from falling
+            var isAboutToFall =
+                !Physics.CheckSphere(groundCheck.position + move.normalized * 0.05f, 0.15f, groundLayerMask);
             characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
-                                             (_isRunning.Value ? runMultiplier : 1f)) + _velocity * Time.deltaTime);
+                                             (_isRunning.Value ? runMultiplier : 1f) *
+                                             (_isCrouching.Value ? crouchMultiplier : 1f) *
+                                             (_isCrouching.Value && isAboutToFall ? 0f : 1f))
+                                     + _velocity * Time.deltaTime);
 
             // Broadcast the walking state
             var isWalking = math.abs(x) > 0.1f || math.abs(z) > 0.1f;
@@ -319,6 +339,7 @@ namespace Prefabs.Player
                 _usedStamina += Time.deltaTime;
                 _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
                 _isRunning.Value = true;
+                _isCrouching.Value = false;
             }
             else
             {
@@ -329,6 +350,16 @@ namespace Prefabs.Player
                     _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
                 }
             }
+
+            // Handle crouch
+            if (Input.GetKeyDown(KeyCode.LeftControl) && !_isCrouching.Value && !_isRunning.Value)
+            {
+                _isRunning.Value = false;
+                _isCrouching.Value = true;
+            }
+
+            if (Input.GetKeyUp(KeyCode.LeftControl) && _isCrouching.Value)
+                _isCrouching.Value = false;
         }
 
         public void SpawnWeaponEffect(WeaponType weaponType)

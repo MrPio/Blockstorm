@@ -333,7 +333,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1893801084
+  GlobalObjectIdHash: 519613176
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -358,6 +358,7 @@ MonoBehaviour:
   stamina: 2.75
   staminaRecoverSpeed: 0.6
   runMultiplier: 1.4
+  crouchMultiplier: 0.65
   fallSpeed: 2
   gravity: 24
   jumpHeight: 1.25
