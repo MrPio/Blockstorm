@@ -18,8 +18,8 @@ RenderSettings:
   m_FogColor: {r: 0.78039217, g: 0.90588236, b: 0.9882353, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
-  m_LinearFogStart: 100
-  m_LinearFogEnd: 120
+  m_LinearFogStart: 110
+  m_LinearFogEnd: 125
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: playerPrefab
       value: 
       objectReference: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
+    - target: {fileID: 859926405249268054, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
+      propertyPath: networkPrefabsList
+      value: 
+      objectReference: {fileID: 11400000, guid: bf14e47616d35e04da384a520224bebb, type: 2}
     - target: {fileID: 3006782948519643556, guid: 8ecfca90d12ea7042ad430dd8ae11a4d, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1931877512

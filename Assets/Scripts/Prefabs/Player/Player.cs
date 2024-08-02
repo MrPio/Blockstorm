@@ -318,6 +318,12 @@ namespace Prefabs.Player
         public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
             float ragdollScale = 1)
         {
+            var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
+
+            // Check if the enemy is allied
+            if (attackerID != OwnerClientId && attacker.Status.Value.Team == Status.Value.Team)
+                return;
+
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var newStatus = Status.Value;
             newStatus.Hp -= (int)damage;
@@ -333,8 +339,6 @@ namespace Prefabs.Player
             }
 
             // Spawn damage circle
-            var attacker = GameObject.FindGameObjectsWithTag("Player")
-                .First(it => it.GetComponent<Player>().OwnerClientId == attackerID);
             var directionToEnemy = attacker.transform.position - cameraTransform.position;
             var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
             var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);

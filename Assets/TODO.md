@@ -7,9 +7,15 @@
 - Lobby menu
 - Team selector
 - Take kills & deaths into consideration in dashboard
-- Shift + Ctrl
+- Shift to run with stamina bar
+- Ctrl to crunch and avoid falling
+- ~~Friendly fire must be disabled~~
+- Tnt
+  - The explosion is handled by WorldManager::EditVoxel(*, 0).
+  - Recursively, when another TNT is met, another explosion is triggered.
 - `Collectables weapons`
 - ~~Bazooka weapon~~
+  - Automatically switch to previous weapon when ammo runs over
 - ~~Scopes~~
 - ~~Mipmap with positions~~
 - ~~Melee should deal enemy damage~~

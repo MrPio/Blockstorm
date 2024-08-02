@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 820346062917833799}
   - component: {fileID: 805539657547440743}
   - component: {fileID: 7801186516557851054}
+  - component: {fileID: 9195361858869913536}
   - component: {fileID: 893739296602550550}
   - component: {fileID: 6374599167877546130}
-  - component: {fileID: 9195361858869913536}
   - component: {fileID: 6524289725508826659}
   - component: {fileID: 4735235214375217783}
   m_Layer: 0
@@ -141,6 +141,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &9195361858869913536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2901448088429456168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1620007481
+  InScenePlacedSourceGlobalObjectIdHash: 1663247929
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &893739296602550550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,6 +185,7 @@ MonoBehaviour:
   - {fileID: 4980176256678363977}
   - {fileID: 6596028330307384508}
   isMissile: 0
+  smoke: {fileID: 0}
 --- !u!82 &6374599167877546130
 AudioSource:
   m_ObjectHideFlags: 0
@@ -260,27 +282,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &9195361858869913536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2901448088429456168}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1176668828
-  InScenePlacedSourceGlobalObjectIdHash: 1663247929
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &6524289725508826659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,7 +289,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2901448088429456168}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a1aac7ee4dc4e24ae9a616a0ffb1d4e, type: 3}
   m_Name: 

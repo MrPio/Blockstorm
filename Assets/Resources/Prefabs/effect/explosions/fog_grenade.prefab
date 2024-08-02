@@ -2316,7 +2316,7 @@ GameObject:
   - component: {fileID: -8650840158755165316}
   - component: {fileID: -7086848895917648549}
   m_Layer: 0
-  m_Name: grenade
+  m_Name: fog_grenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

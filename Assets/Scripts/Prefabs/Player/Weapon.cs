@@ -103,7 +103,7 @@ namespace Prefabs.Player
             if (_weaponModel == null || Time.time - _lastSwitch < 0.25f || _reloadingCoroutine is not null)
                 return;
 
-            // Play audio effect and animation.
+            // Play audio effect and animation
             player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.Name] > 0)
             {
@@ -144,15 +144,15 @@ namespace Prefabs.Player
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {
-                var mouth = player.WeaponPrefab.transform.Find("mouth");
-                var go = Instantiate(missile, mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
-                    mainCamera.transform.rotation);
-                go.GetComponent<Explosive>().Apply(it =>
-                {
-                    it.Damage = _weaponModel.Damage;
-                    it.ExplosionTime = _weaponModel.ExplosionTime!.Value;
-                    it.ExplosionRange = _weaponModel.ExplosionRange!.Value;
-                });
+                _sm.serverManager.SpawnExplosiveServerRpc(
+                    missile.name,
+                    mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
+                    mainCamera.transform.rotation.eulerAngles,
+                    mainCamera.transform.forward,
+                    _weaponModel.Damage,
+                    _weaponModel.ExplosionTime!.Value,
+                    _weaponModel.ExplosionRange!.Value
+                );
                 return;
             }
 
@@ -176,24 +176,29 @@ namespace Prefabs.Player
                     var attackedPlayer = hit.transform.GetComponentInParent<Player>();
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
-                        // Spawn the damage text
-                        var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                        damageTextGo.transform.position =
-                            hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                            cameraTransform.forward * 0.35f;
-                        damageTextGo.transform.rotation = player.transform.rotation;
-                        damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
-                        damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                        // Check if the enemy is allied
+                        if (attackedPlayer.IsOwner ||
+                            attackedPlayer.Status.Value.Team != player.Status.Value.Team)
                         {
-                            text.text = damage.ToString();
-                            text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
-                        });
-                        damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+                            // Spawn the damage text
+                            var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
+                            damageTextGo.transform.position =
+                                hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                                cameraTransform.forward * 0.35f;
+                            damageTextGo.transform.rotation = player.transform.rotation;
+                            damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
+                            damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                            {
+                                text.text = damage.ToString();
+                                text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                            });
+                            damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
 
-                        // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
-                            new NetVector3(cameraTransform.forward),
-                            player.OwnerClientId);
+                            // Send the damage to the enemy
+                            attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
+                                new NetVector3(cameraTransform.forward),
+                                player.OwnerClientId);
+                        }
                     }
 
                     // Prevents damaging the ground
@@ -240,24 +245,16 @@ namespace Prefabs.Player
                 animator.SetTrigger(Animator.StringToHash("inventory_switch"));
                 rightArm.SetActive(true);
                 yield return new WaitForSeconds(0.35f);
-                var grenade =
-                    Resources.Load<GameObject>(
-                        $"Prefabs/weapons/grenade/{newStatus.Grenade!.Name.ToUpper()}");
-                var go = Instantiate(grenade,
-                    mainCamera.transform.position + mainCamera.transform.forward * 0.5f + Vector3.down * 0.2f,
-                    Quaternion.Euler(VectorExtensions.RandomVector3(-180, 180f)));
-                go.GetComponent<NetworkObject>().Spawn();
-                var rb = go.GetComponent<Rigidbody>();
-                rb.AddForce(mainCamera.transform.forward * math.clamp(6.5f * force, 2.25f, 6.5f),
-                    ForceMode.Impulse);
-                rb.angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
-                go.GetComponent<Explosive>().Apply(it =>
-                {
-                    it.Delay = force;
-                    it.Damage = newStatus.Grenade!.Damage;
-                    it.ExplosionTime = newStatus.Grenade!.ExplosionTime!.Value;
-                    it.ExplosionRange = newStatus.Grenade!.ExplosionRange!.Value;
-                });
+                _sm.serverManager.SpawnExplosiveServerRpc(
+                    newStatus.Grenade!.Name.ToUpper(),
+                    mainCamera.transform.position + mainCamera.transform.forward * 0.75f + Vector3.down * 0.2f,
+                    VectorExtensions.RandomVector3(-180, 180f),
+                    mainCamera.transform.forward,
+                    newStatus.Grenade!.Damage,
+                    newStatus.Grenade!.ExplosionTime!.Value,
+                    newStatus.Grenade!.ExplosionRange!.Value,
+                    force
+                );
             }
         }
 

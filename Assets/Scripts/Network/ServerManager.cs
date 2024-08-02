@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Linq;
+using ExtensionFunctions;
 using Managers;
+using Prefabs;
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace Network
     public class ServerManager : NetworkBehaviour
     {
         private SceneManager _sm;
+        [SerializeField] private NetworkPrefabsList networkPrefabsList;
 
         [SerializeField] private GameObject playerPrefab;
 
@@ -48,6 +50,32 @@ namespace Network
                 var player = Instantiate(playerPrefab);
                 player.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SpawnPrefabServerRpc(string prefabName, NetVector3 position, NetVector3 rotation)
+        {
+            if (!IsServer) return;
+            var go = Instantiate(networkPrefabsList.PrefabList.First(it => it.Prefab.name == prefabName).Prefab,
+                position.ToVector3,
+                Quaternion.Euler(rotation.ToVector3)
+            );
+            go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void SpawnExplosiveServerRpc(string prefabName, NetVector3 position, NetVector3 rotation,
+            NetVector3 forward, uint damage, float explosionTime, float explosionRange, float force = 0,
+            ServerRpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            var go = Instantiate(networkPrefabsList.PrefabList.First(it => it.Prefab.name == prefabName).Prefab,
+                position.ToVector3,
+                Quaternion.Euler(rotation.ToVector3)
+            );
+            go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
+            go.GetComponent<Explosive>().InitializeRpc(forward, damage, explosionTime, explosionRange,
+                rpcParams.Receive.SenderClientId, force);
         }
     }
 }

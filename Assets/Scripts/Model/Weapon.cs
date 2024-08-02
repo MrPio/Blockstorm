@@ -60,14 +60,16 @@ namespace Model
 
         public static readonly List<Weapon> Tertiaries = new()
         {
-            new Weapon(name: "shmel", damage: 175, rof:10, zoom: 2.75f, explosionRange: 2f, type: WeaponType.Tertiary, ammo: 1,
-                reloadTime: 200, magazine: 1, scope:"shmel", fireAnimation: "gun"),
+            new Weapon(name: "shmel", damage: 175, rof: 10 * 5, zoom: 2.75f, explosionRange: 2.25f,
+                type: WeaponType.Tertiary, ammo: 1,
+                reloadTime: 200, magazine: 1 * 100, scope: "shmel", fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()
         {
             new Weapon(name: "M61", damage: 100, explosionRange: 1.65f, explosionTime: 3.25f, type: WeaponType.Grenade),
-            new Weapon(name: "M61_NY", damage: 150, explosionRange: 1.4f, explosionTime: 2.25f, type: WeaponType.Grenade),
+            new Weapon(name: "M61_NY", damage: 150, explosionRange: 1.4f, explosionTime: 2.25f,
+                type: WeaponType.Grenade),
         };
 
         public string Name, Audio, FireAnimation;
@@ -82,7 +84,7 @@ namespace Model
             [CanBeNull] string fireAnimation = null,
             ushort? magazine = null, ushort? ammo = null, ushort? reloadTime = null,
             WeaponType type = WeaponType.Primary,
-            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope=null)
+            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope = null)
         {
             Name = name;
             Audio = audio ?? name;

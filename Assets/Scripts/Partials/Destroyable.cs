@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using Unity.VisualScripting;
+using UnityEngine;
 
 namespace Partials
 {
@@ -21,7 +23,18 @@ namespace Partials
         private void FixedUpdate()
         {
             if (lifespan > 0.001f && Time.time - _startTime > lifespan)
-                Destroy(gameObject);
+            {
+                if (gameObject == null || gameObject.IsDestroyed())
+                    return;
+                var networkObject = GetComponent<NetworkObject>();
+                if (networkObject is not null && networkObject.IsOwner)
+                {
+                    print(networkObject.OwnerClientId);
+                    networkObject.Despawn();
+                }
+                else
+                    Destroy(gameObject);
+            }
         }
     }
 }

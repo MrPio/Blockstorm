@@ -73,6 +73,10 @@ namespace Network
         }
 
         public Vector3 ToVector3 => new(x, y, z);
+
+        public static implicit operator Vector3(NetVector3 rValue) => new(rValue.x, rValue.y, rValue.z);
+
+        public static implicit operator NetVector3(Vector3 rValue) => new(rValue);
     }
 
     /// <summary>
@@ -115,6 +119,7 @@ namespace Network
         }
 
         public bool IsDead => Hp <= 0;
+
         [CanBeNull]
         public Weapon Name2Weapon(string name) => Weapon.Blocks.FirstOrDefault(it => it.Name == name) ??
                                                   Weapon.Melees.FirstOrDefault(it => it.Name == name) ??
