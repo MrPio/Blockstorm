@@ -128,7 +128,7 @@ namespace Prefabs.Player
                 if (_weaponModel.Type is WeaponType.Block)
                     _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
                 else
-                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name]);
+                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], isTertiary: _weaponModel.Type is WeaponType.Tertiary);
             }
 
             // Add block to map
@@ -311,7 +311,7 @@ namespace Prefabs.Player
                 _sm.ammoHUD.SetMelee();
             else
                 _sm.ammoHUD
-                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name]);
+                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name], weaponType is WeaponType.Tertiary);
 
 
             // Play sound and animation
@@ -418,7 +418,7 @@ namespace Prefabs.Player
                 var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
                 LeftAmmo[_weaponModel!.Name] -= takenAmmo;
                 Magazine[_weaponModel!.Name] += takenAmmo;
-                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name]);
+                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name], isTertiary: _weaponModel.Type is WeaponType.Tertiary);
 
                 // Unpause the animator
                 animator.speed = 1;

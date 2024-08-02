@@ -4,12 +4,13 @@ using UnityEngine;
 public class AmmoHUD : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI ammoText, ammoLeftText, grenadesText;
-    [SerializeField] private GameObject ammoIcon, blockIcon;
+    [SerializeField] private GameObject ammoIcon, blockIcon, rocketIcon;
 
-    public void SetAmmo(int ammo, int? ammoLeft = null)
+    public void SetAmmo(int ammo, int? ammoLeft = null, bool isTertiary=false)
     {
-        ammoIcon.SetActive(true);
+        ammoIcon.SetActive(!isTertiary);
         blockIcon.SetActive(false);
+        rocketIcon.SetActive(isTertiary);
         ammoLeftText.gameObject.SetActive(true);
         ammoText.gameObject.SetActive(true);
         ammoText.text = ammo.ToString();
@@ -21,6 +22,7 @@ public class AmmoHUD : MonoBehaviour
     {
         ammoIcon.SetActive(false);
         blockIcon.SetActive(true);
+        rocketIcon.SetActive(false);
         ammoLeftText.gameObject.SetActive(false);
         ammoText.gameObject.SetActive(true);
         ammoText.text = blocks.ToString();
@@ -35,6 +37,7 @@ public class AmmoHUD : MonoBehaviour
     {
         ammoIcon.SetActive(false);
         blockIcon.SetActive(false);
+        rocketIcon.SetActive(false);
         ammoLeftText.gameObject.SetActive(false);
         ammoText.gameObject.SetActive(false);
     }
