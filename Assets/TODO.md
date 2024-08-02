@@ -1,6 +1,5 @@
 ﻿# TODO
 - React on host disconnect
-- Bazooka weapon
 - Click to respawn, load spawn camera.
 - Helmet removal on first head Hit + sound
 - Integrate Lobby service
@@ -8,8 +7,10 @@
 - Lobby menu
 - Team selector
 - Take kills & deaths into consideration in dashboard
-- Scopes
+- Shift + Ctrl
 - `Collectables weapons`
+- ~~Bazooka weapon~~
+- ~~Scopes~~
 - ~~Mipmap with positions~~
 - ~~Melee should deal enemy damage~~
 - ~~Player death (~~ragdoll~~, respawn)~~
