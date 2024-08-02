@@ -23,6 +23,9 @@ namespace Prefabs.Player
         private SceneManager _sm;
 
         [Header("Params")] [SerializeField] public float speed = 8f;
+        [SerializeField] public float stamina = 5f;
+        [SerializeField] public float staminaRecoverSpeed = 1f;
+        [SerializeField] public float runMultiplier = 1.5f;
         [SerializeField] public float fallSpeed = 2f;
         [SerializeField] public float gravity = 9.18f;
         [SerializeField] public float jumpHeight = 1.25f;
@@ -63,9 +66,14 @@ namespace Prefabs.Player
         private float _lastWalkCheck;
         [NonSerialized] public GameObject WeaponPrefab;
         private bool isDying;
+        private float _usedStamina;
 
         // Used to set the enemy walking animation
-        private readonly NetworkVariable<bool> _isPlayerWalking = new(false,
+        private readonly NetworkVariable<bool> _isWalking = new(false,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        // Used to set the enemy walking speed animation
+        private readonly NetworkVariable<bool> _isRunning = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to disable the enemy walking animation
@@ -94,12 +102,19 @@ namespace Prefabs.Player
             }
             else
             {
-                _isPlayerWalking.OnValueChanged += (_, newValue) =>
+                _isWalking.OnValueChanged += (_, newValue) =>
                 {
                     var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - LastShot.Value < 400;
                     bodyAnimator.SetTrigger(newValue && !isShooting
                         ? Animator.StringToHash("walk")
                         : Animator.StringToHash("idle"));
+                };
+                _isRunning.OnValueChanged += (_, newValue) =>
+                {
+                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - LastShot.Value < 400;
+                    bodyAnimator.speed = newValue && _isWalking.Value && !isShooting
+                        ? 1.4f
+                        : 1f;
                 };
                 LastShot.OnValueChanged += (_, _) =>
                 {
@@ -216,13 +231,13 @@ namespace Prefabs.Player
             var move = _transform.right * x + _transform.forward * z;
             _velocity.y -= gravity * Time.deltaTime;
             _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
-            characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f)) +
-                                     _velocity * Time.deltaTime);
+            characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
+                                             (_isRunning.Value ? runMultiplier : 1f)) + _velocity * Time.deltaTime);
 
             // Broadcast the walking state
             var isWalking = math.abs(x) > 0.1f || math.abs(z) > 0.1f;
-            if (_isPlayerWalking.Value != isWalking)
-                _isPlayerWalking.Value = isWalking;
+            if (_isWalking.Value != isWalking)
+                _isWalking.Value = isWalking;
 
             // Handle jump
             if (Input.GetButtonDown("Jump") && _isGrounded /*&& !Weapon.isAiming*/)
@@ -297,6 +312,23 @@ namespace Prefabs.Player
                 if (weapon.Magazine[weapon.WeaponModel!.Name] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
                 else weapon.audioSource.PlayOneShot(weapon.noAmmoClip);
+
+            // Handle sprint
+            if (Input.GetKey(KeyCode.LeftShift) && _usedStamina < stamina)
+            {
+                _usedStamina += Time.deltaTime;
+                _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
+                _isRunning.Value = true;
+            }
+            else
+            {
+                _isRunning.Value = false;
+                if (_usedStamina > 0)
+                {
+                    _usedStamina -= Time.deltaTime * staminaRecoverSpeed;
+                    _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
+                }
+            }
         }
 
         public void SpawnWeaponEffect(WeaponType weaponType)

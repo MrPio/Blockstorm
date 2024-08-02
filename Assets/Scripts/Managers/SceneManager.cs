@@ -22,6 +22,7 @@ namespace Managers
         public HpHUD hpHUD;
         public AmmoHUD ammoHUD;
         public ReloadBar reloadBar;
+        public ReloadBar staminaBar;
         public Transform circleDamageContainer;
         public Mipmap mipmap;
         public GameObject scopeContainer;

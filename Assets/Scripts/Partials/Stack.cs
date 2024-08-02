@@ -14,6 +14,7 @@ namespace Partials
     {
         [SerializeField] private float gap;
         [SerializeField] private bool vertical = true, inverse, refreshOnActivateChange;
+        [SerializeField] private Transform[] childrenToConsider;
 
         [Button("Update")]
         public void UpdateUI()
@@ -21,7 +22,8 @@ namespace Partials
             // Arrange the children in a stack
             var accumulator = 0f;
             var count = 0;
-            foreach (Transform child in transform)
+
+            void SetChildPos(Transform child)
             {
                 // Calculate child position
                 var childPos = (vertical ? Vector3.up : Vector3.right) *
@@ -33,14 +35,21 @@ namespace Partials
                 rect.anchoredPosition = childPos;
                 accumulator += vertical ? rect.rect.height : rect.rect.width;
             }
+
+            if (childrenToConsider is null)
+                foreach (Transform child in transform)
+                    SetChildPos(child);
+            else
+                foreach (var child in childrenToConsider.Where(it=>it.gameObject.activeSelf))
+                    SetChildPos(child);
         }
 
         private void Awake()
         {
             if (!refreshOnActivateChange)
                 return;
-            // Listen on  children enable/disable
-            foreach (Transform child in transform)
+            // Listen on children enable/disable
+            foreach (var child in transform.GetComponentsInChildren<Transform>(true))
             {
                 if (child.GetComponent<Notifier>() is null)
                     child.AddComponent<Notifier>();
