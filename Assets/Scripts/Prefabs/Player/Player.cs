@@ -148,8 +148,7 @@ namespace Prefabs.Player
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
                     print($"Player {OwnerClientId} has equipped {newValue.Message}");
-                    var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value.Split(':')[0],
-                        newValue.Message.Value.Split(':')[1]);
+                    var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
                     if (weaponModel is null)
                         return;
                     foreach (Transform child in enemyWeaponContainer)
@@ -351,7 +350,7 @@ namespace Prefabs.Player
 
             // Handle weapon reloading
             if (Input.GetKeyDown(KeyCode.R) && (weapon.WeaponModel?.IsGun ?? false))
-                if (weapon.Magazine[weapon.WeaponModel!.Name] < weapon.WeaponModel.Magazine)
+                if (weapon.Magazine[weapon.WeaponModel!.GetNetName] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
                 else weapon.audioSource.PlayOneShot(weapon.noAmmoClip);
 

@@ -157,8 +157,8 @@ namespace Model
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec
         public bool IsGun => Type is WeaponType.Primary or WeaponType.Secondary or WeaponType.Tertiary;
 
-        public string GetPrefab(bool aiming = false, bool enemy = false) =>
-            $"Prefabs/weapons/{(aiming ? "aim/" : "")}{(enemy ? "enemy/" : "")}{Name.ToUpper()}";
+        public string GetPrefab(bool aiming = false, bool enemy = false, bool collectable = false) =>
+            $"Prefabs/weapons/{(aiming ? "aim/" : "")}{(enemy ? "enemy/" : "")}{(collectable ? "collectable/" : "")}{Name.ToUpper()}";
 
         public string GetAudioClip => $"Audio/weapons/{Audio.ToUpper()}";
         public string GetScope => $"Textures/scope/{Scope}";
@@ -170,24 +170,29 @@ namespace Model
             Variant is null ? null : $"Textures/weapons/Materials/{Name}_{Variant.ToUpper()}";
 
         [CanBeNull]
-        public static Weapon Name2Weapon(string name, string variant = null) =>
+        public static Weapon Name2Weapon(string netName) =>
             Blocks.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant) ??
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]) ??
             Melees.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant) ??
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]) ??
             Primaries.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant) ??
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]) ??
             Secondaries.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant) ??
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]) ??
             Tertiaries.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant) ??
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]) ??
             Grenades.FirstOrDefault(it =>
-                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == variant);
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == netName.Split(":")[1]);
+
+        public static readonly List<Weapon> Weapons = Blocks.Concat(Melees).Concat(Primaries).Concat(Secondaries)
+            .Concat(Tertiaries).Concat(Grenades).ToList();
+
+        public string GetNetName => $"{Name}:{Variant}";
     }
 }

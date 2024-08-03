@@ -124,7 +124,7 @@ namespace Network
         }
 
         public bool IsDead => Hp <= 0;
-        
+
         public Skin Skin
         {
             get
@@ -143,7 +143,7 @@ namespace Network
                 var name = blockName.Value;
                 return Weapon.Blocks.FirstOrDefault(it => it.Name == name);
             }
-            set => blockName = value?.Name ?? "";
+            set => blockName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         [CanBeNull]
@@ -154,7 +154,7 @@ namespace Network
                 var name = meleeName.Value;
                 return Weapon.Melees.FirstOrDefault(it => it.Name == name);
             }
-            set => meleeName = value?.Name ?? "";
+            set => meleeName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         [CanBeNull]
@@ -166,7 +166,7 @@ namespace Network
                 return Weapon.Primaries.FirstOrDefault(it =>
                     it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
             }
-            set => primaryName = value?.Name ?? "";
+            set => primaryName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         [CanBeNull]
@@ -178,7 +178,7 @@ namespace Network
                 return Weapon.Secondaries.FirstOrDefault(it =>
                     it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
             }
-            set => secondaryName = value?.Name ?? "";
+            set => secondaryName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         [CanBeNull]
@@ -189,7 +189,7 @@ namespace Network
                 var name = tertiaryName.Value;
                 return Weapon.Tertiaries.FirstOrDefault(it => it.Name == name);
             }
-            set => tertiaryName = value?.Name ?? "";
+            set => tertiaryName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         [CanBeNull]
@@ -200,7 +200,7 @@ namespace Network
                 var name = grenadeName.Value;
                 return Weapon.Grenades.FirstOrDefault(it => it.Name == name);
             }
-            set => grenadeName = value?.Name ?? "";
+            set => grenadeName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
         public byte BlockId =>

@@ -17,7 +17,7 @@ namespace Prefabs
     [RequireComponent(typeof(Destroyable))]
     public class Explosive : NetworkBehaviour
     {
-        private const float RangeMultiplierForDamage = 5f;
+        private const float RangeMultiplierForDamage = 4f;
         private SceneManager _sm;
 
         public GameObject[] explosions;

@@ -71,8 +71,8 @@ namespace Prefabs.Player
                 if (value.Type == WeaponType.Block)
                 {
                     cameraMovement.CanPlace = true;
-                    if (!Magazine.ContainsKey(_weaponModel.Name))
-                        Magazine[_weaponModel.Name] = _weaponModel.Magazine!.Value;
+                    if (!Magazine.ContainsKey(_weaponModel.GetNetName))
+                        Magazine[_weaponModel.GetNetName] = _weaponModel.Magazine!.Value;
                 }
                 else if (value.Type == WeaponType.Melee)
                     cameraMovement.CanDig = true;
@@ -80,10 +80,10 @@ namespace Prefabs.Player
                 {
                     cameraMovement.CanPlace = false;
                     cameraMovement.CanDig = false;
-                    if (!LeftAmmo.ContainsKey(_weaponModel.Name))
-                        LeftAmmo[_weaponModel.Name] = _weaponModel.Ammo!.Value;
-                    if (!Magazine.ContainsKey(_weaponModel.Name))
-                        Magazine[_weaponModel.Name] = _weaponModel.Magazine!.Value;
+                    if (!LeftAmmo.ContainsKey(_weaponModel.GetNetName))
+                        LeftAmmo[_weaponModel.GetNetName] = _weaponModel.Ammo!.Value;
+                    if (!Magazine.ContainsKey(_weaponModel.GetNetName))
+                        Magazine[_weaponModel.GetNetName] = _weaponModel.Magazine!.Value;
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace Prefabs.Player
 
             // Play audio effect and crosshair/scope animation
             // player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.Name] > 0)
+            if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.GetNetName] > 0)
             {
                 // Propagate the sound across the net
                 player.LastShotWeapon.Value = "";
@@ -127,18 +127,18 @@ namespace Prefabs.Player
             if (_weaponModel.Type is WeaponType.Block || _weaponModel.IsGun)
             {
                 // Check if the player has enough ammo
-                if (Magazine[_weaponModel.Name] <= 0)
+                if (Magazine[_weaponModel.GetNetName] <= 0)
                 {
                     audioSource.PlayOneShot(noAmmoClip);
                     return;
                 }
 
                 // Subtract ammo
-                Magazine[_weaponModel.Name]--;
+                Magazine[_weaponModel.GetNetName]--;
                 if (_weaponModel.Type is WeaponType.Block)
-                    _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
+                    _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.GetNetName]);
                 else
-                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name],
+                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.GetNetName],
                         isTertiary: _weaponModel.Type is WeaponType.Tertiary);
             }
 
@@ -167,8 +167,10 @@ namespace Prefabs.Player
                 );
 
                 // Switch to the previous weapon if ran out of ammo
-                if (LeftAmmo[_weaponModel.Name] <= 0)
+                if (LeftAmmo[_weaponModel.GetNetName] <= 0)
                     SwitchEquipped(_lastWeapon);
+                else
+                    SwitchEquipped(WeaponType.Tertiary, silent: true);
                 return;
             }
 
@@ -278,7 +280,7 @@ namespace Prefabs.Player
         /// Switch the currently selected weapon.
         /// </summary>
         /// <param name="weaponType"> The weapon to equip. </param>
-        public void SwitchEquipped(WeaponType weaponType)
+        public void SwitchEquipped(WeaponType weaponType, bool silent = false)
         {
             // Make sure the weapon is not switching too fast.
             if (Time.time - _lastSwitch < 0.25f)
@@ -316,17 +318,18 @@ namespace Prefabs.Player
             // Update Ammo HUD
             if (weaponType is WeaponType.Block)
                 _sm.ammoHUD
-                    .SetBlocks(Magazine[_weaponModel!.Name]);
+                    .SetBlocks(Magazine[_weaponModel!.GetNetName]);
             else if (weaponType is WeaponType.Melee)
                 _sm.ammoHUD.SetMelee();
             else
                 _sm.ammoHUD
-                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name],
+                    .SetAmmo(Magazine[_weaponModel!.GetNetName], LeftAmmo[_weaponModel!.GetNetName],
                         weaponType is WeaponType.Tertiary);
 
 
             // Play sound and animation
-            audioSource.PlayOneShot(switchEquippedClip);
+            if (!silent)
+                audioSource.PlayOneShot(switchEquippedClip);
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
 
             // Broadcast the new equipment
@@ -441,7 +444,7 @@ namespace Prefabs.Player
             if (isAiming)
                 ToggleAim();
 
-            var leftAmmo = LeftAmmo[_weaponModel!.Name];
+            var leftAmmo = LeftAmmo[_weaponModel!.GetNetName];
             if (leftAmmo <= 0) return;
 
             // Play audio clip and animation
@@ -458,10 +461,10 @@ namespace Prefabs.Player
                 yield return new WaitForSeconds(_weaponModel!.ReloadTime!.Value / 100f);
 
                 // Update the magazine and notify the HUD
-                var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
-                LeftAmmo[_weaponModel!.Name] -= takenAmmo;
-                Magazine[_weaponModel!.Name] += takenAmmo;
-                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name],
+                var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.GetNetName]);
+                LeftAmmo[_weaponModel!.GetNetName] -= takenAmmo;
+                Magazine[_weaponModel!.GetNetName] += takenAmmo;
+                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.GetNetName], LeftAmmo[_weaponModel!.GetNetName],
                     isTertiary: _weaponModel.Type is WeaponType.Tertiary);
 
                 // Unpause the animator

@@ -1,4 +1,10 @@
-﻿namespace Model
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ExtensionFunctions;
+using JetBrains.Annotations;
+
+namespace Model
 {
     public enum CollectableType
     {
@@ -7,15 +13,64 @@
         Hp
     }
 
+    public enum Medkit
+    {
+        Small,
+        Medium,
+        Large
+    }
+
+
     public class Collectable
     {
-        public CollectableType Type;
-        public Weapon Item;
+        private static readonly Dictionary<CollectableType, float> Probabilities = new()
+        {
+            { CollectableType.Hp, 0.3f },
+            { CollectableType.Ammo, 0.3f },
+            { CollectableType.Weapon, 0.4f },
+        };
 
-        public Collectable(CollectableType type, Weapon item)
+        public  static readonly Dictionary<Medkit, ushort> MedkitHps = new()
+        {
+            { Medkit.Small, 30 },
+            { Medkit.Medium, 60 },
+            { Medkit.Large, 100 }
+        };
+
+        public CollectableType Type;
+        [CanBeNull] public Weapon WeaponItem;
+        public Medkit? MedkitType;
+
+        public Collectable(CollectableType type, Weapon weaponItem = null, Medkit? medkitType = null)
         {
             Type = type;
-            Item = item;
+            WeaponItem = weaponItem;
+            MedkitType = medkitType;
+        }
+
+        public static Collectable GetRandomCollectable
+        {
+            get
+            {
+                var p = new Random().NextDouble();
+                var acc = 0f;
+                foreach (var (key, value) in Probabilities)
+                {
+                    acc += value;
+                    if (acc >= p)
+                        return new Collectable(key,
+                            key is CollectableType.Weapon
+                                ? Weapon.Weapons.Where(it => it.Type is not WeaponType.Block and not WeaponType.Melee)
+                                    .ToList().RandomItem()
+                                : null,
+                            key is CollectableType.Hp
+                                ? (Medkit)Enum.GetValues(typeof(Medkit))
+                                    .GetValue(new Random().Next(Enum.GetNames(typeof(Medkit)).Length))
+                                : null);
+                }
+
+                return null;
+            }
         }
     }
 }

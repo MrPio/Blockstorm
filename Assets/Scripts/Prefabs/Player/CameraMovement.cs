@@ -135,7 +135,7 @@ namespace Prefabs.Player
                      Time.time - _lastPlace > weapon.WeaponModel.Delay)
             {
                 _lastPlace = Time.time;
-                if (weapon.Magazine[weapon.WeaponModel.Name] > 0 || Input.GetMouseButtonDown(0))
+                if (weapon.Magazine[weapon.WeaponModel.GetNetName] > 0 || Input.GetMouseButtonDown(0))
                     weapon.Fire();
                 _sm.placeBlock.gameObject.SetActive(false);
             }
@@ -144,7 +144,7 @@ namespace Prefabs.Player
             else if (Input.GetMouseButton(0) && (weapon.WeaponModel?.IsGun ?? false) &&
                      Time.time - _lastFire > weapon.WeaponModel.Delay)
             {
-                if (weapon.Magazine[weapon.WeaponModel.Name] > 0)
+                if (weapon.Magazine[weapon.WeaponModel.GetNetName] > 0)
                 {
                     _lastFire = Time.time;
                     weapon.Fire();

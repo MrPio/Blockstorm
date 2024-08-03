@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7650455697043361929
 Transform:
   m_ObjectHideFlags: 0
@@ -307,7 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1976720253
+  GlobalObjectIdHash: 2816709887
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -332,6 +332,11 @@ MonoBehaviour:
   hpLight: {fileID: 7052785425675606772}
   weaponLight: {fileID: 1401246565623001051}
   collectableContainer: {fileID: 5801873289709672766}
+  ammoPrefab: {fileID: 6540235310300609860, guid: c879d5817fdfc5b4999dbe7de131b90a, type: 3}
+  medkitPrefabs:
+  - {fileID: 921932547157562997, guid: 7addfa692aad2cd42b4c6a0af7a00811, type: 3}
+  - {fileID: 3770308940089150954, guid: b76b0afb1fa6a8a4986d8d069b5ea51f, type: 3}
+  - {fileID: 2452541436102613723, guid: c4b10bc6ea546234f98ca906b622f80f, type: 3}
   lootAudioClip: {fileID: 8300000, guid: 834bc238c2f15854985acc3998890b48, type: 3}
 --- !u!1 &5801873289709672766
 GameObject:
