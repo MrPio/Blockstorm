@@ -6,6 +6,7 @@ using Prefabs;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using Utils;
 
 namespace Network
 {
@@ -76,6 +77,22 @@ namespace Network
             go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
             go.GetComponent<Explosive>().InitializeRpc(forward, damage, explosionTime, explosionRange,
                 rpcParams.Receive.SenderClientId, force);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void LootCollectableServerRpc(NetVector3 id)
+        {
+            _sm.worldManager.FreeCollectablesSpawnPoints.Add(id);
+            var looted = _sm.worldManager.SpawnedCollectables.First(it => it.Model.ID == id);
+            _sm.worldManager.SpawnedCollectables.Remove(looted);
+            Destroy(looted);
+
+            // TODO: spawn a new one in a pos different from id
+
+            // Update the clients collectable status
+            _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
+                _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
+                _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
         }
     }
 }

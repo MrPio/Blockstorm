@@ -458,6 +458,7 @@ MonoBehaviour:
   viewDistance: 192
   atlasCount: 16
   mapName: Harbor
+  collectable: {fileID: 2791876225109273032, guid: 38c460983c04cfb4ea333447d2264182, type: 3}
 --- !u!114 &958774639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1468,6 +1469,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClientManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6180080625161611371, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
+      propertyPath: collectable
+      value: 
+      objectReference: {fileID: 2791876225109273032, guid: 38c460983c04cfb4ea333447d2264182, type: 3}
     - target: {fileID: 8408558640280020905, guid: ac60506851c30e04996e873c31a00ce3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

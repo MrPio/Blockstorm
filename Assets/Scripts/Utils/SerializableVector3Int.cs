@@ -6,7 +6,7 @@ namespace Utils
     /// <summary>
     /// Since unity doesn't flag the Vector3 as serializable, we
     /// need to create our own version. This one will automatically convert
-    /// between Vector3 and SerializableVector3
+    /// between Vector3 and NetVector3
     /// </summary>
     [Serializable]
     public struct SerializableVector3Int

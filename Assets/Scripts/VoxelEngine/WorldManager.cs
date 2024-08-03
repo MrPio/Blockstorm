@@ -4,8 +4,11 @@ using System.Linq;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Model;
+using Network;
 using Unity.Mathematics;
 using UnityEngine;
+using Utils;
+using Collectable = Prefabs.Collectable;
 
 namespace VoxelEngine
 {
@@ -28,6 +31,9 @@ namespace VoxelEngine
         private Vector3 _playerLastPos;
         [SerializeField] private string mapName = "Harbor";
         private bool _hasRendered;
+        [SerializeField] private GameObject collectable;
+        [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints;
+        [NonSerialized] public List<Collectable> SpawnedCollectables;
 
         private void Start()
         {
@@ -255,6 +261,21 @@ namespace VoxelEngine
             }
 
             return voxels;
+        }
+
+        // Server only
+        public void SpawnCollectables()
+        {
+            var spawnPoints = Resources.Load<GameObject>($"Prefabs/collectablePoints/{Map.name}");
+            var transforms = spawnPoints.GetComponentsInChildren<Transform>().Where(it => it != spawnPoints.transform)
+                .ToList();
+            var freeSpawnPoints = transforms.RandomSublist(transforms.Count / 2).ToList();
+            FreeCollectablesSpawnPoints = freeSpawnPoints.Select(it => (NetVector3)it.position).ToList();
+            SpawnedCollectables = transforms.Where(it => !freeSpawnPoints.Contains(it))
+                .Select(point => Instantiate(collectable, point.position, Quaternion.identity)
+                    .GetComponent<Collectable>()).ToList();
+            foreach (var c in SpawnedCollectables)
+                c.Initialize(Model.Collectable.GetRandomCollectable(c.transform.position));
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Model;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using Utils;
 using VoxelEngine;
 
 namespace Network
@@ -77,11 +79,29 @@ namespace Network
             z = vector3.z;
         }
 
+        public NetVector3(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
         public Vector3 ToVector3 => new(x, y, z);
 
         public static implicit operator Vector3(NetVector3 rValue) => new(rValue.x, rValue.y, rValue.z);
 
         public static implicit operator NetVector3(Vector3 rValue) => new(rValue);
+
+        public static bool operator ==(NetVector3 lhs, NetVector3 rhs)
+        {
+            return Mathf.Approximately(lhs.x, rhs.x) && Mathf.Approximately(lhs.y, rhs.y) &&
+                   Mathf.Approximately(lhs.z, rhs.z);
+        }
+
+        public static bool operator !=(NetVector3 lhs, NetVector3 rhs)
+        {
+            return !(lhs == rhs);
+        }
     }
 
     /// <summary>
@@ -223,6 +243,50 @@ namespace Network
             serializer.SerializeValue(ref secondaryName);
             serializer.SerializeValue(ref tertiaryName);
             serializer.SerializeValue(ref grenadeName);
+        }
+    }
+
+    public struct CollectablesStatus : INetworkSerializable
+    {
+        public float[] Xs, Ys, Zs;
+        public byte[] MedkitTypes, CollectableTypes;
+        public NetString[] WeaponNames;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Xs);
+            serializer.SerializeValue(ref Ys);
+            serializer.SerializeValue(ref Zs);
+            serializer.SerializeValue(ref WeaponNames);
+            serializer.SerializeValue(ref MedkitTypes);
+            serializer.SerializeValue(ref CollectableTypes);
+        }
+
+        public CollectablesStatus(List<Vector3> positions, List<Collectable> collectables)
+        {
+            Xs = positions.Select(it => it.x).ToArray();
+            Ys = positions.Select(it => it.y).ToArray();
+            Zs = positions.Select(it => it.z).ToArray();
+            Debug.Log(collectables.Count);
+            CollectableTypes = collectables.Select(it => (byte)it.Type).ToArray();
+            MedkitTypes = collectables.Select(it => it.MedkitType is null ? (byte)0 : (byte)it.MedkitType).ToArray();
+            WeaponNames = collectables.Select(it => (NetString)(it.WeaponItem?.GetNetName ?? "")).ToArray();
+        }
+
+        public List<Collectable> ToCollectables
+        {
+            get
+            {
+                List<Collectable> collectables = new();
+                for (var i = 0; i < Xs.Length; i++)
+                    collectables.Add(new Collectable(
+                        (CollectableType)Enum.GetValues(typeof(CollectableType)).GetValue(CollectableTypes[i]),
+                        new NetVector3(Xs[i], Ys[i], Zs[i]),
+                        Weapon.Name2Weapon(WeaponNames[i]),
+                        (Medkit)Enum.GetValues(typeof(Medkit)).GetValue(MedkitTypes[i])
+                    ));
+                return collectables;
+            }
         }
     }
 }

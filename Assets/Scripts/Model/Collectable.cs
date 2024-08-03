@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
 using JetBrains.Annotations;
+using Network;
+using Utils;
 
 namespace Model
 {
@@ -30,7 +32,7 @@ namespace Model
             { CollectableType.Weapon, 0.4f },
         };
 
-        public  static readonly Dictionary<Medkit, ushort> MedkitHps = new()
+        public static readonly Dictionary<Medkit, ushort> MedkitHps = new()
         {
             { Medkit.Small, 30 },
             { Medkit.Medium, 60 },
@@ -40,37 +42,37 @@ namespace Model
         public CollectableType Type;
         [CanBeNull] public Weapon WeaponItem;
         public Medkit? MedkitType;
+        public NetVector3 ID;
 
-        public Collectable(CollectableType type, Weapon weaponItem = null, Medkit? medkitType = null)
+        public Collectable(CollectableType type, NetVector3 id, Weapon weaponItem = null,
+            Medkit? medkitType = null)
         {
             Type = type;
             WeaponItem = weaponItem;
             MedkitType = medkitType;
+            ID = id;
         }
 
-        public static Collectable GetRandomCollectable
+        public static Collectable GetRandomCollectable(NetVector3 id)
         {
-            get
+            var p = new Random().NextDouble();
+            var acc = 0f;
+            foreach (var (key, value) in Probabilities)
             {
-                var p = new Random().NextDouble();
-                var acc = 0f;
-                foreach (var (key, value) in Probabilities)
-                {
-                    acc += value;
-                    if (acc >= p)
-                        return new Collectable(key,
-                            key is CollectableType.Weapon
-                                ? Weapon.Weapons.Where(it => it.Type is not WeaponType.Block and not WeaponType.Melee)
-                                    .ToList().RandomItem()
-                                : null,
-                            key is CollectableType.Hp
-                                ? (Medkit)Enum.GetValues(typeof(Medkit))
-                                    .GetValue(new Random().Next(Enum.GetNames(typeof(Medkit)).Length))
-                                : null);
-                }
-
-                return null;
+                acc += value;
+                if (acc >= p)
+                    return new Collectable(key, id,
+                        key is CollectableType.Weapon
+                            ? Weapon.Weapons.Where(it => it.Type is not WeaponType.Block and not WeaponType.Melee)
+                                .ToList().RandomItem()
+                            : null,
+                        key is CollectableType.Hp
+                            ? (Medkit)Enum.GetValues(typeof(Medkit))
+                                .GetValue(new Random().Next(Enum.GetNames(typeof(Medkit)).Length))
+                            : null);
             }
+
+            return null;
         }
     }
 }
