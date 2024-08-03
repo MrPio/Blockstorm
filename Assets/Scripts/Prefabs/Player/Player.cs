@@ -77,11 +77,16 @@ namespace Prefabs.Player
         private readonly NetworkVariable<bool> _isRunning = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        // Used to set the enemy crouching animation
         private readonly NetworkVariable<bool> _isCrouching = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to disable the enemy walking animation
         public readonly NetworkVariable<long> LastShot = new(0,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        // Used to play the weapon sound
+        public readonly NetworkVariable<NetString> LastShotWeapon = new(new(),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to animate the enemy's body tilt
@@ -92,6 +97,7 @@ namespace Prefabs.Player
         public readonly NetworkVariable<NetString> EquippedWeapon = new(new NetString { Message = "" },
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        // The player status contains all the player information that needs to be shared
         public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -133,19 +139,34 @@ namespace Prefabs.Player
                     bodyAnimator.SetTrigger(Animator.StringToHash("idle"));
                     // _isPlayerWalking.Value = false;
                 };
+                LastShotWeapon.OnValueChanged += (_, newValue) =>
+                {
+                    if (newValue.Message.Value.Length > 0)
+                        audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/weapons/{newValue.Message.Value}"),
+                            0.65f);
+                };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
                     print($"Player {OwnerClientId} has equipped {newValue.Message}");
+                    var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value.Split(':')[0],
+                        newValue.Message.Value.Split(':')[1]);
+                    if (weaponModel is null)
+                        return;
                     foreach (Transform child in enemyWeaponContainer)
                         Destroy(child.gameObject);
-                    var go = Resources.Load<GameObject>($"Prefabs/weapons/enemy/{newValue.Message.Value.ToUpper()}");
+                    var go = Resources.Load<GameObject>(weaponModel.GetPrefab(enemy: true));
                     WeaponPrefab = Instantiate(go, enemyWeaponContainer).Apply(o =>
                     {
                         o.AddComponent<WeaponSway>();
-                        if (newValue.Message.Value.ToUpper() == "BLOCK")
+                        if (weaponModel.Type is WeaponType.Block)
                             o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
                                 $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType.sideID + 1):D1}");
                     });
+
+                    // Load materials
+                    foreach (var mesh in WeaponPrefab.GetComponentsInChildren<MeshRenderer>(true))
+                        if (!mesh.gameObject.name.Contains("scope") && weaponModel.Variant is not null)
+                            mesh.material = Resources.Load<Material>(weaponModel.GetMaterial);
                 };
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {

@@ -8,9 +8,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 865513094456943267, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 876225155405952693, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1805455090362709063, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3135938660582874851, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475049548045046704, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5628927348501479117, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6211343100905639805, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
       propertyPath: m_Name
-      value: AK47 Variant
+      value: AK47
+      objectReference: {fileID: 0}
+    - target: {fileID: 6211343100905639805, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7476551211793568285, guid: ee52ea37c7c6a7f4fa9c1c68cd4b0b7b, type: 3}
       propertyPath: m_LocalPosition.x

@@ -106,10 +106,13 @@ namespace Prefabs.Player
                 return;
 
             // Play audio effect and crosshair/scope animation
-            player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            // player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.Name] > 0)
             {
-                audioSource.PlayOneShot(_fireClip, 0.6f); // TODO: propagate the sound across the net
+                // Propagate the sound across the net
+                player.LastShotWeapon.Value = "";
+                player.LastShotWeapon.Value = _weaponModel.Name.ToUpper();
+                audioSource.PlayOneShot(_fireClip, 0.65f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
                 weaponAnimator?.SetTrigger(Animator.StringToHash("fire"));
 
@@ -183,7 +186,7 @@ namespace Prefabs.Player
 
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
-                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.2f,
+                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.025f,
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
@@ -327,7 +330,7 @@ namespace Prefabs.Player
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
 
             // Broadcast the new equipment
-            player.EquippedWeapon.Value = new NetString { Message = WeaponModel!.Name };
+            player.EquippedWeapon.Value = $"{WeaponModel!.Name}:{WeaponModel!.Variant}";
         }
 
         /// <summary>
@@ -392,7 +395,7 @@ namespace Prefabs.Player
                              .Where(it => it != transform && it != transform.parent))
                     Destroy(child.gameObject);
 
-                var prefab = Resources.Load<GameObject>(WeaponModel!.GetPrefab(isAiming));
+                var prefab = Resources.Load<GameObject>(WeaponModel!.GetPrefab(aiming: isAiming));
                 player.WeaponPrefab = Instantiate(prefab, isAiming ? transform.parent : transform).Apply(go =>
                 {
                     // Load the weapon material and the scope

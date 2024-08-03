@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Model
@@ -156,7 +157,9 @@ namespace Model
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec
         public bool IsGun => Type is WeaponType.Primary or WeaponType.Secondary or WeaponType.Tertiary;
 
-        public string GetPrefab(bool aiming = false) => $"Prefabs/weapons/{(aiming ? "aim/" : "")}{Name.ToUpper()}";
+        public string GetPrefab(bool aiming = false, bool enemy = false) =>
+            $"Prefabs/weapons/{(aiming ? "aim/" : "")}{(enemy ? "enemy/" : "")}{Name.ToUpper()}";
+
         public string GetAudioClip => $"Audio/weapons/{Audio.ToUpper()}";
         public string GetScope => $"Textures/scope/{Scope}";
 
@@ -165,5 +168,26 @@ namespace Model
         [CanBeNull]
         public string GetMaterial =>
             Variant is null ? null : $"Textures/weapons/Materials/{Name}_{Variant.ToUpper()}";
+
+        [CanBeNull]
+        public static Weapon Name2Weapon(string name, string variant = null) =>
+            Blocks.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant) ??
+            Melees.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant) ??
+            Primaries.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant) ??
+            Secondaries.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant) ??
+            Tertiaries.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant) ??
+            Grenades.FirstOrDefault(it =>
+                string.Equals(it.Name, name, StringComparison.CurrentCultureIgnoreCase) &&
+                (it.Variant ?? "") == variant);
     }
 }

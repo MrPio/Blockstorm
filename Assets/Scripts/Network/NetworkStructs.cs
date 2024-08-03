@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
 using Model;
 using Unity.Collections;
@@ -9,16 +10,20 @@ using VoxelEngine;
 namespace Network
 {
     /// <summary>
-    /// A string message of 512 bytes in size.
+    /// A string message of 64 bytes in size.
     /// </summary>
     public struct NetString : INetworkSerializable
     {
-        public FixedString512Bytes Message;
+        public FixedString64Bytes Message;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Message);
         }
+
+        public static implicit operator string(NetString rValue) => rValue.Message.Value;
+
+        public static implicit operator NetString(string rValue) => new() { Message = rValue };
     }
 
     /// <summary>
@@ -119,15 +124,7 @@ namespace Network
         }
 
         public bool IsDead => Hp <= 0;
-
-        [CanBeNull]
-        public Weapon Name2Weapon(string name) => Weapon.Blocks.FirstOrDefault(it => it.Name == name) ??
-                                                  Weapon.Melees.FirstOrDefault(it => it.Name == name) ??
-                                                  Weapon.Primaries.FirstOrDefault(it => it.Name == name) ??
-                                                  Weapon.Secondaries.FirstOrDefault(it => it.Name == name) ??
-                                                  Weapon.Tertiaries.FirstOrDefault(it => it.Name == name) ??
-                                                  Weapon.Grenades.FirstOrDefault(it => it.Name == name);
-
+        
         public Skin Skin
         {
             get

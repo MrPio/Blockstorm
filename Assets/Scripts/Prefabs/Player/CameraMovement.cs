@@ -16,7 +16,7 @@ namespace Prefabs.Player
     /// <seealso cref="Weapon"/>
     public class CameraMovement : MonoBehaviour
     {
-        public const float FOVMain = 68, FOVWeapon = 44;
+        public const float FOVMain = 68, FOVWeapon = 54;
         private SceneManager _sm;
 
         [Header("Params")] [SerializeField] public float sensitivity, smoothing;

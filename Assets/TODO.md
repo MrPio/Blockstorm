@@ -7,13 +7,14 @@
 - Lobby menu
 - Team selector
 - Take kills & deaths into consideration in dashboard
-- Shift to run with stamina bar
-- Ctrl to crunch and avoid falling
-- Introduce a secondary weapon
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
-- `Collectables weapons`
+- `Collectables weapons/ammo`
+- ~~Introduce a secondary weapon~~
+- ~~Add weapon variation based on texture~~
+- ~~Shift to run with stamina bar~~
+- ~~Ctrl to crunch and avoid falling~~
 - ~~Bazooka weapon~~
   - ~~Automatically switch to the previous weapon when ammo runs over~~
 - ~~Friendly fire must be disabled~~
