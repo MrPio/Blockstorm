@@ -368,7 +368,7 @@ namespace Prefabs.Player
             var mouth = WeaponPrefab.transform.Find("mouth");
             if (mouth)
             {
-                Instantiate(muzzles.RandomItem(), mouth)
+                Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation)
                     .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
                 if (IsOwner)
                     SpawnWeaponEffectRpc(weapon.WeaponModel!.Type);

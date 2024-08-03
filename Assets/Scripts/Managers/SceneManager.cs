@@ -26,6 +26,8 @@ namespace Managers
         public Transform circleDamageContainer;
         public Mipmap mipmap;
         public GameObject scopeContainer;
+        public CrosshairFire crosshairFire;
+        public CrosshairFire scopeFire;
 
         [Header("Managers")] public WorldManager worldManager;
         public ClientManager clientManager;

@@ -38,7 +38,7 @@ namespace Prefabs.Player
 
         private Transform _transform;
         private bool _canDig, _canPlace;
-        private float _lastDig, _lastPlace, _lastFire;
+        private float _lastDig, _lastPlace, _lastFire = -99f;
         private bool _isPlaceCursorBlocksStarted;
         private float Reach => weapon.WeaponModel?.Distance ?? 0f;
         private Vector2 _mouseLook;
@@ -46,6 +46,7 @@ namespace Prefabs.Player
         private float _throwingAcc;
         private bool _canThrow = true;
         private const float MaxThrowingAcc = 0.5f;
+        private Camera _camera;
 
         public bool CanDig
         {
@@ -78,6 +79,7 @@ namespace Prefabs.Player
         private void Awake()
         {
             _sm = FindObjectOfType<SceneManager>();
+            _camera = GetComponent<Camera>();
         }
 
         private void Start()
@@ -96,7 +98,7 @@ namespace Prefabs.Player
             _smoothV.y = Mathf.Lerp(_smoothV.y, mouseDelta.y, 1f / (smoothing + 1f));
 
             // Calculate rotation based on mouse input and sensitivity
-            _mouseLook += _smoothV * (sensitivity * Time.deltaTime);
+            _mouseLook += _smoothV * (sensitivity * Time.deltaTime * _camera.fieldOfView / FOVMain);
 
             // Clamp vertical rotation to prevent inverted view
             _mouseLook.y = Mathf.Clamp(_mouseLook.y, -90f, 90f);
@@ -142,9 +144,13 @@ namespace Prefabs.Player
             else if (Input.GetMouseButton(0) && (weapon.WeaponModel?.IsGun ?? false) &&
                      Time.time - _lastFire > weapon.WeaponModel.Delay)
             {
-                _lastFire = Time.time;
-                if (weapon.Magazine[weapon.WeaponModel.Name] > 0 || Input.GetMouseButtonDown(0))
+                if (weapon.Magazine[weapon.WeaponModel.Name] > 0)
+                {
+                    _lastFire = Time.time;
                     weapon.Fire();
+                }
+                else if (Input.GetMouseButtonDown(0))
+                    weapon.audioSource.PlayOneShot(weapon.noAmmoClip);
             }
 
             // If I am throwing a grenade

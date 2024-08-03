@@ -65,5 +65,7 @@ namespace Model
                     : "block_damage_medium";
             }
         }
+
+        public string GetMaterial => $"Textures/texturepacks/blockade/Materials/blockade_{topID + 1:D1}";
     }
 }

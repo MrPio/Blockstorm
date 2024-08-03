@@ -112,8 +112,8 @@ namespace Network
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
             this.meleeName = meleeName ?? "shovel";
-            this.primaryName = primaryName ?? "ak47";
-            this.secondaryName = secondaryName ?? "";
+            this.primaryName = primaryName ?? "ak47:NY22";
+            this.secondaryName = secondaryName ?? "m1911:ICE";
             this.tertiaryName = tertiaryName ?? "shmel";
             this.grenadeName = grenadeName ?? "M61_NY";
         }
@@ -166,7 +166,8 @@ namespace Network
             get
             {
                 var name = primaryName.Value;
-                return Weapon.Primaries.FirstOrDefault(it => it.Name == name);
+                return Weapon.Primaries.FirstOrDefault(it =>
+                    it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
             }
             set => primaryName = value?.Name ?? "";
         }
@@ -177,7 +178,8 @@ namespace Network
             get
             {
                 var name = secondaryName.Value;
-                return Weapon.Secondaries.FirstOrDefault(it => it.Name == name);
+                return Weapon.Secondaries.FirstOrDefault(it =>
+                    it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
             }
             set => secondaryName = value?.Name ?? "";
         }

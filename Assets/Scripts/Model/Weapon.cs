@@ -50,19 +50,67 @@ namespace Model
 
         public static readonly List<Weapon> Primaries = new()
         {
-            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 72, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 30, reloadTime: 250)
+            // AK47 =========================================================================================
+            // 2_000
+            new Weapon(name: "ak47", damage: 20, rof: 100, distance: 80, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 1.65f, ammo: 120, magazine: 20, reloadTime: 250),
+
+            // 2_400
+            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 80, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 24, reloadTime: 300,
+                variant: "DESERT_STORM"),
+
+            // 3_000
+            new Weapon(name: "ak47", damage: 20, rof: 150, distance: 80, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 2f, ammo: 120, magazine: 24, reloadTime: 250, variant: "NY22",
+                scope: "scope0"),
+
+            // 3_360
+            new Weapon(name: "ak47", damage: 28, rof: 120, distance: 90, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 3.35f, ammo: 160, magazine: 32, reloadTime: 300, variant: "SNOW",
+                scope: "scope3"),
+
+            // 3_500
+            new Weapon(name: "ak47", damage: 50, rof: 70, distance: 100, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 24, reloadTime: 350, variant: "SURVIVAL",
+                scope: "scope4"),
+
+            // BARRETT =====================================================================================
+            // 300
+            new Weapon(name: "barrett", damage: 100, rof: 3, distance: 200, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600,
+                scope: "scope5"),
+
+            // 375
+            new Weapon(name: "barrett", damage: 125, rof: 3, distance: 150, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
+                scope: "scope5"),
         };
 
         public static readonly List<Weapon> Secondaries = new()
         {
+            // 1_104
+            new Weapon(name: "m1911", damage: 24, rof: 46, distance: 50, type: WeaponType.Secondary,
+                fireAnimation: "gun", zoom: 1.4f, ammo: 56, magazine: 9, reloadTime: 140),
+
+            // 1_472
+            new Weapon(name: "m1911", damage: 32, rof: 46, distance: 50, type: WeaponType.Secondary,
+                fireAnimation: "gun", zoom: 1.55f, ammo: 56, magazine: 11, reloadTime: 160, variant: "MILITARY"),
+
+            // 1_600
+            new Weapon(name: "m1911", damage: 40, rof: 40, distance: 50, type: WeaponType.Secondary,
+                fireAnimation: "gun", zoom: 1.55f, ammo: 77, magazine: 11, reloadTime: 200, variant: "ICE"),
+
+            // 2_250
+            new Weapon(name: "m1911", damage: 75, rof: 30, distance: 50, type: WeaponType.Secondary,
+                fireAnimation: "gun", zoom: 1.55f, ammo: 60, magazine: 5, reloadTime: 160, variant: "GOLD"),
         };
 
         public static readonly List<Weapon> Tertiaries = new()
         {
             new Weapon(name: "shmel", damage: 175, rof: 10 * 5, zoom: 3f, explosionRange: 2.15f,
                 type: WeaponType.Tertiary, ammo: 1,
-                reloadTime: 200, magazine: 1, scope: "shmel", fireAnimation: "gun"),
+                reloadTime: 200, magazine: 1, scope: "scope7", fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()
@@ -79,12 +127,14 @@ namespace Model
         public float Zoom; // ex: 1.5x
         public WeaponType Type;
         [CanBeNull] public string Scope;
+        [CanBeNull] public string Variant;
 
         public Weapon(string name, uint damage, uint rof = 0, uint distance = 0, [CanBeNull] string audio = null,
             [CanBeNull] string fireAnimation = null,
             ushort? magazine = null, ushort? ammo = null, ushort? reloadTime = null,
             WeaponType type = WeaponType.Primary,
-            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope = null)
+            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope = null,
+            string variant = null)
         {
             Name = name;
             Audio = audio ?? name;
@@ -100,9 +150,20 @@ namespace Model
             ExplosionRange = explosionRange;
             ExplosionTime = explosionTime;
             Scope = scope;
+            Variant = variant;
         }
 
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec
         public bool IsGun => Type is WeaponType.Primary or WeaponType.Secondary or WeaponType.Tertiary;
+
+        public string GetPrefab(bool aiming = false) => $"Prefabs/weapons/{(aiming ? "aim/" : "")}{Name.ToUpper()}";
+        public string GetAudioClip => $"Audio/weapons/{Audio.ToUpper()}";
+        public string GetScope => $"Textures/scope/{Scope}";
+
+        public bool HasScope => Scope is not null && int.Parse(Scope.Split("scope")[1]) > 0;
+
+        [CanBeNull]
+        public string GetMaterial =>
+            Variant is null ? null : $"Textures/weapons/Materials/{Name}_{Variant.ToUpper()}";
     }
 }

@@ -57,6 +57,7 @@ namespace Prefabs.Player
         public readonly Dictionary<string, int> Magazine = new();
         [CanBeNull] private Coroutine _reloadingCoroutine;
         private WeaponType _lastWeapon = WeaponType.Primary;
+        [CanBeNull] private Animator weaponAnimator;
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -66,7 +67,7 @@ namespace Prefabs.Player
             {
                 _weaponModel = value;
                 if (value == null) return;
-                _fireClip = Resources.Load<AudioClip>($"Audio/weapons/{value.Audio.ToUpper()}");
+                _fireClip = Resources.Load<AudioClip>(value.GetAudioClip);
                 if (value.Type == WeaponType.Block)
                 {
                     cameraMovement.CanPlace = true;
@@ -87,7 +88,7 @@ namespace Prefabs.Player
             }
         }
 
-        private void Start()
+        public void Start()
         {
             _sm = FindObjectOfType<SceneManager>();
             isAiming = false;
@@ -104,13 +105,19 @@ namespace Prefabs.Player
             if (_weaponModel == null || Time.time - _lastSwitch < 0.25f || _reloadingCoroutine is not null)
                 return;
 
-            // Play audio effect and animation
+            // Play audio effect and crosshair/scope animation
             player.LastShot.Value = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             if (_weaponModel.Type is WeaponType.Block or WeaponType.Melee || Magazine[_weaponModel.Name] > 0)
             {
-                audioSource.PlayOneShot(_fireClip, 0.5f);
+                audioSource.PlayOneShot(_fireClip, 0.6f); // TODO: propagate the sound across the net
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
-                _sm.crosshairAnimator.SetTrigger(Animator.StringToHash("fire"));
+                weaponAnimator?.SetTrigger(Animator.StringToHash("fire"));
+
+                if (_weaponModel.HasScope && isAiming)
+                    _sm.scopeFire.Animate(_weaponModel.Delay, math.clamp(_weaponModel.Damage / 30f, 0.75f, 2.75f));
+                else
+                    _sm.crosshairFire.Animate(_weaponModel.Delay * 0.925f,
+                        math.clamp(_weaponModel.Damage / 30f, 0.75f, 2.5f));
             }
 
             // Handle ammo
@@ -128,7 +135,8 @@ namespace Prefabs.Player
                 if (_weaponModel.Type is WeaponType.Block)
                     _sm.ammoHUD.SetBlocks(Magazine[_weaponModel.Name]);
                 else
-                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], isTertiary: _weaponModel.Type is WeaponType.Tertiary);
+                    _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name],
+                        isTertiary: _weaponModel.Type is WeaponType.Tertiary);
             }
 
             // Add block to map
@@ -140,7 +148,7 @@ namespace Prefabs.Player
             }
 
             // Spawn the weapon effect
-            if (_weaponModel.IsGun)
+            if (_weaponModel.IsGun && !_weaponModel.HasScope)
                 player.SpawnWeaponEffect(_weaponModel!.Type);
 
             if (_weaponModel.Type is WeaponType.Tertiary)
@@ -154,7 +162,7 @@ namespace Prefabs.Player
                     _weaponModel.ExplosionTime!.Value,
                     _weaponModel.ExplosionRange!.Value
                 );
-                
+
                 // Switch to the previous weapon if ran out of ammo
                 if (LeftAmmo[_weaponModel.Name] <= 0)
                     SwitchEquipped(_lastWeapon);
@@ -166,7 +174,7 @@ namespace Prefabs.Player
             var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
 
             // Checks if there was a hit on an enemy
-            var hasHitEnemy=false;
+            var hasHitEnemy = false;
             if (Physics.Raycast(ray, out var hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                 if (hit.collider is not null)
                 {
@@ -175,7 +183,7 @@ namespace Prefabs.Player
 
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
-                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f),
+                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.2f,
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
@@ -212,7 +220,8 @@ namespace Prefabs.Player
                 }
 
             // Checks if there was a hit on the ground
-            if (!hasHitEnemy && Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
+            if (!hasHitEnemy &&
+                Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
                 if (hit.collider is not null)
                 {
                     // Check if the hit block is solid
@@ -222,15 +231,13 @@ namespace Prefabs.Player
 
                     // Spawn damage effect on the block
                     _sm.blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
-                    _sm.blockDigEffect.GetComponent<Renderer>().material =
-                        Resources.Load<Material>(
-                            $"Textures/texturepacks/blockade/Materials/blockade_{block.topID + 1:D1}");
+                    _sm.blockDigEffect.GetComponent<Renderer>().material = Resources.Load<Material>(block.GetMaterial);
                     _sm.blockDigEffect.Play();
                     audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/blocks/{block.AudioClip}"));
 
                     // Broadcast the damage action
                     _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
-                } 
+                }
         }
 
         /// <summary>
@@ -311,7 +318,8 @@ namespace Prefabs.Player
                 _sm.ammoHUD.SetMelee();
             else
                 _sm.ammoHUD
-                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name], weaponType is WeaponType.Tertiary);
+                    .SetAmmo(Magazine[_weaponModel!.Name], LeftAmmo[_weaponModel!.Name],
+                        weaponType is WeaponType.Tertiary);
 
 
             // Play sound and animation
@@ -335,15 +343,22 @@ namespace Prefabs.Player
                 // Load the new weapon prefab
                 foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
                     Destroy(child.gameObject);
-                var go = Resources.Load<GameObject>($"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}");
+                var go = Resources.Load<GameObject>(WeaponModel!.GetPrefab());
                 player.WeaponPrefab = Instantiate(go, transform).Apply(o =>
                 {
+                    // Load the weapon material and the scope
+                    foreach (var mesh in o.GetComponentsInChildren<MeshRenderer>(true))
+                        if (mesh.gameObject.name.Contains("scope"))
+                            mesh.gameObject.SetActive(_weaponModel!.Scope == mesh.gameObject.name);
+                        else if (WeaponModel!.Variant is not null)
+                            mesh.material = Resources.Load<Material>(WeaponModel.GetMaterial);
                     o.layer = LayerMask.NameToLayer("WeaponCamera");
                     o.AddComponent<WeaponSway>();
                     if (WeaponModel.Type == WeaponType.Block)
-                        o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                            $"Textures/texturepacks/blockade/Materials/blockade_{(player.Status.Value.BlockType.sideID + 1):D1}");
+                        o.GetComponent<MeshRenderer>().material =
+                            Resources.Load<Material>(player.Status.Value.BlockType.GetMaterial);
                 });
+                weaponAnimator = player.WeaponPrefab.GetComponentInChildren<Animator>();
             }
         }
 
@@ -352,17 +367,20 @@ namespace Prefabs.Player
         /// </summary>
         public void ToggleAim()
         {
+            if (_reloadingCoroutine is not null)
+                return;
+
             isAiming = !isAiming;
 
             // Disable the crosshair
             _sm.crosshair.gameObject.SetActive(!isAiming);
 
-            if (_weaponModel?.Scope is not null)
+            if (_weaponModel!.HasScope)
             {
                 _sm.scopeContainer.SetActive(isAiming);
                 if (isAiming)
                     _sm.scopeContainer.transform.Find("Scope").GetComponent<Image>().sprite =
-                        Resources.Load<Sprite>($"Textures/scope/{_weaponModel!.Scope}");
+                        Resources.Load<Sprite>(_weaponModel!.GetScope);
                 foreach (var child in transform.parent.GetComponentsInChildren<Transform>(true)
                              .Where(it => it != transform && it != transform.parent))
                     child.gameObject.SetActive(!isAiming);
@@ -374,13 +392,30 @@ namespace Prefabs.Player
                              .Where(it => it != transform && it != transform.parent))
                     Destroy(child.gameObject);
 
-                var go = Resources.Load<GameObject>(
-                    $"Prefabs/weapons/{WeaponModel!.Name.ToUpper()}" + (isAiming ? "_aim" : ""));
-                player.WeaponPrefab = Instantiate(go, isAiming ? transform.parent : transform).Apply(o =>
+                var prefab = Resources.Load<GameObject>(WeaponModel!.GetPrefab(isAiming));
+                player.WeaponPrefab = Instantiate(prefab, isAiming ? transform.parent : transform).Apply(go =>
                 {
-                    o.layer = LayerMask.NameToLayer("WeaponCamera");
-                    o.AddComponent<WeaponSway>();
+                    // Load the weapon material and the scope
+                    var hasDot = false;
+                    foreach (var mesh in go.GetComponentsInChildren<MeshRenderer>(true))
+                        if (mesh.gameObject.name.Contains("scope"))
+                        {
+                            var isRightScope = _weaponModel.Scope == mesh.gameObject.name;
+                            mesh.gameObject.SetActive(isRightScope);
+                            if (isRightScope)
+                                hasDot = mesh.transform.childCount > 0;
+                        }
+                        else if (WeaponModel!.Variant is not null)
+                            mesh.material = Resources.Load<Material>(WeaponModel.GetMaterial);
+
+                    // Hide weapon mesh when aiming with a red dot weapon
+                    if (isAiming && hasDot)
+                        go.GetComponent<MeshRenderer>().enabled = false;
+
+                    go.layer = LayerMask.NameToLayer("WeaponCamera");
+                    go.AddComponent<WeaponSway>();
                 });
+                weaponAnimator = player.WeaponPrefab.GetComponentInChildren<Animator>();
             }
 
             // Set the camera zoom according to the weapon scope
@@ -398,6 +433,11 @@ namespace Prefabs.Player
             if (_reloadingCoroutine is not null || _weaponModel is null ||
                 _weaponModel.Type is WeaponType.Block or WeaponType.Melee)
                 return;
+
+            // Disable any aiming
+            if (isAiming)
+                ToggleAim();
+
             var leftAmmo = LeftAmmo[_weaponModel!.Name];
             if (leftAmmo <= 0) return;
 
@@ -418,7 +458,8 @@ namespace Prefabs.Player
                 var takenAmmo = math.min(leftAmmo, _weaponModel.Magazine!.Value - Magazine[_weaponModel!.Name]);
                 LeftAmmo[_weaponModel!.Name] -= takenAmmo;
                 Magazine[_weaponModel!.Name] += takenAmmo;
-                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name], isTertiary: _weaponModel.Type is WeaponType.Tertiary);
+                _sm.ammoHUD.SetAmmo(Magazine[_weaponModel.Name], LeftAmmo[_weaponModel!.Name],
+                    isTertiary: _weaponModel.Type is WeaponType.Tertiary);
 
                 // Unpause the animator
                 animator.speed = 1;
