@@ -10,7 +10,7 @@
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
-- `Collectables weapons/ammo`
+- ~~Collectables weapons/ammo~~
 - ~~Introduce a secondary weapon~~
 - ~~Add weapon variation based on texture~~
 - ~~Shift to run with stamina bar~~

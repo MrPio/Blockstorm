@@ -32,8 +32,8 @@ namespace VoxelEngine
         [SerializeField] private string mapName = "Harbor";
         private bool _hasRendered;
         [SerializeField] private GameObject collectable;
-        [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints;
-        [NonSerialized] public List<Collectable> SpawnedCollectables;
+        [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
+        [NonSerialized] public List<Collectable> SpawnedCollectables = new();
 
         private void Start()
         {
@@ -269,13 +269,26 @@ namespace VoxelEngine
             var spawnPoints = Resources.Load<GameObject>($"Prefabs/collectablePoints/{Map.name}");
             var transforms = spawnPoints.GetComponentsInChildren<Transform>().Where(it => it != spawnPoints.transform)
                 .ToList();
-            var freeSpawnPoints = transforms.RandomSublist(transforms.Count / 2).ToList();
-            FreeCollectablesSpawnPoints = freeSpawnPoints.Select(it => (NetVector3)it.position).ToList();
-            SpawnedCollectables = transforms.Where(it => !freeSpawnPoints.Contains(it))
-                .Select(point => Instantiate(collectable, point.position, Quaternion.identity)
-                    .GetComponent<Collectable>()).ToList();
-            foreach (var c in SpawnedCollectables)
-                c.Initialize(Model.Collectable.GetRandomCollectable(c.transform.position));
+            FreeCollectablesSpawnPoints = transforms.Select(it => (NetVector3)it.position).ToList();
+            foreach (var collectablesSpawnPoint in
+                     transforms.RandomSublist(transforms.Count / 2).ToList())
+                SpawnCollectableWithID(collectablesSpawnPoint.position, log: false);
+        }
+
+        /// <summary>
+        /// Spawn a collectable at the given ID location, if not already occupied by another collectable.
+        /// This updates `FreeCollectablesSpawnPoints` and `SpawnedCollectables` lists  
+        /// </summary>
+        /// <param name="id"> The id of the new collectable. </param>
+        /// <param name="model"> The collectable model. If not provided, a random collectable will be spawned. </param>
+        public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null, bool log = true)
+        {
+            if (SpawnedCollectables.Any(it => it.Model.ID == id)) return;
+            if (log) Debug.Log($"Spawning collectable at {id}");
+            var newCollectable = Instantiate(collectable, id, Quaternion.identity).GetComponent<Collectable>();
+            SpawnedCollectables.Add(newCollectable);
+            FreeCollectablesSpawnPoints.Remove(id);
+            newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));
         }
     }
 }

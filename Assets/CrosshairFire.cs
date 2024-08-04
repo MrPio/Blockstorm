@@ -51,7 +51,6 @@ public class CrosshairFire : MonoBehaviour
 
     public void Animate(float duration, float intensity)
     {
-        print(intensity);
         _isAnimating = true;
         _acc = 0;
         _duration = duration;

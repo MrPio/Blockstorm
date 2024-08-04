@@ -365,7 +365,7 @@ namespace Prefabs.Player
             else
             {
                 _isRunning.Value = false;
-                if (_usedStamina > 0)
+                if (!Input.GetKey(KeyCode.LeftShift) && _usedStamina > 0)
                 {
                     _usedStamina -= Time.deltaTime * staminaRecoverSpeed;
                     _sm.staminaBar.SetValue(1 - _usedStamina / stamina);

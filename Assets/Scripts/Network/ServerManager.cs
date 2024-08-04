@@ -82,14 +82,16 @@ namespace Network
         [ServerRpc(RequireOwnership = false)]
         public void LootCollectableServerRpc(NetVector3 id)
         {
+            var newId = _sm.worldManager.FreeCollectablesSpawnPoints.RandomItem();
             _sm.worldManager.FreeCollectablesSpawnPoints.Add(id);
             var looted = _sm.worldManager.SpawnedCollectables.First(it => it.Model.ID == id);
             _sm.worldManager.SpawnedCollectables.Remove(looted);
-            Destroy(looted);
+            Destroy(looted.gameObject);
 
-            // TODO: spawn a new one in a pos different from id
+            // Spawn new collectable on the host
+            _sm.worldManager.SpawnCollectableWithID(newId); 
 
-            // Update the clients collectable status
+            // Spawn new collectable on the clients
             _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
                 _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
                 _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());

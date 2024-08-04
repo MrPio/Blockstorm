@@ -102,6 +102,12 @@ namespace Network
         {
             return !(lhs == rhs);
         }
+
+        public override string ToString() => $"{nameof(x)}: {x}, {nameof(y)}: {y}, {nameof(z)}: {z}";
+
+        public override bool Equals(object obj) => base.Equals(obj);
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     /// <summary>
@@ -267,7 +273,6 @@ namespace Network
             Xs = positions.Select(it => it.x).ToArray();
             Ys = positions.Select(it => it.y).ToArray();
             Zs = positions.Select(it => it.z).ToArray();
-            Debug.Log(collectables.Count);
             CollectableTypes = collectables.Select(it => (byte)it.Type).ToArray();
             MedkitTypes = collectables.Select(it => it.MedkitType is null ? (byte)0 : (byte)it.MedkitType).ToArray();
             WeaponNames = collectables.Select(it => (NetString)(it.WeaponItem?.GetNetName ?? "")).ToArray();

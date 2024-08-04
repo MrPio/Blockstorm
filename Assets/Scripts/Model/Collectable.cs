@@ -27,9 +27,9 @@ namespace Model
     {
         private static readonly Dictionary<CollectableType, float> Probabilities = new()
         {
-            { CollectableType.Hp, 0.3f },
-            { CollectableType.Ammo, 0.3f },
-            { CollectableType.Weapon, 0.4f },
+            { CollectableType.Hp, 0.333f },
+            { CollectableType.Ammo, 0.333f },
+            { CollectableType.Weapon, 0.333f },
         };
 
         public static readonly Dictionary<Medkit, ushort> MedkitHps = new()

@@ -28,10 +28,7 @@ namespace Partials
                     return;
                 var networkObject = GetComponent<NetworkObject>();
                 if (networkObject is not null && networkObject.IsOwner)
-                {
-                    print(networkObject.OwnerClientId);
                     networkObject.Despawn();
-                }
                 else
                     Destroy(gameObject);
             }

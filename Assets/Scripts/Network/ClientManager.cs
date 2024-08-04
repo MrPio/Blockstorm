@@ -4,7 +4,9 @@ using System.Linq;
 using Managers;
 using Model;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
+using Collectable = Prefabs.Collectable;
 
 namespace Network
 {
@@ -45,23 +47,29 @@ namespace Network
                 for (var i = 0; i < status.Ids.Length; i++)
                     _sm.worldManager.Map.Blocks[status.Ys[i], status.Xs[i], status.Zs[i]] = status.Ids[i];
 
-                // React on collectable changes
-                collectableStatus.OnValueChanged += (_, newValue) =>
+                void LoadCollectables(CollectablesStatus newStatus)
                 {
-                    var newCollectables = newValue.ToCollectables;
+                    var newCollectables = newStatus.ToCollectables;
                     foreach (var model in newCollectables)
-                    {
-                        if (_sm.worldManager.SpawnedCollectables.Any(it => it.Model.ID == model.ID)) continue;
-                        var collectableGo = Instantiate(collectable, model.ID, Quaternion.identity)
-                            .GetComponent<Prefabs.Collectable>();
-                        _sm.worldManager.SpawnedCollectables.Add(collectableGo);
-                        collectableGo.Initialize(model);
-                    }
+                        _sm.worldManager.SpawnCollectableWithID(model.ID, model);
 
+                    var removed = new List<Collectable>();
                     foreach (var spawnedCollectable in _sm.worldManager.SpawnedCollectables)
-                        if (newCollectables.All(it => it.ID != spawnedCollectable.Model.ID))
-                            Destroy(spawnedCollectable);
-                };
+                        if (newCollectables.All(it =>
+                                it.ID != spawnedCollectable.Model.ID && !spawnedCollectable.IsDestroyed()))
+                        {
+                            print($"Destroying {spawnedCollectable.Model.ID}");
+                            removed.Add(spawnedCollectable);
+                            _sm.worldManager.FreeCollectablesSpawnPoints.Add(spawnedCollectable.Model.ID);
+                            Destroy(spawnedCollectable.gameObject);
+                        }
+
+                    removed.ForEach(it => _sm.worldManager.SpawnedCollectables.Remove(it));
+                }
+
+                // React on collectable changes
+                collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
+                LoadCollectables(collectableStatus.Value);
             }
 
             // Render the map and spawn the player

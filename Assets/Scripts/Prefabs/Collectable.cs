@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
-using ExtensionFunctions;
 using Managers;
 using Model;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using Weapon = Model.Weapon;
 
 namespace Prefabs
 {
+    /// <summary>
+    /// This is not a network object since weapons prefab need to be loaded inside
+    /// </summary>
     public class Collectable : MonoBehaviour
     {
         private SceneManager _sm;
@@ -24,7 +25,7 @@ namespace Prefabs
 
         public Model.Collectable Model;
 
-        public void Initialize(global::Model.Collectable collectable)
+        public void Initialize(Model.Collectable collectable)
         {
             _sm = FindObjectOfType<SceneManager>();
             Model = collectable;
@@ -52,7 +53,7 @@ namespace Prefabs
         private void OnTriggerEnter(Collider other)
         {
             var player = other.gameObject.GetComponentInParent<Player.Player>();
-            if (player.IsOwner)
+            if (player is not null && player.IsOwner)
             {
                 var newStatus = player.Status.Value;
                 player.audioSource.PlayOneShot(lootAudioClip);
@@ -109,6 +110,7 @@ namespace Prefabs
                     player.Status.Value = newStatus;
                 }
 
+                _sm.serverManager.LootCollectableServerRpc(Model.ID);
                 Destroy(gameObject);
             }
         }
