@@ -48,6 +48,7 @@ namespace Prefabs.Player
         [SerializeField] private Transform belly;
         [SerializeField] private Ragdoll ragdoll;
         [SerializeField] private SkinnedMeshRenderer[] bodyMeshes;
+        [SerializeField] private GameObject helmet;
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public List<GameObject> smokes;
@@ -55,6 +56,9 @@ namespace Prefabs.Player
 
         [Header("AudioClips")] [SerializeField]
         public AudioClip walkGeneric;
+
+        [SerializeField] private AudioClip hit;
+        [SerializeField] private AudioClip helmetHit;
 
         [SerializeField] public AudioClip walkMetal;
         [SerializeField] public AudioClip walkWater;
@@ -175,6 +179,13 @@ namespace Prefabs.Player
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
+                
+                // Load the enemy helmet, if any
+                helmet.SetActive(Status.Value.HasHelmet);
+                if (Status.Value.HasHelmet)
+                    helmet.GetComponent<MeshRenderer>().material =
+                        Resources.Load<Material>(
+                            $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
             }
 
             print($"Player {OwnerClientId} joined the session!");
@@ -398,10 +409,28 @@ namespace Prefabs.Player
         [Rpc(SendTo.NotOwner)]
         private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
 
-        [Rpc(SendTo.Owner)]
+        [Rpc(SendTo.Everyone)]
         public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
             float ragdollScale = 1)
         {
+            // Both owner and non-owner hear the hit sound effect
+            audioSource.PlayOneShot(hit);
+
+            // Handle helmet removal
+            if (bodyPart == "head" && Status.Value.HasHelmet)
+            {
+                audioSource.PlayOneShot(helmetHit);
+                if (!IsOwner)
+                {
+                    helmet.GetComponent<BoxCollider>().enabled = true;
+                    helmet.GetComponent<Destroyable>().enabled = true;
+                    helmet.AddComponent<Rigidbody>().AddExplosionForce(math.clamp(damage, 20f, 150f) * 0.25f,
+                        helmet.transform.position, 0.5f);
+                }
+            }
+
+            // Owner only
+            if (!IsOwner) return;
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
 
             // Check if the enemy is allied
@@ -411,6 +440,9 @@ namespace Prefabs.Player
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var newStatus = Status.Value;
             newStatus.Hp -= (int)damage;
+
+            if (bodyPart == "head" && Status.Value.HasHelmet)
+                newStatus.HasHelmet = false;
 
             // Update player's HP
             Status.Value = newStatus;

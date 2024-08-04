@@ -188,7 +188,7 @@ namespace Prefabs.Player
 
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
-                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.025f,
+                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.1f,
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 

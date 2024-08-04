@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExtensionFunctions;
 using JetBrains.Annotations;
 using Model;
 using Unity.Collections;
@@ -134,10 +135,10 @@ namespace Network
             FixedString32Bytes? tertiaryName = null,
             FixedString32Bytes? grenadeName = null)
         {
-            Team = team ?? Team.Yellow;
+            Team = team ?? EnumExtensions.RandomItem<Team>();
             Hp = hp ?? 100;
             Armor = armor ?? 0;
-            HasHelmet = hasHelmet ?? false;
+            HasHelmet = hasHelmet ?? true;
             LeftGrenades = leftGrenades ?? 5;
             HasArmoredBlock = hasArmoredBlock ?? false;
             this.skinName = skinName ?? "soldier";

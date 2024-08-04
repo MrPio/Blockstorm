@@ -1,4 +1,5 @@
 ﻿# TODO
+- Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map
 - React on host disconnect
 - Click to respawn, load spawn camera.
 - Helmet removal on first head Hit + sound
