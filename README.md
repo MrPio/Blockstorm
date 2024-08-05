@@ -4,10 +4,10 @@ An FPS game in the style of Minecraft. This is my first attempt at writing a **v
 in Unity.
 
 <div>
-     <img src="https://github.com/user-attachments/assets/7628268a-8225-457e-aebf-7ae64729517a" width="24.5%"/>
-     <img src="https://github.com/user-attachments/assets/2e8074e3-2208-40bc-b29e-de46f0550b8a" width="24.5%"/>
-     <img src="https://github.com/user-attachments/assets/99a70a98-be7c-4ecb-a639-39c17c39f987" width="24.5%"/>
-     <img src="https://github.com/user-attachments/assets/4ccc262c-ec67-42af-af12-be87df5cf1d9" width="24.5%"/>
+     <img src="https://github.com/user-attachments/assets/7628268a-8225-457e-aebf-7ae64729517a" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/2e8074e3-2208-40bc-b29e-de46f0550b8a" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/99a70a98-be7c-4ecb-a639-39c17c39f987" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/4ccc262c-ec67-42af-af12-be87df5cf1d9" width="23.5%"/>
 </div>
 
 ## 🧊 What is a Voxel Engine?
