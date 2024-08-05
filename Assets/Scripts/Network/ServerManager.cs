@@ -36,7 +36,7 @@ namespace Network
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void RespawnServerRpc(ServerRpcParams rpcParams = default)
+        public void KillPlayerServerRpc(ServerRpcParams rpcParams = default)
         {
             if (!IsServer) return;
             StartCoroutine(Respawn());
@@ -47,10 +47,15 @@ namespace Network
                 yield return new WaitForSeconds(5f / 2f);
                 Destroy(GameObject.FindGameObjectsWithTag("Player").First(it =>
                     it.GetComponent<NetworkObject>().OwnerClientId == rpcParams.Receive.SenderClientId));
-                yield return null;
-                var player = Instantiate(playerPrefab);
-                player.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void RespawnServerRpc(ServerRpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            var player = Instantiate(playerPrefab);
+            player.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -89,7 +94,7 @@ namespace Network
             Destroy(looted.gameObject);
 
             // Spawn new collectable on the host
-            _sm.worldManager.SpawnCollectableWithID(newId); 
+            _sm.worldManager.SpawnCollectableWithID(newId);
 
             // Spawn new collectable on the clients
             _sm.clientManager.collectableStatus.Value = new CollectablesStatus(

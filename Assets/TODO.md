@@ -2,8 +2,6 @@
 - Convert Weapon collectable in weapon level increment! + rarity lights
 - Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map
 - React on host disconnect
-- Click to respawn, load spawn camera.
-- Helmet removal on first head Hit + sound
 - Integrate Lobby service
 - Integrate Relay service
 - Lobby menu
@@ -12,6 +10,8 @@
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
+- ~~Click to respawn, load spawn camera.~~
+- ~~Helmet removal on first head Hit + sound~~
 - ~~Collectables weapons/ammo~~
 - ~~Introduce a secondary weapon~~
 - ~~Add weapon variation based on texture~~

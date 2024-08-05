@@ -30,5 +30,7 @@ namespace UI
             if (hasHelmet is not null)
                 helmetIcon.SetActive(hasHelmet.Value);
         }
+
+        public void Reset() => SetHp(100, true);
     }
 }

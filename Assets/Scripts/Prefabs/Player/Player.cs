@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
@@ -21,6 +22,8 @@ namespace Prefabs.Player
     public class Player : NetworkBehaviour
     {
         private SceneManager _sm;
+
+        #region Serializable
 
         [Header("Params")] [SerializeField] public float speed = 8f;
         [SerializeField] public float stamina = 5f;
@@ -65,6 +68,10 @@ namespace Prefabs.Player
         [SerializeField] public AudioClip walkMetal;
         [SerializeField] public AudioClip walkWater;
 
+        #endregion
+
+        #region Private
+
         private Transform _transform;
         private bool _isGrounded;
         private Vector3 _velocity;
@@ -75,7 +82,11 @@ namespace Prefabs.Player
         private bool isDying;
         private float _usedStamina;
 
-        // Used to set the enemy walking animation
+        #endregion
+
+        #region NetworkVariables
+
+// Used to set the enemy walking animation
         private readonly NetworkVariable<bool> _isWalking = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -107,12 +118,17 @@ namespace Prefabs.Player
         public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        #endregion
+
+        #region Events
+
         public override void OnNetworkSpawn()
         {
             // Listen to network variables based on ownership
             if (IsOwner)
             {
                 Spawn();
+                _sm.spawnCamera.gameObject.SetActive(false);
                 LoadStatus(Status.Value);
                 Status.OnValueChanged += (_, newStatus) => LoadStatus(newStatus);
             }
@@ -196,34 +212,6 @@ namespace Prefabs.Player
             _sm.mipmap.AddPlayerMarker(Status.Value.Team, transform);
         }
 
-        // Owner only
-        private void LoadStatus(PlayerStatus status)
-        {
-            _sm.hpHUD.SetHp(status.Hp, status.HasHelmet);
-            _sm.ammoHUD.SetGrenades(status.LeftGrenades);
-        }
-
-        // Owner only
-        private void Spawn()
-        {
-            _velocity = new Vector3();
-            var spawnPoint =
-                _sm.worldManager.Map.GetRandomSpawnPoint(
-                    Team.Yellow /*Status.Value.Team*/) +
-                Vector3.up * 2f; // TODO: here
-            var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
-            transform.SetPositionAndRotation(spawnPoint, rotation);
-            GetComponent<ClientNetworkTransform>().Interpolate = true;
-
-            // Load the body skin
-            foreach (var bodyMesh in bodyMeshes)
-            {
-                if (bodyMesh.IsDestroyed()) continue;
-                var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
-                bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
-            }
-        }
-
         private void Awake()
         {
             _sm = FindObjectOfType<SceneManager>();
@@ -238,9 +226,6 @@ namespace Prefabs.Player
             // Update the view distance. Render new chunks if needed.
             InvokeRepeating(nameof(UpdateChunks), 0, 1);
         }
-
-        private void UpdateChunks() =>
-            _sm.worldManager.UpdatePlayerPos(_transform.position);
 
         private void Update()
         {
@@ -398,17 +383,51 @@ namespace Prefabs.Player
                 _isCrouching.Value = false;
         }
 
-        public void SpawnWeaponEffect(WeaponType weaponType)
+        /// <summary>
+        /// When the player dies, the serverRpc `RespawnServerRpc` despawn it.
+        /// The owner of that player must switch the spawn camera on and wait for user input to respawn.
+        /// </summary>
+        public override void OnDestroy()
         {
-            var mouth = WeaponPrefab.transform.Find("mouth");
-            if (mouth)
+            if (!IsOwner) return;
+            _sm.spawnCamera.gameObject.SetActive(true);
+            _sm.clickToRespawn.SetActive(true);
+            _sm.hpHUD.Reset();
+        }
+
+        #endregion
+
+        #region OwnerOnly
+
+        private void LoadStatus(PlayerStatus status)
+        {
+            _sm.hpHUD.SetHp(status.Hp, status.HasHelmet);
+            _sm.ammoHUD.SetGrenades(status.LeftGrenades);
+        }
+
+        private void Spawn()
+        {
+            _velocity = new Vector3();
+            var spawnPoint =
+                _sm.worldManager.Map.GetRandomSpawnPoint(
+                    Team.Yellow /*Status.Value.Team*/) +
+                Vector3.up * 2f; // TODO: here
+            var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
+            transform.SetPositionAndRotation(spawnPoint, rotation);
+            GetComponent<ClientNetworkTransform>().Interpolate = true;
+
+            // Load the body skin
+            foreach (var bodyMesh in bodyMeshes)
             {
-                Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation)
-                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
-                if (IsOwner)
-                    SpawnWeaponEffectRpc(weapon.WeaponModel!.Type);
+                if (bodyMesh.IsDestroyed()) continue;
+                var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
+                bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
         }
+
+        #endregion
+
+        #region Rpc
 
         [Rpc(SendTo.NotOwner)]
         private void SpawnWeaponEffectRpc(WeaponType weaponType) => SpawnWeaponEffect(weaponType);
@@ -428,7 +447,7 @@ namespace Prefabs.Player
                         helmet.IsDestroyed() ? cameraTransform.position + Vector3.up * 0.5f : helmet.transform.position,
                         helmet.IsDestroyed() ? cameraTransform.rotation : helmet.transform.rotation)
                     .GetComponent<Rigidbody>();
-                rb.AddExplosionForce(helmet.IsDestroyed() ?400f:700f,
+                rb.AddExplosionForce(helmet.IsDestroyed() ? 400f : 700f,
                     helmet.IsDestroyed()
                         ? cameraTransform.position
                         : helmet.transform.position + VectorExtensions.RandomVector3(-0.6f, 0.6f), 2f);
@@ -467,7 +486,7 @@ namespace Prefabs.Player
             if (newStatus.Hp <= 0)
             {
                 RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
-                _sm.serverManager.RespawnServerRpc();
+                _sm.serverManager.KillPlayerServerRpc();
             }
 
             // Spawn damage circle
@@ -500,6 +519,23 @@ namespace Prefabs.Player
                 gameObject.AddComponent<Rigidbody>().Apply(rb =>
                     rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
                         _transform.position + Vector3.up * 0.5f));
+            }
+        }
+
+        #endregion
+
+        private void UpdateChunks() =>
+            _sm.worldManager.UpdatePlayerPos(_transform.position);
+
+        public void SpawnWeaponEffect(WeaponType weaponType)
+        {
+            var mouth = WeaponPrefab.transform.Find("mouth");
+            if (mouth)
+            {
+                Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation)
+                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
+                if (IsOwner)
+                    SpawnWeaponEffectRpc(weapon.WeaponModel!.Type);
             }
         }
     }

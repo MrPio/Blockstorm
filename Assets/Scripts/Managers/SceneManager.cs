@@ -1,4 +1,5 @@
 ﻿using Network;
+using Prefabs;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
@@ -28,6 +29,9 @@ namespace Managers
         public GameObject scopeContainer;
         public CrosshairFire crosshairFire;
         public CrosshairFire scopeFire;
+        public GameObject clickToRespawn;
+
+        [Header("Cameras")] public SpawnCamera spawnCamera;
 
         [Header("Managers")] public WorldManager worldManager;
         public ClientManager clientManager;

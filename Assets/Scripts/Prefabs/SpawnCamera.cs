@@ -8,7 +8,8 @@ namespace Prefabs
     public class SpawnCamera : MonoBehaviour
     {
         private SceneManager _sm;
-        private void Start()
+
+        public void InitializePosition()
         {
             _sm = FindObjectOfType<SceneManager>();
             var cameraSpawn = _sm.worldManager.Map.cameraSpawns.RandomItem();
@@ -18,8 +19,6 @@ namespace Prefabs
             // Render the map at the current position
             // wm.UpdatePlayerPos(cameraSpawn.position); TODO: enable this when the lobby is done and a menu is created
 
-            // Disable spawn camera on player spawn
-            NetworkManager.Singleton.OnClientConnectedCallback += _ => gameObject.SetActive(false);
         }
     }
 }

@@ -63,7 +63,9 @@ namespace Model
                 if (acc >= p)
                     return new Collectable(key, id,
                         key is CollectableType.Weapon
-                            ? Weapon.Weapons.Where(it => it.Type is not WeaponType.Block and not WeaponType.Melee)
+                            ? Weapon.Weapons.Where(it =>
+                                    (it.IsGun && (it.Type is WeaponType.Tertiary || it.Variant != "")) ||
+                                    it.Type is WeaponType.Grenade)
                                 .ToList().RandomItem()
                             : null,
                         key is CollectableType.Hp
