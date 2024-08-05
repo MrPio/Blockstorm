@@ -18,18 +18,25 @@ namespace UI
         [SerializeField] private GameObject playerStat;
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
+        [SerializeField] private bool isTeamSelector;
         private List<ulong> _lastPlayerIds = new();
 
         private void Start()
         {
             _sm = FindObjectOfType<SceneManager>();
-            transform.GetChild(0).gameObject.SetActive(false);
+            if (!isTeamSelector)
+                transform.GetChild(0).gameObject.SetActive(false);
         }
 
         private void Update()
         {
             if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
                 return;
+            if (isTeamSelector)
+            {
+                InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
+                return;
+            }
 
             if (Input.GetKeyDown(KeyCode.Tab))
             {
