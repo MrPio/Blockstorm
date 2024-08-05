@@ -2578,9 +2578,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1611964766}
     m_Modifications:
+    - target: {fileID: 2831387509390794439, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3030347728686576762, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
       propertyPath: m_Name
       value: DashboardContainer
+      objectReference: {fileID: 0}
+    - target: {fileID: 3030347728686576762, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4255598068347102916, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
       propertyPath: m_Pivot.x
@@ -2660,6 +2668,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4255598068347102916, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9091381549521379233, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
+      propertyPath: gap
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

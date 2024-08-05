@@ -183,8 +183,15 @@ namespace Prefabs.Player
             if (Physics.Raycast(ray, out var hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
                 if (hit.collider is not null)
                 {
+                    var attackedPlayer = hit.transform.GetComponentInParent<Player>();
                     var multiplier = Model.Weapon.BodyPartMultipliers[hit.transform.gameObject.name];
-                    var damage = (uint)(_weaponModel.Damage * multiplier);
+                    var distance = Vector3.Distance(player.transform.position, hit.collider.transform.position);
+                    var distanceFactor =
+                        math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                    var helmetHit = hit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
+
+                    var damage = (uint)(_weaponModel.Damage * multiplier *
+                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.5f : 1f));
 
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
@@ -192,7 +199,6 @@ namespace Prefabs.Player
                         Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
                         Quaternion.Euler(0, Random.Range(-180, 180), 0));
 
-                    var attackedPlayer = hit.transform.GetComponentInParent<Player>();
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
                         // Check if the enemy is allied
@@ -210,6 +216,7 @@ namespace Prefabs.Player
                             {
                                 text.text = damage.ToString();
                                 text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                                text.fontSize += distance > 10f ? distance / 20f + 0.5f : 1f;
                             });
                             damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
 

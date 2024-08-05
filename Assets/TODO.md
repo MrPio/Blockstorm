@@ -1,4 +1,5 @@
 ﻿# TODO
+- Convert Weapon collectable in weapon level increment! + rarity lights
 - Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map
 - React on host disconnect
 - Click to respawn, load spawn camera.

@@ -71,8 +71,8 @@ namespace Model
                 fireAnimation: "gun", zoom: 3.35f, ammo: 160, magazine: 32, reloadTime: 300, variant: "SNOW",
                 scope: "scope3"),
 
-            // 3_500
-            new Weapon(name: "ak47", damage: 50, rof: 70, distance: 100, type: WeaponType.Primary,
+            // 3_000
+            new Weapon(name: "ak47", damage: 50, rof: 60, distance: 100, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 24, reloadTime: 350, variant: "SURVIVAL",
                 scope: "scope4"),
 

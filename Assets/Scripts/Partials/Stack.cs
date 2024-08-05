@@ -36,11 +36,11 @@ namespace Partials
                 accumulator += vertical ? rect.rect.height : rect.rect.width;
             }
 
-            if (childrenToConsider is null)
+            if (childrenToConsider is null || childrenToConsider.Length <= 0)
                 foreach (Transform child in transform)
                     SetChildPos(child);
             else
-                foreach (var child in childrenToConsider.Where(it=>it.gameObject.activeSelf))
+                foreach (var child in childrenToConsider.Where(it => it.gameObject.activeSelf))
                     SetChildPos(child);
         }
 

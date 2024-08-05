@@ -42,6 +42,7 @@ namespace Prefabs.Player
         [SerializeField] private Animator bodyAnimator;
         [SerializeField] private Transform enemyWeaponContainer;
         [SerializeField] public Weapon weapon;
+        [SerializeField] public AudioSource walkAudioSource;
         [SerializeField] public AudioSource audioSource;
         [SerializeField] public Transform cameraTransform;
         [SerializeField] private Transform head;
@@ -53,6 +54,7 @@ namespace Prefabs.Player
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public List<GameObject> smokes;
         [SerializeField] public GameObject circleDamage;
+        [SerializeField] private GameObject helmetPrefab;
 
         [Header("AudioClips")] [SerializeField]
         public AudioClip walkGeneric;
@@ -179,7 +181,7 @@ namespace Prefabs.Player
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
-                
+
                 // Load the enemy helmet, if any
                 helmet.SetActive(Status.Value.HasHelmet);
                 if (Status.Value.HasHelmet)
@@ -205,7 +207,10 @@ namespace Prefabs.Player
         private void Spawn()
         {
             _velocity = new Vector3();
-            var spawnPoint = _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) + Vector3.up * 2f;
+            var spawnPoint =
+                _sm.worldManager.Map.GetRandomSpawnPoint(
+                    Team.Yellow /*Status.Value.Team*/) +
+                Vector3.up * 2f; // TODO: here
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
             GetComponent<ClientNetworkTransform>().Interpolate = true;
@@ -310,31 +315,30 @@ namespace Prefabs.Player
             // Play walk sound
             if (Time.time - _lastWalkCheck > 0.1f)
             {
-                audioSource.pitch = _isRunning.Value ? runMultiplier : 1f;
+                walkAudioSource.pitch = _isRunning.Value ? runMultiplier : 1f;
                 _lastWalkCheck = Time.time;
                 if (_isGrounded && move.magnitude > 0.1f)
                 {
                     var terrainType =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 2));
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position + Vector3.down * 2));
                     var hasWater =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position - Vector3.up * 1))!
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position + Vector3.down * 1))!
                             .name.Contains("water");
 
                     if (terrainType == null)
                         return;
                     var clip = walkGeneric;
-                    if (new List<string> { "iron", "steel" }.Any(it =>
-                            terrainType.name.Contains(it)))
+                    if (new List<string> { "iron", "steel" }.Any(it => terrainType.name.Contains(it)))
                         clip = walkMetal;
                     if (hasWater)
                         clip = walkWater;
-                    if (audioSource.clip != clip)
-                        audioSource.clip = clip;
-                    if (!audioSource.isPlaying)
-                        audioSource.Play();
+                    if (walkAudioSource.clip != clip)
+                        walkAudioSource.clip = clip;
+                    if (!walkAudioSource.isPlaying)
+                        walkAudioSource.Play();
                 }
-                else if (audioSource.isPlaying)
-                    audioSource.Pause();
+                else if (walkAudioSource.isPlaying)
+                    walkAudioSource.Pause();
             }
 
             // Handle inventory weapon switch
@@ -363,7 +367,7 @@ namespace Prefabs.Player
             if (Input.GetKeyDown(KeyCode.R) && (weapon.WeaponModel?.IsGun ?? false))
                 if (weapon.Magazine[weapon.WeaponModel!.GetNetName] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
-                else weapon.audioSource.PlayOneShot(weapon.noAmmoClip);
+                else audioSource.PlayOneShot(weapon.noAmmoClip);
 
             // Handle sprint
             if (Input.GetKey(KeyCode.LeftShift) && _usedStamina < stamina)
@@ -413,35 +417,47 @@ namespace Prefabs.Player
         public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
             float ragdollScale = 1)
         {
+            print($"ClientID {OwnerClientId} is playing sound at position {transform.position.ToString()}");
             // Both owner and non-owner hear the hit sound effect
-            audioSource.PlayOneShot(hit);
-
             // Handle helmet removal
-            if (bodyPart == "head" && Status.Value.HasHelmet)
+            if (bodyPart == "Head" && Status.Value.HasHelmet)
             {
                 audioSource.PlayOneShot(helmetHit);
+
+                var rb = Instantiate(helmetPrefab,
+                        helmet.IsDestroyed() ? cameraTransform.position + Vector3.up * 0.5f : helmet.transform.position,
+                        helmet.IsDestroyed() ? cameraTransform.rotation : helmet.transform.rotation)
+                    .GetComponent<Rigidbody>();
+                rb.AddExplosionForce(helmet.IsDestroyed() ?400f:700f,
+                    helmet.IsDestroyed()
+                        ? cameraTransform.position
+                        : helmet.transform.position + VectorExtensions.RandomVector3(-0.6f, 0.6f), 2f);
+                rb.angularVelocity = VectorExtensions.RandomVector3(-50f, 50f);
+                rb.GetComponent<MeshRenderer>().material =
+                    Resources.Load<Material>(
+                        $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
+
+
                 if (!IsOwner)
-                {
-                    helmet.GetComponent<BoxCollider>().enabled = true;
-                    helmet.GetComponent<Destroyable>().enabled = true;
-                    helmet.AddComponent<Rigidbody>().AddExplosionForce(math.clamp(damage, 20f, 150f) * 0.25f,
-                        helmet.transform.position, 0.5f);
-                }
+                    Destroy(helmet);
+                // damage /= 2; Already halved by Fire()
             }
+            else
+                audioSource.PlayOneShot(hit);
 
             // Owner only
             if (!IsOwner) return;
+            print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
 
             // Check if the enemy is allied
             if (attackerID != OwnerClientId && attacker.Status.Value.Team == Status.Value.Team)
                 return;
 
-            print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var newStatus = Status.Value;
             newStatus.Hp -= (int)damage;
 
-            if (bodyPart == "head" && Status.Value.HasHelmet)
+            if (bodyPart == "Head" && Status.Value.HasHelmet)
                 newStatus.HasHelmet = false;
 
             // Update player's HP

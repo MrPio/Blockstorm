@@ -144,8 +144,8 @@ namespace Network
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
             this.meleeName = meleeName ?? "shovel";
-            this.primaryName = primaryName ?? "ak47:NY22";
-            this.secondaryName = secondaryName ?? "m1911:ICE";
+            this.primaryName = primaryName ?? "ak47:";
+            this.secondaryName = secondaryName ?? "m1911:";
             this.tertiaryName = tertiaryName ?? "shmel";
             this.grenadeName = grenadeName ?? "M61_NY";
         }
