@@ -21,7 +21,7 @@ namespace Network
         });
 
         // Used to update the collectables
-        public readonly NetworkVariable<CollectablesStatus> collectableStatus =
+        public readonly NetworkVariable<CollectablesStatus> CollectableStatus =
             new(new CollectablesStatus
             {
                 Xs = Array.Empty<float>(), Ys = Array.Empty<float>(), Zs = Array.Empty<float>(),
@@ -68,8 +68,8 @@ namespace Network
                 }
 
                 // React on collectable changes
-                collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
-                LoadCollectables(collectableStatus.Value);
+                CollectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
+                LoadCollectables(CollectableStatus.Value);
             }
 
             // Render the map and spawn the player
@@ -79,7 +79,7 @@ namespace Network
             {
                 // Spawn collectables on the server and across the net
                 _sm.worldManager.SpawnCollectables();
-                _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
+                _sm.clientManager.CollectableStatus.Value = new CollectablesStatus(
                     _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
                     _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
             }

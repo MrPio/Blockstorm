@@ -391,6 +391,7 @@ namespace Prefabs.Player
         {
             if (!IsOwner) return;
             _sm.spawnCamera.gameObject.SetActive(true);
+            _sm.spawnCamera.InitializePosition();
             _sm.clickToRespawn.SetActive(true);
             _sm.hpHUD.Reset();
         }

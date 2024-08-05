@@ -97,7 +97,7 @@ namespace Network
             _sm.worldManager.SpawnCollectableWithID(newId);
 
             // Spawn new collectable on the clients
-            _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
+            _sm.clientManager.CollectableStatus.Value = new CollectablesStatus(
                 _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
                 _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
         }

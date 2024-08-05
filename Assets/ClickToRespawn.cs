@@ -10,18 +10,19 @@ using UnityEngine;
 /// </summary>
 public class ClickToRespawn : MonoBehaviour
 {
-    public const float DelayBeforeRespawning = 6f;
+    public const float DelayBeforeRespawning = 5f;
     private SceneManager _sm;
     private List<Transform> _children;
     private bool _canRespawn;
-    
+
     private void Start()
     {
         _sm = FindObjectOfType<SceneManager>();
-        _children = transform.GetComponentsInChildren<Transform>().ToList();
+        _children = transform.GetComponentsInChildren<Transform>().Where(it => it != transform).ToList();
+        HideChildren();
     }
 
-    private void Hide() => _children.ForEach(it => it.gameObject.SetActive(false));
+    private void HideChildren() => _children.ForEach(it => it.gameObject.SetActive(false));
 
     private void Update()
     {
@@ -33,7 +34,8 @@ public class ClickToRespawn : MonoBehaviour
                 Send = new ServerRpcSendParams(),
                 Receive = new ServerRpcReceiveParams { SenderClientId = _sm.clientManager.OwnerClientId }
             });
-            Hide();
+            HideChildren();
+            gameObject.SetActive(false);
             _canRespawn = false;
         }
     }
