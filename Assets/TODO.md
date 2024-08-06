@@ -2,14 +2,14 @@
 - Convert Weapon collectable in weapon level increment! + rarity lights
 - Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map
 - React on host disconnect
-- Integrate Lobby service
-- Integrate Relay service
-- Lobby menu
-- Team selector
 - Take kills & deaths into consideration in dashboard
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
+- `Integrate Lobby service`
+- `Integrate Relay service`
+- `Lobby menu`
+- `Team selector`
 - ~~Click to respawn, load spawn camera.~~
 - ~~Helmet removal on first head Hit + sound~~
 - ~~Collectables weapons/ammo~~

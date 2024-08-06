@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slider: {fileID: 1307483550514411000}
+  inverse: 0
 --- !u!1 &1698289559471290613
 GameObject:
   m_ObjectHideFlags: 0

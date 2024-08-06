@@ -14,8 +14,6 @@ namespace VoxelEngine
 {
     public class WorldManager : MonoBehaviour
     {
-        public static ushort maxPlayers = 32;
-
         public byte BlockTypeIndex(string blockName) =>
             (byte)VoxelData.BlockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 

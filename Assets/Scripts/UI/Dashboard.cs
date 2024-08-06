@@ -34,20 +34,21 @@ namespace UI
                 return;
             if (isTeamSelector)
             {
-                InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
-                return;
+                InvokeRepeating(nameof(DashboardLoop), 0.5f, refreshRate);
             }
-
-            if (Input.GetKeyDown(KeyCode.Tab))
+            else
             {
-                transform.GetChild(0).gameObject.SetActive(true);
-                InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
-            }
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    transform.GetChild(0).gameObject.SetActive(true);
+                    InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
+                }
 
-            if (Input.GetKeyUp(KeyCode.Tab))
-            {
-                transform.GetChild(0).gameObject.SetActive(false);
-                CancelInvoke(nameof(DashboardLoop));
+                if (Input.GetKeyUp(KeyCode.Tab))
+                {
+                    transform.GetChild(0).gameObject.SetActive(false);
+                    CancelInvoke(nameof(DashboardLoop));
+                }
             }
         }
 

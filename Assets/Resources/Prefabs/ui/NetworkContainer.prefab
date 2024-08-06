@@ -323,6 +323,7 @@ MonoBehaviour:
   vertical: 1
   inverse: 1
   refreshOnActivateChange: 0
+  childrenToConsider: []
 --- !u!114 &3116810229137527208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +337,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hostBtn: {fileID: 3213961811596197149}
-  serverBtn: {fileID: 0}
   clientBtn: {fileID: 6338313422236765218}
 --- !u!1 &6779421973317222967
 GameObject:

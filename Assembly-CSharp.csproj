@@ -56,18 +56,19 @@
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\UI\HpHUD.cs" />
     <Compile Include="Assets\Scripts\UI\Dashboard.cs" />
-    <Compile Include="Assets\ClickToRespawn.cs" />
     <Compile Include="Assets\Scripts\Utils\MapConverter.cs" />
     <Compile Include="Assets\Scripts\Partials\NetworkDestroyable.cs" />
     <Compile Include="Assets\Scripts\Utils\ClientNetworkTransform.cs" />
+    <Compile Include="Assets\Scripts\PlayerMarker.cs" />
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
     <Compile Include="Assets\Scripts\Utils\Vector2XZ.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
-    <Compile Include="Assets\CrosshairFire.cs" />
     <Compile Include="Assets\Scripts\Model\Team.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Model\Skin.cs" />
+    <Compile Include="Assets\Scripts\RelayManager.cs" />
+    <Compile Include="Assets\Scripts\Mipmap.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />
@@ -82,24 +83,25 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
     <Compile Include="Assets\Scripts\Model\Collectable.cs" />
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />
-    <Compile Include="Assets\PlayerMarker.cs" />
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
-    <Compile Include="Assets\Mipmap.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
+    <Compile Include="Assets\Scripts\ClickableUI.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
+    <Compile Include="Assets\Scripts\CrosshairFire.cs" />
     <Compile Include="Assets\Scripts\UI\ReloadBar.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />
     <Compile Include="Assets\Scripts\AmmoHUD.cs" />
+    <Compile Include="Assets\Scripts\LobbyManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
-    <Compile Include="Assets\ClickableUI.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
+    <Compile Include="Assets\Scripts\ClickToRespawn.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
@@ -393,6 +395,9 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.nuget.mono-cecil@1.11.4\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="websocket-sharp">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.services.wire@1.2.6\Plugins\websocket-sharp.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -766,6 +771,9 @@
     <Reference Include="Unity.Burst.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Burst.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Services.Core">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
+    </Reference>
     <Reference Include="EasyButtons">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\EasyButtons.dll</HintPath>
     </Reference>
@@ -805,6 +813,12 @@
     <Reference Include="Unity.Netcode.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Services.Core.Environments">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Relay">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Relay.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Multiplayer.Tools.NetStats">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetStats.dll</HintPath>
     </Reference>
@@ -837,6 +851,9 @@
     </Reference>
     <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Analytics">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
@@ -895,6 +912,9 @@
     <Reference Include="Unity.VisualScripting.Core.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Services.QoS">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.QoS.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Runtime">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Runtime.dll</HintPath>
     </Reference>
@@ -930,6 +950,12 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Authentication">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Authentication.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Lobbies">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Lobbies.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
