@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\Prefabs\Player\Player.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Explosive.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\Chunk.cs" />
+    <Compile Include="Assets\UsernameUI.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
@@ -381,6 +382,9 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.services.wire@1.2.6\Plugins\websocket-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
@@ -395,9 +399,6 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.nuget.mono-cecil@1.11.4\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="websocket-sharp">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.services.wire@1.2.6\Plugins\websocket-sharp.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -849,11 +850,11 @@
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Services.Core.Analytics">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Multiplayer.Tools.NetworkProfiler.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.NetworkProfiler.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
@@ -861,14 +862,14 @@
     <Reference Include="Unity.Multiplayer.Tools.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Profiling.Core">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Profiling.Core.dll</HintPath>
+    <Reference Include="Unity.Multiplayer.Tools.Common">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Common.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Multiplayer.Tools.Common">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.Common.dll</HintPath>
+    <Reference Include="Unity.Profiling.Core">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Profiling.Core.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>

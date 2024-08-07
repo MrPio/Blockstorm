@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,7 +9,9 @@ internal enum ActionType
 {
     None,
     ToggleFullScreen,
-    ExitGame
+    ExitGame,
+    EditText,
+    ConfirmEditText
 }
 
 public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -16,11 +19,22 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField] private Color hoverColor;
     [SerializeField] private Image image;
     [SerializeField] private ActionType actionType;
+
+    [Header("EditText")] [SerializeField] private GameObject text;
+    [SerializeField] private GameObject editText;
+    [SerializeField] private GameObject confirmIcon;
+
+    [Header("ConfirmEditText")] [SerializeField]
+    private TextMeshProUGUI editTextText;
+
+    [SerializeField] private UsernameUI usernameUI;
+
     private Color startColor;
 
     private void Start()
     {
-        startColor = image.color;
+        if (image is not null)
+            startColor = image.color;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -43,5 +57,14 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 : FullScreenMode.Windowed;
         if (actionType is ActionType.ExitGame)
             Application.Quit(0);
+        if (actionType is ActionType.EditText)
+        {
+            text.gameObject.SetActive(!text.gameObject.activeSelf);
+            editText.gameObject.SetActive(!text.gameObject.activeSelf);
+            confirmIcon?.gameObject.SetActive(!text.gameObject.activeSelf);
+        }
+
+        if (actionType is ActionType.ConfirmEditText)
+            usernameUI.SaveUsername(editTextText.text);
     }
 }

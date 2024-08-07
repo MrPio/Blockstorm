@@ -17,9 +17,7 @@ namespace VoxelEngine
     {
         public static ISerializer Serializer => JsonSerializer.Instance;
         public const short MaxHeight = 128;
-
-        private static readonly string MapsDir = "maps/";
-
+        
         public string name;
 
         // We assume that we have no more than 256 types of blocks.
@@ -51,7 +49,7 @@ namespace VoxelEngine
             return this;
         }
 
-        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(MapsDir + mapName).DeserializeMap();
+        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName).DeserializeMap();
 
         public BlockType GetBlock(Vector3Int pos) => VoxelData.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
 
