@@ -6,10 +6,12 @@
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
-- `Integrate Lobby service`
-- `Integrate Relay service`
-- `Lobby menu`
+- Add in-game esc menu
 - `Team selector`
+- `Show menu bg while loading + loading sprite`
+- ~~Integrate Lobby service~~
+- ~~Integrate Relay service~~
+- ~~Lobby menu~~
 - ~~Click to respawn, load spawn camera.~~
 - ~~Helmet removal on first head Hit + sound~~
 - ~~Collectables weapons/ammo~~

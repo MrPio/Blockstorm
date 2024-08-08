@@ -18,6 +18,7 @@ namespace Managers
         [Header("Prefabs")] public GameObject playerPrefab;
 
         [Header("UI")] public Canvas worldCanvas;
+        public Canvas uiCanvas;
         public Transform crosshair;
         public Animator crosshairAnimator;
         public Dashboard dashboard;
@@ -32,6 +33,7 @@ namespace Managers
         public CrosshairFire scopeFire;
         public GameObject clickToRespawn;
         public GameObject teamSelector;
+        public UsernameUI usernameUI;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;public SpawnCamera menuCamera;
 

@@ -85,10 +85,10 @@ namespace Network
             }
 
             Debug.Log($"The map {_sm.worldManager.Map.name} was rendered!");
-            _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
+            // _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
         }
 
-        private void OnClientConnected(ulong clientId)
+        /*private void OnClientConnected(ulong clientId)
         {
             Debug.Log("New client connected: " + clientId);
             if (IsServer)
@@ -96,7 +96,7 @@ namespace Network
                 var player = Instantiate(_sm.playerPrefab);
                 player.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
             }
-        }
+        }*/
 
 
         [Rpc(SendTo.Everyone)]

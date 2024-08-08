@@ -1,28 +1,22 @@
-using System;
+using Managers;
 using Managers.Serializer;
 using TMPro;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class UsernameUI : MonoBehaviour
 {
+    private SceneManager _sm;
     [SerializeField] private TextMeshProUGUI usernameText, editUsernameText;
     private ISerializer _serializer;
-    private string _username;
 
-    private void Start()
+    private void Awake()
     {
-        _serializer = BinarySerializer.Instance;
-        try
-        {
-            _username = _serializer.Deserialize<string>($"{ISerializer.ConfigsDir}/username");
-        }
-        catch (Exception e)
-        {
-            SaveUsername($"Player{Random.Range(10, 10000)}");
-        }
+        _sm = FindObjectOfType<SceneManager>();
+    }
 
-        usernameText.text = _username;
+    public void Initialize()
+    {
+        usernameText.text = _sm.lobbyManager.Username;
     }
 
     public void SaveUsername(string username)
@@ -30,9 +24,9 @@ public class UsernameUI : MonoBehaviour
         if (username.Length < 4)
             return;
 
-        _username = username;
-        usernameText.text = _username;
-        _serializer.Serialize(_username, ISerializer.ConfigsDir, "username");
+        _sm.lobbyManager.Username = username;
+        usernameText.text = _sm.lobbyManager.Username;
+        _serializer.Serialize(_sm.lobbyManager.Username, ISerializer.ConfigsDir, "username");
         print("New username saved successfully!");
     }
 }
