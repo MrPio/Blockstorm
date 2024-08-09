@@ -7,6 +7,7 @@ using Model;
 using Network;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 using Collectable = Prefabs.Collectable;
 
@@ -28,7 +29,7 @@ namespace VoxelEngine
         [NonSerialized] public Map Map;
         private Vector3 _playerLastPos;
         [SerializeField] private string mapName = "Harbor";
-        private bool _hasRendered;
+        [NonSerialized] public bool HasRendered;
         [SerializeField] private GameObject collectable;
         [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
         [NonSerialized] public List<Collectable> SpawnedCollectables = new();
@@ -60,7 +61,7 @@ namespace VoxelEngine
                 }
             }
 
-            _hasRendered = true;
+            HasRendered = true;
         }
 
         public bool IsVoxelInWorld(Vector3Int posNorm) =>
@@ -74,7 +75,7 @@ namespace VoxelEngine
         // This is used to update the rendered chunks
         public void UpdatePlayerPos(Vector3 playerPos)
         {
-            if (!_hasRendered || Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
+            if (!HasRendered || Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
                 return;
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)

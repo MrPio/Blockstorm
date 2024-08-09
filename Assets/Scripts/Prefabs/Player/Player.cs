@@ -6,6 +6,7 @@ using Managers;
 using Model;
 using Network;
 using Partials;
+using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -128,7 +129,6 @@ namespace Prefabs.Player
             // Listen to network variables based on ownership
             if (IsOwner)
             {
-                Spawn();
                 _sm.spawnCamera.gameObject.SetActive(false);
                 LoadStatus(Status.Value);
                 Status.OnValueChanged += (_, newStatus) => LoadStatus(newStatus);
@@ -198,13 +198,6 @@ namespace Prefabs.Player
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
-
-                // Load the enemy helmet, if any
-                helmet.SetActive(Status.Value.HasHelmet);
-                if (Status.Value.HasHelmet)
-                    helmet.GetComponent<MeshRenderer>().material =
-                        Resources.Load<Material>(
-                            $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
             }
 
             print($"Player {OwnerClientId} joined the session!");
@@ -231,6 +224,26 @@ namespace Prefabs.Player
         private void Update()
         {
             if (!IsOwner || isDying) return;
+
+            // Show the pause menu
+            if (Input.GetKeyUp(KeyCode.Escape))
+            {
+                if (!_sm.pauseMenu.activeSelf)
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
+
+                _sm.pauseMenu.SetActive(!_sm.pauseMenu.activeSelf);
+            }
+
+            if (_sm.pauseMenu.activeSelf)
+                return;
 
             // Debug: Kill everyone except myself when pressing the L key
             if (Input.GetKeyDown(KeyCode.L))
@@ -380,7 +393,7 @@ namespace Prefabs.Player
                 _isCrouching.Value = true;
             }
 
-            if (Input.GetKeyUp(KeyCode.LeftControl) && _isCrouching.Value)
+            else if (Input.GetKeyUp(KeyCode.LeftControl) && _isCrouching.Value)
                 _isCrouching.Value = false;
         }
 
@@ -409,21 +422,32 @@ namespace Prefabs.Player
             _sm.ammoHUD.SetGrenades(status.LeftGrenades);
         }
 
-        private void Spawn()
+        public void Spawn()
         {
             _velocity = new Vector3();
             var spawnPoint =
                 _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) +
-                Vector3.up * 2f; // TODO: here
+                Vector3.up * 2f;
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
             GetComponent<ClientNetworkTransform>().Interpolate = true;
+
+            // Load the enemy helmet, if any
+            if (!IsOwner)
+            {
+                helmet.SetActive(Status.Value.HasHelmet);
+                if (Status.Value.HasHelmet)
+                    helmet.GetComponent<MeshRenderer>().material =
+                        Resources.Load<Material>(
+                            $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
+            }
 
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)
             {
                 if (bodyMesh.IsDestroyed()) continue;
                 var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
+                print($"Materials/skin/{skinName}");
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
         }
@@ -492,7 +516,7 @@ namespace Prefabs.Player
                 {
                     var newAttackerStats = attacker.Stats.Value;
                     newAttackerStats.Kills += 1;
-                    attacker.Stats.Value = newAttackerStats;
+                    attacker.InitializeRpc((int)attacker.Status.Value.Team, newAttackerStats, false);
                 }
 
                 var newAttackedStats = attacker.Stats.Value;
@@ -533,6 +557,20 @@ namespace Prefabs.Player
                     rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
                         _transform.position + Vector3.up * 0.5f));
             }
+        }
+
+        [Rpc(SendTo.Owner)]
+        public void InitializeRpc(int team, PlayerStats playerStats, bool spawn = true)
+        {
+            // Set Team
+            var newStatus = Status.Value;
+            newStatus.Team = (Team)Enum.GetValues(typeof(Team)).GetValue(team);
+            Status.Value = newStatus;
+
+            // Set Stats
+            Stats.Value = playerStats;
+            if (spawn)
+                Spawn();
         }
 
         #endregion

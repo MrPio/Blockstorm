@@ -201,7 +201,7 @@ namespace Prefabs.Player
 
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
-                        // Check if the enemy is allied
+                        // Check if the enemy is not allied
                         if (attackedPlayer.IsOwner ||
                             attackedPlayer.Status.Value.Team != player.Status.Value.Team)
                         {

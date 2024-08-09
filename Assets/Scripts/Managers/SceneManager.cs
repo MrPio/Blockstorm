@@ -38,6 +38,7 @@ namespace Managers
         public GameObject lobbyMenuUIContainer;
         public GameObject[] lobbyMenuUIs;
         public GameObject loadingBar;
+        public GameObject pauseMenu;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;
         public SpawnCamera menuCamera;
@@ -49,10 +50,15 @@ namespace Managers
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
 
+        private void Start()
+        {
+            InitializeMenu();
+        }
+
         /// <summary>
         /// At the beginning, the user has to choose whether he wants to play as a host or as a client.
         /// </summary>
-        private void Start()
+        public void InitializeMenu()
         {
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(false);
@@ -66,6 +72,7 @@ namespace Managers
             foreach (var lobbyMenuUI in lobbyMenuUIs)
                 lobbyMenuUI.SetActive(true);
             loadingBar.SetActive(false);
+            pauseMenu.SetActive(false);
         }
 
         /// <summary>
@@ -79,6 +86,7 @@ namespace Managers
             foreach (var lobbyMenuUI in lobbyMenuUIs)
                 lobbyMenuUI.SetActive(false);
             loadingBar.SetActive(true);
+            pauseMenu.SetActive(false);
         }
 
         /// <summary>
@@ -97,6 +105,7 @@ namespace Managers
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
             loadingBar.SetActive(false);
+            pauseMenu.SetActive(false);
         }
 
         /// <summary>
@@ -115,6 +124,7 @@ namespace Managers
             lobbyMenuUIContainer.SetActive(false);
             serverManager.RespawnServerRpc((int)team, new PlayerStats(username: lobbyManager.Username));
             loadingBar.SetActive(false);
+            pauseMenu.SetActive(false);
         }
     }
 }

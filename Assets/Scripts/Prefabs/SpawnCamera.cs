@@ -22,7 +22,7 @@ namespace Prefabs
             transform.rotation = Quaternion.Euler(cameraSpawn.rotation);
 
             // Render the map at the current position
-            _sm.worldManager.UpdatePlayerPos(cameraSpawn.position); //TODO: enable this when the lobby is done and a menu is created
+            _sm.worldManager.UpdatePlayerPos(cameraSpawn.position);
 
         }
     }

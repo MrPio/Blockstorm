@@ -1,14 +1,15 @@
 ﻿# TODO
 - Convert Weapon collectable in weapon level increment! + rarity lights
-- Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map
 - React on host disconnect
-- Take kills & deaths into consideration in dashboard
+- Skin and helmet texture not loading for both owner and non-owner. PlayerMarker are of wrong color. 
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
-- Add in-game esc menu
-- `Team selector`
-- `Show menu bg while loading + loading sprite`
+- ~~Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map~~
+- ~~Take kills & deaths into consideration in dashboard~~
+- ~~Add in-game esc menu~~
+- ~~Team selector~~
+- ~~Show menu bg while loading + loading sprite~~
 - ~~Integrate Lobby service~~
 - ~~Integrate Relay service~~
 - ~~Lobby menu~~

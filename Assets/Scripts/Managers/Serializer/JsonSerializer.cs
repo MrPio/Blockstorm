@@ -20,7 +20,10 @@ namespace Managers.Serializer
             File.WriteAllText(path + filename + ".json", JsonUtility.ToJson(obj));
         }
 
-        public T Deserialize<T>(string filePath) =>
-            JsonUtility.FromJson<T>(File.ReadAllText(Path.Combine(Application.persistentDataPath, filePath + ".json")));
+        public T Deserialize<T>(string filePath, T ifNotExist)
+        {
+            var path = Path.Combine(Application.persistentDataPath, filePath + ".json");
+            return !File.Exists(path) ? ifNotExist : JsonUtility.FromJson<T>(File.ReadAllText(path));
+        }
     }
 }

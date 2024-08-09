@@ -23,9 +23,10 @@ namespace Managers.Serializer
             formatter.Serialize(fileStream, obj);
         }
 
-        public T Deserialize<T>(string filePath)
+        public T Deserialize<T>(string filePath, T ifNotExist)
         {
             var path = Path.Combine(Application.persistentDataPath, filePath + ".binary");
+            if (!File.Exists(path)) return ifNotExist;
             var formatter = new BinaryFormatter();
             using var fileStream = new FileStream(path, FileMode.Open);
             var obj = (T)formatter.Deserialize(fileStream);

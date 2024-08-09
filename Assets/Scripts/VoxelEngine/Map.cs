@@ -49,7 +49,7 @@ namespace VoxelEngine
             return this;
         }
 
-        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName).DeserializeMap();
+        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName, null).DeserializeMap();
 
         public BlockType GetBlock(Vector3Int pos) => VoxelData.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
 

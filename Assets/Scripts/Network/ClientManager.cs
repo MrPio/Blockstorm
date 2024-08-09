@@ -73,7 +73,6 @@ namespace Network
             }
 
             // Render the map and spawn the player
-            // TODO: the player should be spawned after team selection
             _sm.worldManager.RenderMap();
             if (IsHost)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
+using Managers.Serializer;
 using Model;
 using Unity.Mathematics;
 using UnityEngine;
@@ -87,10 +88,14 @@ namespace Prefabs.Player
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _transform = transform;
+            SetSensitivity(BinarySerializer.Instance.Deserialize<float>($"{ISerializer.ConfigsDir}/sensitivity", 0.2f));
         }
 
         private void LateUpdate()
         {
+            if (_sm.pauseMenu.activeSelf)
+                return;
+
             var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
             // Handle camera rotation with smoothing
@@ -234,5 +239,12 @@ namespace Prefabs.Player
             _sm.highlightBlock.gameObject.SetActive(false);
             _sm.placeBlock.gameObject.SetActive(false);
         }
+
+        /// <summary>
+        /// Set the camera sensitivity
+        /// </summary>
+        /// <param name="value"> A value normalized in [0, 1]. </param>
+        public void SetSensitivity(float value) =>
+            sensitivity = (value * 4f + 0.25f) * 100f;
     }
 }

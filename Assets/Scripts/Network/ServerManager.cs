@@ -54,20 +54,12 @@ namespace Network
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void RespawnServerRpc(int team,PlayerStats playerStats, ServerRpcParams rpcParams = default)
+        public void RespawnServerRpc(int team, PlayerStats playerStats, ServerRpcParams rpcParams = default)
         {
             if (!IsServer) return;
             var playerGo = Instantiate(playerPrefab);
             playerGo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
-
-            // Set Team
-            var player = playerGo.GetComponent<Player>();
-            var newStatus = player.Status.Value;
-            newStatus.Team = (Team)Enum.GetValues(typeof(Team)).GetValue(team);
-            player.Status.Value = newStatus;
-
-            // Set Stats
-            player.Stats.Value = playerStats;
+            playerGo.GetComponent<Player>().InitializeRpc(team, playerStats);
         }
 
         [ServerRpc(RequireOwnership = false)]
