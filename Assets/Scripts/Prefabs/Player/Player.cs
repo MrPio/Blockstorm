@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
@@ -7,13 +6,11 @@ using Managers;
 using Model;
 using Network;
 using Partials;
-using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using Utils.Unity.Multiplayer.Samples.Utilities.ClientAuthority;
-using VoxelEngine;
 using Random = UnityEngine.Random;
 
 
@@ -86,7 +83,7 @@ namespace Prefabs.Player
 
         #region NetworkVariables
 
-// Used to set the enemy walking animation
+        // Used to set the enemy walking animation
         private readonly NetworkVariable<bool> _isWalking = new(false,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -114,8 +111,12 @@ namespace Prefabs.Player
         public readonly NetworkVariable<NetString> EquippedWeapon = new(new NetString { Message = "" },
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-        // The player status contains all the player information that needs to be shared
+        // The player status contains all the player info that needs to be shared
         public readonly NetworkVariable<PlayerStatus> Status = new(new PlayerStatus(null),
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        // The player stat stores all the info that needs to be showed in the dashboard
+        public readonly NetworkVariable<PlayerStats> Stats = new(new PlayerStats(null),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         #endregion
@@ -393,6 +394,8 @@ namespace Prefabs.Player
             _sm.spawnCamera.gameObject.SetActive(true);
             _sm.spawnCamera.InitializePosition();
             _sm.clickToRespawn.SetActive(true);
+            _sm.clickToRespawn.GetComponent<ClickToRespawn>().PlayerTeam = Status.Value.Team;
+            _sm.clickToRespawn.GetComponent<ClickToRespawn>().PlayerStats = Stats.Value;
             _sm.hpHUD.Reset();
         }
 
@@ -410,8 +413,7 @@ namespace Prefabs.Player
         {
             _velocity = new Vector3();
             var spawnPoint =
-                _sm.worldManager.Map.GetRandomSpawnPoint(
-                    Team.Yellow /*Status.Value.Team*/) +
+                _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) +
                 Vector3.up * 2f; // TODO: here
             var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
             transform.SetPositionAndRotation(spawnPoint, rotation);
@@ -486,6 +488,16 @@ namespace Prefabs.Player
             // Ragdoll
             if (newStatus.Hp <= 0)
             {
+                if (attackerID != OwnerClientId)
+                {
+                    var newAttackerStats = attacker.Stats.Value;
+                    newAttackerStats.Kills += 1;
+                    attacker.Stats.Value = newAttackerStats;
+                }
+
+                var newAttackedStats = attacker.Stats.Value;
+                newAttackedStats.Deaths += 1;
+                Stats.Value = newAttackedStats;
                 RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
                 _sm.serverManager.KillPlayerServerRpc();
             }

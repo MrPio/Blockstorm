@@ -1,4 +1,5 @@
 ﻿using System;
+using Model;
 using Network;
 using Prefabs;
 using UI;
@@ -34,8 +35,12 @@ namespace Managers
         public GameObject clickToRespawn;
         public GameObject teamSelector;
         public UsernameUI usernameUI;
+        public GameObject lobbyMenuUIContainer;
+        public GameObject[] lobbyMenuUIs;
+        public GameObject loadingBar;
 
-        [Header("Cameras")] public SpawnCamera spawnCamera;public SpawnCamera menuCamera;
+        [Header("Cameras")] public SpawnCamera spawnCamera;
+        public SpawnCamera menuCamera;
 
         [Header("Managers")] public WorldManager worldManager;
         public ClientManager clientManager;
@@ -49,6 +54,7 @@ namespace Managers
         /// </summary>
         private void Start()
         {
+            dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(false);
             teamSelector.SetActive(false);
             ammoHUD.gameObject.SetActive(false);
@@ -56,6 +62,23 @@ namespace Managers
             mipmap.gameObject.SetActive(false);
             crosshair.gameObject.SetActive(false);
             menuCamera.gameObject.SetActive(true);
+            lobbyMenuUIContainer.SetActive(true);
+            foreach (var lobbyMenuUI in lobbyMenuUIs)
+                lobbyMenuUI.SetActive(true);
+            loadingBar.SetActive(false);
+        }
+
+        /// <summary>
+        /// When connecting to the lobby.
+        /// </summary>
+        public void InitializeLoading()
+        {
+            dashboard.gameObject.SetActive(false);
+            menuCamera.gameObject.SetActive(true);
+            lobbyMenuUIContainer.SetActive(true);
+            foreach (var lobbyMenuUI in lobbyMenuUIs)
+                lobbyMenuUI.SetActive(false);
+            loadingBar.SetActive(true);
         }
 
         /// <summary>
@@ -63,6 +86,7 @@ namespace Managers
         /// </summary>
         public void InitializeMatch()
         {
+            dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(true);
             spawnCamera.InitializePosition();
             teamSelector.SetActive(true);
@@ -71,13 +95,16 @@ namespace Managers
             mipmap.gameObject.SetActive(true);
             crosshair.gameObject.SetActive(false);
             menuCamera.gameObject.SetActive(false);
+            lobbyMenuUIContainer.SetActive(false);
+            loadingBar.SetActive(false);
         }
 
         /// <summary>
         /// This is called right after the team selection is done and the player is ready to spawn.
         /// </summary>
-        public void InitializeSpawn()
+        public void InitializeSpawn(Team team)
         {
+            dashboard.gameObject.SetActive(true);
             spawnCamera.gameObject.SetActive(false);
             teamSelector.SetActive(false);
             ammoHUD.gameObject.SetActive(true);
@@ -85,6 +112,9 @@ namespace Managers
             mipmap.gameObject.SetActive(true);
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
+            lobbyMenuUIContainer.SetActive(false);
+            serverManager.RespawnServerRpc((int)team, new PlayerStats(username: lobbyManager.Username));
+            loadingBar.SetActive(false);
         }
     }
 }

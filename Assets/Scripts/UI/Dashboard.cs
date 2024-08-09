@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
+using Model;
 using Network;
+using Prefabs.Player;
 using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -20,6 +23,7 @@ namespace UI
         [SerializeField] private float refreshRate = 1f;
         [SerializeField] private bool isTeamSelector;
         private List<ulong> _lastPlayerIds = new();
+        private bool _isLooping;
 
         private void Start()
         {
@@ -32,35 +36,52 @@ namespace UI
         {
             if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsClient)
                 return;
-            if (isTeamSelector)
+            if (isTeamSelector && !_isLooping)
             {
-                InvokeRepeating(nameof(DashboardLoop), 0.5f, refreshRate);
+                _isLooping = true;
+                InvokeRepeating(nameof(UpdateDashboard), 0.5f, refreshRate);
             }
             else
             {
                 if (Input.GetKeyDown(KeyCode.Tab))
                 {
                     transform.GetChild(0).gameObject.SetActive(true);
-                    InvokeRepeating(nameof(DashboardLoop), 0f, refreshRate);
+                    InvokeRepeating(nameof(UpdateDashboard), 0.05f, refreshRate);
                 }
 
                 if (Input.GetKeyUp(KeyCode.Tab))
                 {
                     transform.GetChild(0).gameObject.SetActive(false);
-                    CancelInvoke(nameof(DashboardLoop));
+                    CancelInvoke(nameof(UpdateDashboard));
                 }
             }
         }
 
+        private void OnDisable()
+        {
+            CancelInvoke(nameof(UpdateDashboard));
+        }
+
+        /*
         private void DashboardLoop() =>
             _sm.serverManager.RequestPlayerListServerRpc();
+            */
 
-        public void UpdateDashboard(ulong[] playerIds)
+        public void UpdateDashboard()
         {
-            // Prevent useless update // TODO: also take Kill&Death into consideration!
-            if (playerIds.Length == _lastPlayerIds.Count && playerIds.All(it => _lastPlayerIds.Contains(it)))
-                return;
-            _lastPlayerIds = playerIds.ToList();
+            // Prevent useless update
+            // if (playerIds.Length == _lastPlayerIds.Count && playerIds.All(it => _lastPlayerIds.Contains(it)))
+            //     return;
+            // _lastPlayerIds = playerIds.ToList();
+            foreach (Transform child in redStats)
+                if (child is not null && !child.IsDestroyed())
+                    Destroy(child.gameObject);
+            foreach (Transform child in blueStats)
+                if (child is not null && !child.IsDestroyed())
+                    Destroy(child.gameObject);
+            foreach (Transform child in greenStats)
+                if (child is not null && !child.IsDestroyed())
+                    Destroy(child.gameObject);
             foreach (Transform child in yellowStats)
                 if (child is not null && !child.IsDestroyed())
                     Destroy(child.gameObject);
@@ -72,13 +93,24 @@ namespace UI
             {
                 // Wait for the next frame to ensure that the garbage collector has destroyed the last game objects
                 yield return null;
-                foreach (var client in playerIds)
+                var players = FindObjectsOfType<Player>();
+                print(players.Length);
+                foreach (var player in players)
                 {
-                    // var playerObject = client.PlayerObject; | TODO: use playerObject.name as players' username 
-                    var stat = Instantiate(playerStat, yellowStats);
-                    stat.name = client.ToString();
-                    stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().text =
-                        client.ToString();
+                    var stat = Instantiate(playerStat,
+                        player.Status.Value.Team switch
+                        {
+                            Team.Red => redStats,
+                            Team.Blue => blueStats,
+                            Team.Green => greenStats,
+                            _ => yellowStats
+                        });
+                    stat.name = $"{player.Stats.Value.Username.Value} ({player.OwnerClientId})";
+                    stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().text = stat.name;
+                    stat.transform.Find("KillsText").GetComponent<TextMeshProUGUI>().text =
+                        player.Stats.Value.Kills.ToString();
+                    stat.transform.Find("DeathsText").GetComponent<TextMeshProUGUI>().text =
+                        player.Stats.Value.Deaths.ToString();
                 }
 
                 yellowStats.GetComponent<Stack>().UpdateUI();

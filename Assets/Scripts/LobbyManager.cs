@@ -63,7 +63,7 @@ public class LobbyManager : MonoBehaviour
         {
             Username = BinarySerializer.Instance.Deserialize<string>($"{ISerializer.ConfigsDir}/username");
         }
-        catch (Exception e)
+        catch
         {
             Username = $"Player{Random.Range(10, 10000)}";
         }
@@ -112,7 +112,8 @@ public class LobbyManager : MonoBehaviour
             if (password is not null && password.Length >= 8)
                 options.Password = password;
             _hostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
-            InvokeRepeating(nameof(SendHeartbeat), 1f, 15f);
+            _joinedLobby = _hostedLobby;
+            InvokeRepeating(nameof(SendHeartbeat), 1f, HeartbeatRate);
             Debug.Log($"Lobby '{_hostedLobby.Name}' created!");
             CancelInvoke(nameof(UpdateLobbies));
             return true;
@@ -138,7 +139,6 @@ public class LobbyManager : MonoBehaviour
 
         await LobbyService.Instance.RemovePlayerAsync(_joinedLobby.Id, AuthenticationService.Instance.PlayerId);
         _joinedLobby = null;
-        CancelInvoke(nameof(SendHeartbeat));
         // TODO: goto main menu reloading scene
     }
 
@@ -185,7 +185,6 @@ public class LobbyManager : MonoBehaviour
             {
                 Player = GetPlayerOptions(),
             };
-            print(password);
             if (password is not null && password.Length >= 8)
                 options.Password = password;
             _joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
@@ -269,5 +268,11 @@ public class LobbyManager : MonoBehaviour
             $"Players in Lobby: {lobby.Name}. Game mode: {lobby.Data["game_mode"].Value}. Map: {lobby.Data["map"].Value}");
         foreach (var player in lobby.Players)
             Debug.Log(player.Id + " " + player.Data["username"].Value);
+    }
+
+    private async void OnDestroy()
+    {
+        print("exiting...");
+        await LeaveHostedLobby(_hostedLobby is not null);
     }
 }

@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\VoxelEngine\Map.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\BinarySerializer.cs" />
-    <Compile Include="Assets\Scripts\UI\NetworkContainerUI.cs" />
     <Compile Include="Assets\Scripts\Partials\Activable.cs" />
     <Compile Include="Assets\Scripts\Model\BlockType.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />

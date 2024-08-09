@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &30371038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,6 +1037,98 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
+--- !u!1 &438975014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 438975015}
+  - component: {fileID: 438975018}
+  - component: {fileID: 438975017}
+  - component: {fileID: 438975016}
+  m_Layer: 5
+  m_Name: LoadingBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &438975015
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438975014}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8869650043817267658}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 100}
+  m_SizeDelta: {x: 1200, y: 80}
+  m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &438975016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438975014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
+--- !u!114 &438975017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438975014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.9389164, b: 0.36163503, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 8278109db0197ea4a9cf0047193e273d, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 1
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &438975018
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438975014}
+  m_CullTransparentMesh: 1
 --- !u!1 &446706962
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,6 +1380,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 3815914871319004005, guid: 8695a75cd5e12fe4fa9a5e2e6715d4f6, type: 3}
+  team: 0
 --- !u!1 &615195509 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1853273690430706871, guid: d3bdb6ca66fa34d4293f6cc347cfe4e0, type: 3}
@@ -1555,6 +1648,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!114 &851381157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2138,6 +2232,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!1 &1093697059
 GameObject:
   m_ObjectHideFlags: 0
@@ -2738,7 +2833,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1404352926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3195,6 +3290,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!224 &1606958426 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4255598068347102916, guid: f06a6149e6d801f42b5e3dfe34cb13f5, type: 3}
@@ -4083,6 +4179,12 @@ MonoBehaviour:
   clickToRespawn: {fileID: 615195509}
   teamSelector: {fileID: 37796937}
   usernameUI: {fileID: 1434921999}
+  lobbyMenuUIContainer: {fileID: 682420289426269794}
+  lobbyMenuUIs:
+  - {fileID: 1688129905}
+  - {fileID: 1152843761}
+  - {fileID: 1245816091}
+  loadingBar: {fileID: 438975014}
   spawnCamera: {fileID: 1404352930}
   menuCamera: {fileID: 30371038}
   worldManager: {fileID: 958774638}
@@ -4469,6 +4571,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!114 &2032177176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4495,6 +4598,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!1 &2035971377 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7062441996812234007, guid: 8677a676f767d72488e3b00b13647c7a, type: 3}
@@ -5914,6 +6018,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1611964766}
     m_Modifications:
+    - target: {fileID: 21992904023337645, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: team
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 21992904023337645, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: actionType
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 199851957496329505, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: actionType
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2921076338428488182, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: m_Name
+      value: Title
+      objectReference: {fileID: 0}
+    - target: {fileID: 3250834470020102681, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: team
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3250834470020102681, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: actionType
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 3634963686076159989, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: team
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3634963686076159989, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
+      propertyPath: actionType
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 7095150230886109855, guid: d211c9dd6cc928344a44278cc1aa3aa5, type: 3}
       propertyPath: m_Name
       value: TeamSelectionContainer
@@ -6086,6 +6222,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 958438274}
+  - {fileID: 438975015}
   - {fileID: 1688129906}
   - {fileID: 1152843762}
   - {fileID: 1245816092}

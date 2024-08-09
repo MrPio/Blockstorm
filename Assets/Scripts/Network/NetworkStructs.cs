@@ -118,7 +118,7 @@ namespace Network
     {
         public Team Team;
         public int Hp, Armor;
-        public bool HasHelmet; // TODO: handle helmet removal
+        public bool HasHelmet;
         public byte LeftGrenades;
         public bool HasArmoredBlock;
 
@@ -250,6 +250,31 @@ namespace Network
             serializer.SerializeValue(ref secondaryName);
             serializer.SerializeValue(ref tertiaryName);
             serializer.SerializeValue(ref grenadeName);
+        }
+    }
+
+    /// <summary>
+    /// The player info that needs to be showed in the dashboard.
+    /// </summary>
+    public struct PlayerStats : INetworkSerializable
+    {
+        public ushort Kills, Deaths;
+        public FixedString32Bytes Username;
+
+
+        public PlayerStats(ushort? kills = null, ushort? deaths = null,
+            FixedString32Bytes? username = null)
+        {
+            Kills = kills ?? 0;
+            Deaths = deaths ?? 0;
+            Username = username ?? "Guest";
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Kills);
+            serializer.SerializeValue(ref Deaths);
+            serializer.SerializeValue(ref Username);
         }
     }
 

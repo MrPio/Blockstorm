@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Managers;
+using Model;
+using Network;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,6 +17,8 @@ public class ClickToRespawn : MonoBehaviour
     private SceneManager _sm;
     private List<Transform> _children;
     private bool _canRespawn;
+    [NonSerialized] public Team PlayerTeam;
+    [NonSerialized] public PlayerStats PlayerStats;
 
     private void Start()
     {
@@ -29,11 +34,12 @@ public class ClickToRespawn : MonoBehaviour
         if (!_canRespawn) return;
         if (Input.GetMouseButtonDown(0))
         {
-            _sm.serverManager.RespawnServerRpc(new ServerRpcParams
-            {
-                Send = new ServerRpcSendParams(),
-                Receive = new ServerRpcReceiveParams { SenderClientId = _sm.clientManager.OwnerClientId }
-            });
+            _sm.serverManager.RespawnServerRpc((int)PlayerTeam, new PlayerStats(username:_sm.lobbyManager.Username),
+                rpcParams: new ServerRpcParams
+                {
+                    Send = new ServerRpcSendParams(),
+                    Receive = new ServerRpcReceiveParams { SenderClientId = _sm.clientManager.OwnerClientId }
+                });
             HideChildren();
             gameObject.SetActive(false);
             _canRespawn = false;

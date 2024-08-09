@@ -24,7 +24,7 @@ public class UsernameUI : MonoBehaviour
         if (username.Length < 4)
             return;
 
-        _sm.lobbyManager.Username = username;
+        _sm.lobbyManager.Username = username.Length > 31 ? username[..31] : username;
         usernameText.text = _sm.lobbyManager.Username;
         _serializer.Serialize(_sm.lobbyManager.Username, ISerializer.ConfigsDir, "username");
         print("New username saved successfully!");

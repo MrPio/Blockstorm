@@ -99,12 +99,12 @@ namespace Network
         }*/
 
 
-        [Rpc(SendTo.Everyone)]
+        /*[Rpc(SendTo.Everyone)]
         public void SendPlayerListRpc(ulong[] playerIds, ulong clientId)
         {
             if (NetworkManager.Singleton.LocalClientId != clientId) return;
             _sm.dashboard.UpdateDashboard(playerIds);
-        }
+        }*/
 
         /// <summary>
         /// Used to propagate the placement of a block through the network.

@@ -1,5 +1,6 @@
 using System;
 using Managers;
+using Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +19,8 @@ internal enum ActionType
     JoinPrivateLobbyMessagebox,
     NewLobby,
     NewLobbyMessagebox,
-    CloseMessageBox
+    CloseMessageBox,
+    SelectTeam,
 }
 
 public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -50,6 +52,9 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     [Header("NewLobbyMessagebox")] [SerializeField]
     private GameObject newLobbyMessagebox;
+
+    [Header("SelectTeam")] [SerializeField]
+    private Team team;
 
     [NonSerialized] public string LobbyCode;
     private Color startColor;
@@ -87,6 +92,7 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             Application.Quit(0);
         if (actionType is ActionType.JoinLobby)
         {
+            _sm.InitializeLoading();
             var success = await _sm.lobbyManager.JoinLobby(LobbyCode);
             if (success)
                 _sm.InitializeMatch();
@@ -105,13 +111,12 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             usernameUI.SaveUsername(editTextText.text);
         if (actionType is ActionType.JoinPrivateLobby && joinSessionCodeText.text.Length > 3)
         {
+            Destroy(transform.parent.parent.gameObject);
+            _sm.InitializeLoading();
             var success = await _sm.lobbyManager.JoinLobby(joinSessionCodeText.text,
                 password: joinSessionPasswordText.text.Length <= 0 ? null : joinSessionPasswordText.text);
             if (success)
-            {
-                Destroy(transform.parent.parent.gameObject);
                 _sm.InitializeMatch();
-            }
         }
 
         if (actionType is ActionType.JoinPrivateLobbyMessagebox)
@@ -119,18 +124,20 @@ public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         if (actionType is ActionType.NewLobby)
         {
+            Destroy(transform.parent.parent.gameObject);
+            _sm.InitializeLoading();
             var relayCode = await _sm.relayManager.CreateRelay();
             var success = await _sm.lobbyManager.CreateLobby(newLobbyMap.text, relayCode,
                 password: newLobbyPassword.text.Length <= 0 ? null : newLobbyPassword.text,
                 map: newLobbyMap.text);
             if (success)
-            {
-                Destroy(transform.parent.parent.gameObject);
                 _sm.InitializeMatch();
-            }
         }
 
         if (actionType is ActionType.NewLobbyMessagebox)
             Instantiate(newLobbyMessagebox, _sm.uiCanvas.transform);
+
+        if (actionType is ActionType.SelectTeam)
+            _sm.InitializeSpawn(team);
     }
 }

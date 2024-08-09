@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using ExtensionFunctions;
 using Managers;
+using Model;
 using Prefabs;
+using Prefabs.Player;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -27,13 +30,13 @@ namespace Network
             _sm = FindObjectOfType<SceneManager>();
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        /*[ServerRpc(RequireOwnership = false)]
         public void RequestPlayerListServerRpc(ServerRpcParams rpcParams = default)
         {
             if (!IsServer) return;
             var players = NetworkManager.Singleton.ConnectedClientsList.Select(it => it.ClientId);
             _sm.clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
-        }
+        }*/
 
         [ServerRpc(RequireOwnership = false)]
         public void KillPlayerServerRpc(ServerRpcParams rpcParams = default)
@@ -44,18 +47,27 @@ namespace Network
 
             IEnumerator Respawn()
             {
-                yield return new WaitForSeconds(5f / 2f);
+                yield return new WaitForSeconds(4f);
                 Destroy(GameObject.FindGameObjectsWithTag("Player").First(it =>
                     it.GetComponent<NetworkObject>().OwnerClientId == rpcParams.Receive.SenderClientId));
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void RespawnServerRpc(ServerRpcParams rpcParams = default)
+        public void RespawnServerRpc(int team,PlayerStats playerStats, ServerRpcParams rpcParams = default)
         {
             if (!IsServer) return;
-            var player = Instantiate(playerPrefab);
-            player.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
+            var playerGo = Instantiate(playerPrefab);
+            playerGo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
+
+            // Set Team
+            var player = playerGo.GetComponent<Player>();
+            var newStatus = player.Status.Value;
+            newStatus.Team = (Team)Enum.GetValues(typeof(Team)).GetValue(team);
+            player.Status.Value = newStatus;
+
+            // Set Stats
+            player.Stats.Value = playerStats;
         }
 
         [ServerRpc(RequireOwnership = false)]
