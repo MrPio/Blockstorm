@@ -36,7 +36,7 @@ namespace UI
             if (!_canRespawn) return;
             if (Input.GetMouseButtonDown(0))
             {
-                _sm.serverManager.RespawnServerRpc((int)PlayerTeam, PlayerStats,
+                _sm.serverManager.RespawnServerRpc((byte)PlayerTeam, PlayerStats,
                     rpcParams: new ServerRpcParams
                     {
                         Send = new ServerRpcSendParams(),

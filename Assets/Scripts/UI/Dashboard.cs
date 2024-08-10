@@ -41,7 +41,7 @@ namespace UI
                 _isLooping = true;
                 InvokeRepeating(nameof(UpdateDashboard), 0.5f, refreshRate);
             }
-            else
+            else if (!isTeamSelector)
             {
                 if (Input.GetKeyDown(KeyCode.Tab))
                 {
@@ -94,11 +94,10 @@ namespace UI
                 // Wait for the next frame to ensure that the garbage collector has destroyed the last game objects
                 yield return null;
                 var players = FindObjectsOfType<Player>();
-                print(players.Length);
                 foreach (var player in players)
                 {
                     var stat = Instantiate(playerStat,
-                        player.Status.Value.Team switch
+                        player.Team switch
                         {
                             Team.Red => redStats,
                             Team.Blue => blueStats,

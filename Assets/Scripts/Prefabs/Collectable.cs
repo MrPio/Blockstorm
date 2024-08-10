@@ -74,7 +74,9 @@ namespace Prefabs
                         newStatus.LeftGrenades += (byte)Random.Range(1, 4);
                     else if (player.weapon.LeftAmmo.ContainsKey(Model.WeaponItem!.GetNetName))
                         player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] +=
-                            (int)(Model.WeaponItem.Ammo!.Value / Random.Range(2f, 4f));
+                            Model.WeaponItem!.Type is WeaponType.Tertiary
+                                ? Random.Range(1, 3)
+                                : (int)(Model.WeaponItem.Ammo!.Value / Random.Range(2f, 4f));
                     else
                     {
                         player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Ammo!.Value;
@@ -106,7 +108,8 @@ namespace Prefabs
                 }
                 else if (Model.Type is CollectableType.Hp)
                 {
-                    newStatus.Hp = math.min(100, newStatus.Hp + global::Model.Collectable.MedkitHps[Model.MedkitType!.Value]);
+                    newStatus.Hp = math.min(100,
+                        newStatus.Hp + global::Model.Collectable.MedkitHps[Model.MedkitType!.Value]);
                     player.Status.Value = newStatus;
                 }
 

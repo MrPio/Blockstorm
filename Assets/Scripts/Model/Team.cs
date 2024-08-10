@@ -8,7 +8,8 @@ namespace Model
         Red,
         Blue,
         Green,
-        Yellow
+        Yellow,
+        None,
     }
 
     public static class TeamData

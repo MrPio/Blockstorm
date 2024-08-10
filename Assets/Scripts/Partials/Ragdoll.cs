@@ -25,7 +25,6 @@ namespace Partials
         public void ApplyForce(string bodyPart, Vector3 force)
         {
             SetRagdollState(true);
-            print(force);
             foreach (var body in ragdollBodies.Where(it => it.gameObject.name == bodyPart))
                 body.AddForce(force, ForceMode.Impulse);
         }

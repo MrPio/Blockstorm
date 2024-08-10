@@ -65,7 +65,7 @@ namespace Managers
             _sm.usernameUI.Initialize();
 
             var options = new InitializationOptions();
-            // options.SetProfile($"Player{Random.Range(10, 10000)}" /*Username*/); // TODO
+            // options.SetProfile(Username); // TODO
             await UnityServices.InitializeAsync(options);
             if (AuthenticationService.Instance.IsSignedIn)
                 AuthenticationService.Instance.SignOut();
@@ -105,7 +105,6 @@ namespace Managers
                         { "relay_code", new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
                     }
                 };
-                print(options.Player.Id);
                 if (password is not null && password.Length >= 8)
                     options.Password = password;
                 _hostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
@@ -283,7 +282,7 @@ namespace Managers
             }
         }
 
-        private Player GetPlayerOptions() => new(id:AuthenticationService.Instance.PlayerId)
+        private Player GetPlayerOptions() => new(id: AuthenticationService.Instance.PlayerId)
         {
             Data = new Dictionary<string, PlayerDataObject>
             {

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Managers;
 using Model;
+using Prefabs.Player;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +12,7 @@ namespace UI
         private SceneManager _sm;
         [SerializeField] private GameObject playerMarker;
         private Transform _player;
+        private Dictionary<ulong, PlayerMarker> spawnedMarkers = new();
 
         private void Start()
         {
@@ -26,7 +29,11 @@ namespace UI
         public void AddPlayerMarker(Team team, Transform player)
         {
             var go = Instantiate(playerMarker, transform);
-            go.GetComponent<PlayerMarker>().player = player;
+            var playerId = player.GetComponent<Player>().OwnerClientId;
+            if (spawnedMarkers.TryGetValue(playerId, out var marker))
+                Destroy(marker.gameObject);
+            spawnedMarkers[playerId] = go.GetComponent<PlayerMarker>();
+            spawnedMarkers[playerId].player = player;
             go.GetComponent<Image>().color = TeamData.Colors[team];
         }
     }

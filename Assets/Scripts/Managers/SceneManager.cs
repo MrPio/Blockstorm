@@ -122,7 +122,7 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            serverManager.RespawnServerRpc((int)team, new PlayerStats(username: lobbyManager.Username));
+            serverManager.RespawnServerRpc((byte)team, new PlayerStats(username: lobbyManager.Username));
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
         }

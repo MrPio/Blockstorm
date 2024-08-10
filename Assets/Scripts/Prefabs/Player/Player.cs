@@ -79,6 +79,9 @@ namespace Prefabs.Player
         [NonSerialized] public GameObject WeaponPrefab;
         private bool isDying;
         private float _usedStamina;
+        private PlayerStats _playerStats;
+        private byte _teamIndex;
+        private float _startTime = float.PositiveInfinity;
 
         #endregion
 
@@ -97,7 +100,7 @@ namespace Prefabs.Player
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to disable the enemy walking animation
-        public readonly NetworkVariable<long> LastShot = new(0,
+        private readonly NetworkVariable<long> LastShot = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to play the weapon sound
@@ -120,6 +123,16 @@ namespace Prefabs.Player
         public readonly NetworkVariable<PlayerStats> Stats = new(new PlayerStats(null),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        // The player team
+        private readonly NetworkVariable<byte> TeamIndex = new(4,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        public Team Team
+        {
+            get => (Team)Enum.GetValues(typeof(Team)).GetValue(TeamIndex.Value);
+            set => TeamIndex.Value = (byte)value;
+        }
+
         #endregion
 
         #region Events
@@ -129,6 +142,7 @@ namespace Prefabs.Player
             // Listen to network variables based on ownership
             if (IsOwner)
             {
+                _startTime = Time.time;
                 _sm.spawnCamera.gameObject.SetActive(false);
                 LoadStatus(Status.Value);
                 Status.OnValueChanged += (_, newStatus) => LoadStatus(newStatus);
@@ -170,7 +184,7 @@ namespace Prefabs.Player
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
-                    print($"Player {OwnerClientId} has equipped {newValue.Message}");
+                    print($"[EquippedWeapon.OnValueChanged] Player {OwnerClientId} has equipped {newValue.Message}");
                     var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
                     if (weaponModel is null)
                         return;
@@ -182,7 +196,7 @@ namespace Prefabs.Player
                         o.AddComponent<WeaponSway>();
                         if (weaponModel.Type is WeaponType.Block)
                             o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                                $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType.sideID + 1):D1}");
+                                $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType(Team).sideID + 1):D1}");
                     });
 
                     // Load materials
@@ -198,12 +212,13 @@ namespace Prefabs.Player
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);
                 };
+                TeamIndex.OnValueChanged +=
+                    (_, newValue) => Spawn((Team)Enum.GetValues(typeof(Team)).GetValue(newValue), false);
+                // if (TeamIndex.Value < 4)
+                //     Spawn((Team)Enum.GetValues(typeof(Team)).GetValue(TeamIndex.Value), false);
             }
 
-            print($"Player {OwnerClientId} joined the session!");
-
-            // Add the player to the mipmap
-            _sm.mipmap.AddPlayerMarker(Status.Value.Team, transform);
+            print($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
         }
 
         private void Awake()
@@ -224,6 +239,14 @@ namespace Prefabs.Player
         private void Update()
         {
             if (!IsOwner || isDying) return;
+            if (Time.time - _startTime > 1f)
+            {
+                TeamIndex.Value = 4;
+                TeamIndex.Value = _teamIndex;
+                Stats.Value = new PlayerStats(null);
+                Stats.Value = _playerStats;
+                _startTime = float.PositiveInfinity;
+            }
 
             // Show the pause menu
             if (Input.GetKeyUp(KeyCode.Escape))
@@ -309,7 +332,7 @@ namespace Prefabs.Player
                     MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
             if (pos.y < 0.85)
-                Spawn();
+                Spawn(Team);
 
             // Play walk sound
             if (Time.time - _lastWalkCheck > 0.1f)
@@ -407,7 +430,7 @@ namespace Prefabs.Player
             _sm.spawnCamera.gameObject.SetActive(true);
             _sm.spawnCamera.InitializePosition();
             _sm.clickToRespawn.SetActive(true);
-            _sm.clickToRespawn.GetComponent<ClickToRespawn>().PlayerTeam = Status.Value.Team;
+            _sm.clickToRespawn.GetComponent<ClickToRespawn>().PlayerTeam = Team;
             _sm.clickToRespawn.GetComponent<ClickToRespawn>().PlayerStats = Stats.Value;
             _sm.hpHUD.Reset();
         }
@@ -422,15 +445,28 @@ namespace Prefabs.Player
             _sm.ammoHUD.SetGrenades(status.LeftGrenades);
         }
 
-        public void Spawn()
+        /// <summary>
+        /// The owner spawns the player, adds it to the mipmap and loads the right arm skin texture.
+        /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
+        /// </summary>
+        private void Spawn(Team team, bool spawn = true)
         {
-            _velocity = new Vector3();
-            var spawnPoint =
-                _sm.worldManager.Map.GetRandomSpawnPoint(Status.Value.Team) +
-                Vector3.up * 2f;
-            var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
-            transform.SetPositionAndRotation(spawnPoint, rotation);
-            GetComponent<ClientNetworkTransform>().Interpolate = true;
+            Debug.Log($"[Spawn] Spawning IsOwner={IsOwner}, team = {team.ToString()}");
+
+            // Spawn the player
+            if (IsOwner && spawn)
+            {
+                _velocity = new Vector3();
+                var spawnPoint =
+                    _sm.worldManager.Map.GetRandomSpawnPoint(team) +
+                    Vector3.up * 2f;
+                var rotation = Quaternion.Euler(0, Random.Range(-180f, 180f), 0);
+                transform.SetPositionAndRotation(spawnPoint, rotation);
+                GetComponent<ClientNetworkTransform>().Interpolate = true;
+            }
+
+            // Add the player to the mipmap
+            _sm.mipmap.AddPlayerMarker(team, transform);
 
             // Load the enemy helmet, if any
             if (!IsOwner)
@@ -439,15 +475,14 @@ namespace Prefabs.Player
                 if (Status.Value.HasHelmet)
                     helmet.GetComponent<MeshRenderer>().material =
                         Resources.Load<Material>(
-                            $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
+                            $"Textures/helmet/Materials/helmet_{team.ToString().ToLower()}");
             }
 
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)
             {
                 if (bodyMesh.IsDestroyed()) continue;
-                var skinName = Status.Value.Skin.GetSkinForTeam(Status.Value.Team);
-                print($"Materials/skin/{skinName}");
+                var skinName = Status.Value.Skin.GetSkinForTeam(Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
         }
@@ -463,7 +498,6 @@ namespace Prefabs.Player
         public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
             float ragdollScale = 1)
         {
-            print($"ClientID {OwnerClientId} is playing sound at position {transform.position.ToString()}");
             // Both owner and non-owner hear the hit sound effect
             // Handle helmet removal
             if (bodyPart == "Head" && Status.Value.HasHelmet)
@@ -481,7 +515,7 @@ namespace Prefabs.Player
                 rb.angularVelocity = VectorExtensions.RandomVector3(-50f, 50f);
                 rb.GetComponent<MeshRenderer>().material =
                     Resources.Load<Material>(
-                        $"Textures/helmet/Materials/helmet_{Status.Value.Team.ToString().ToLower()}");
+                        $"Textures/helmet/Materials/helmet_{Team.ToString().ToLower()}");
 
 
                 if (!IsOwner)
@@ -497,7 +531,7 @@ namespace Prefabs.Player
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
 
             // Check if the enemy is allied
-            if (attackerID != OwnerClientId && attacker.Status.Value.Team == Status.Value.Team)
+            if (attackerID != OwnerClientId && attacker.Team == Team)
                 return;
 
             var newStatus = Status.Value;
@@ -516,7 +550,7 @@ namespace Prefabs.Player
                 {
                     var newAttackerStats = attacker.Stats.Value;
                     newAttackerStats.Kills += 1;
-                    attacker.InitializeRpc((int)attacker.Status.Value.Team, newAttackerStats, false);
+                    attacker.InitializeRpc((byte)attacker.Team, newAttackerStats);
                 }
 
                 var newAttackedStats = attacker.Stats.Value;
@@ -560,17 +594,18 @@ namespace Prefabs.Player
         }
 
         [Rpc(SendTo.Owner)]
-        public void InitializeRpc(int team, PlayerStats playerStats, bool spawn = true)
+        public void InitializeRpc(byte teamIndex, PlayerStats playerStats)
         {
+            Debug.Log($"[InitializeRpc] teamIndex={teamIndex} playerStats={playerStats.Username}");
             // Set Team
-            var newStatus = Status.Value;
-            newStatus.Team = (Team)Enum.GetValues(typeof(Team)).GetValue(team);
-            Status.Value = newStatus;
+            _teamIndex = teamIndex;
+            var team = (Team)Enum.GetValues(typeof(Team)).GetValue(teamIndex);
+            _playerStats = playerStats;
+            TeamIndex.Value = teamIndex;
 
             // Set Stats
-            Stats.Value = playerStats;
-            if (spawn)
-                Spawn();
+            Stats.Value = _playerStats;
+            Spawn(team);
         }
 
         #endregion

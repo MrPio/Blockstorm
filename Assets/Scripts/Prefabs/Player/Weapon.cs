@@ -92,6 +92,7 @@ namespace Prefabs.Player
         {
             _sm = FindObjectOfType<SceneManager>();
             isAiming = false;
+            Debug.Log($"[Player.Weapon::Start()] Equipping block");
             SwitchEquipped(WeaponType.Block);
         }
 
@@ -146,7 +147,7 @@ namespace Prefabs.Player
             if (_weaponModel.Type is WeaponType.Block)
             {
                 _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
-                    player.Status.Value.BlockId);
+                    player.Status.Value.BlockId(player.Team));
                 return;
             }
 
@@ -203,7 +204,7 @@ namespace Prefabs.Player
                     {
                         // Check if the enemy is not allied
                         if (attackedPlayer.IsOwner ||
-                            attackedPlayer.Status.Value.Team != player.Status.Value.Team)
+                            attackedPlayer.Team != player.Team)
                         {
                             // Spawn the damage text
                             var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
@@ -369,7 +370,7 @@ namespace Prefabs.Player
                     o.AddComponent<WeaponSway>();
                     if (WeaponModel.Type == WeaponType.Block)
                         o.GetComponent<MeshRenderer>().material =
-                            Resources.Load<Material>(player.Status.Value.BlockType.GetMaterial);
+                            Resources.Load<Material>(player.Status.Value.BlockType(player.Team).GetMaterial);
                 });
                 weaponAnimator = player.WeaponPrefab.GetComponentInChildren<Animator>();
             }

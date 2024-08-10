@@ -280,11 +280,13 @@ namespace VoxelEngine
         /// </summary>
         /// <param name="id"> The id of the new collectable. </param>
         /// <param name="model"> The collectable model. If not provided, a random collectable will be spawned. </param>
-        public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null, bool log = true)
+        public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null, bool log = false)
         {
             if (SpawnedCollectables.Any(it => it.Model.ID == id)) return;
             if (log) Debug.Log($"Spawning collectable at {id}");
-            var newCollectable = Instantiate(collectable, id, Quaternion.identity).GetComponent<Collectable>();
+            var newCollectable =
+                Instantiate(collectable, id, Quaternion.identity,
+                    GameObject.FindGameObjectWithTag("CollectablesContainer").transform).GetComponent<Collectable>();
             SpawnedCollectables.Add(newCollectable);
             FreeCollectablesSpawnPoints.Remove(id);
             newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));

@@ -23,6 +23,7 @@ TagManager:
   - NetworkManager
   - WorldCanvas
   - AmmoContainer
+  - CollectablesContainer
   layers:
   - Default
   - TransparentFX

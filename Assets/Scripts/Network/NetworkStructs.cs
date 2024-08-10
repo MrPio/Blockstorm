@@ -116,7 +116,6 @@ namespace Network
     /// </summary>
     public struct PlayerStatus : INetworkSerializable
     {
-        public Team Team;
         public int Hp, Armor;
         public bool HasHelmet;
         public byte LeftGrenades;
@@ -126,7 +125,7 @@ namespace Network
             skinName, blockName, meleeName, primaryName, secondaryName, tertiaryName, grenadeName;
 
 
-        public PlayerStatus(Team? team = null, int? hp = null, int? armor = null,
+        public PlayerStatus( int? hp = null, int? armor = null,
             bool? hasHelmet = null,
             byte? leftGrenades = null, bool? hasArmoredBlock = null, FixedString32Bytes? skinName = null,
             FixedString32Bytes? blockName = null,
@@ -135,7 +134,6 @@ namespace Network
             FixedString32Bytes? tertiaryName = null,
             FixedString32Bytes? grenadeName = null)
         {
-            Team = team ?? EnumExtensions.RandomItem<Team>();
             Hp = hp ?? 100;
             Armor = armor ?? 0;
             HasHelmet = hasHelmet ?? true;
@@ -230,14 +228,13 @@ namespace Network
             set => grenadeName = value is null ? null : $"{value.Name}:{value.Variant}";
         }
 
-        public byte BlockId =>
-            VoxelData.Name2Id($"player_block_{(HasArmoredBlock ? "armored_" : "")}{Team.ToString().ToLower()}");
+        public byte BlockId(Team team) =>
+            VoxelData.Name2Id($"player_block_{(HasArmoredBlock ? "armored_" : "")}{team.ToString().ToLower()}");
 
-        public BlockType BlockType => VoxelData.BlockTypes[BlockId];
+        public BlockType BlockType(Team team) => VoxelData.BlockTypes[BlockId(team)];
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
-            serializer.SerializeValue(ref Team);
             serializer.SerializeValue(ref Hp);
             serializer.SerializeValue(ref Armor);
             serializer.SerializeValue(ref HasHelmet);

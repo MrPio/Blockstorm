@@ -81,7 +81,7 @@ namespace Prefabs
                 {
                     // Check if the enemy is allied
                     if (attackedPlayer.IsOwner ||
-                        attackedPlayer.Status.Value.Team != attackerPlayer.Status.Value.Team)
+                        attackedPlayer.Team != attackerPlayer.Team)
                     {
                         // Spawn the damage text
                         var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);

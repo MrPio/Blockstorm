@@ -51,8 +51,8 @@
     <Compile Include="Assets\Scripts\Model\BlockType.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Scripts\Partials\Ragdoll.cs" />
-    <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\Managers\RelayManager.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\UI\HpHUD.cs" />
     <Compile Include="Assets\Scripts\UI\Dashboard.cs" />

@@ -1,10 +1,11 @@
 ﻿# TODO
 - Convert Weapon collectable in weapon level increment! + rarity lights
 - React on host disconnect
-- Skin and helmet texture not loading for both owner and non-owner. PlayerMarker are of wrong color. 
+- The player respawns after a kill
 - Tnt
   - The explosion is handled by WorldManager::EditVoxel(*, 0).
   - Recursively, when another TNT is met, another explosion is triggered.
+- ~~Skin and helmet texture not loading for both owner and non-owner. PlayerMarker are of wrong color.~~ 
 - ~~Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map~~
 - ~~Take kills & deaths into consideration in dashboard~~
 - ~~Add in-game esc menu~~

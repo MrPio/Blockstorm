@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1893801084
+  GlobalObjectIdHash: 519613176
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -404,8 +404,8 @@ MonoBehaviour:
   belly: {fileID: 7874659249209723408}
   ragdoll: {fileID: 6189725142076711082}
   bodyMeshes:
-  - {fileID: 7995740220784036517}
   - {fileID: 5500786744037264870}
+  - {fileID: 7995740220784036517}
   helmet: {fileID: 6560409552450586431}
   muzzles:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
@@ -1351,7 +1351,7 @@ PrefabInstance:
     - target: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a072f07108eb8b641836d255d4baca92, type: 2}
+      objectReference: {fileID: 2100000, guid: 4287db76126914b4d8ef6d9e28d92cbf, type: 2}
     - target: {fileID: 5843050108895433039, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_IsTrigger
       value: 1
