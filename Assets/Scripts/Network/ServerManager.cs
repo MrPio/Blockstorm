@@ -38,6 +38,7 @@ namespace Network
             _sm.clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
         }*/
 
+        /*
         [ServerRpc(RequireOwnership = false)]
         public void KillPlayerServerRpc(ServerRpcParams rpcParams = default)
         {
@@ -51,18 +52,8 @@ namespace Network
                 Destroy(GameObject.FindGameObjectsWithTag("Player").First(it =>
                     it.GetComponent<NetworkObject>().OwnerClientId == rpcParams.Receive.SenderClientId));
             }
-        }
-
-        [ServerRpc(RequireOwnership = false)]
-        public void RespawnServerRpc(byte team, PlayerStats playerStats, ServerRpcParams rpcParams = default)
-        {
-            if (!IsServer) return;
-            var playerGo = Instantiate(playerPrefab);
-            playerGo.GetComponent<NetworkObject>().SpawnWithOwnership(rpcParams.Receive.SenderClientId, true);
-            Debug.Log($"Spawning client= {playerStats.Username}({rpcParams.Receive.SenderClientId}) on team={team.ToString()}");
-            playerGo.GetComponent<Player>().InitializeRpc(team, playerStats);
-        }
-
+        }*/
+        
         [ServerRpc(RequireOwnership = false)]
         public void SpawnPrefabServerRpc(string prefabName, NetVector3 position, NetVector3 rotation)
         {

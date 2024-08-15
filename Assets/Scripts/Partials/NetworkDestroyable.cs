@@ -12,16 +12,24 @@ namespace Partials
         {
             ifIsMe.ForEach(o =>
             {
-                o.SetActive(IsOwner);
+                // o.SetActive(IsOwner);
                 if (!IsOwner)
                     Destroy(o);
             });
             ifIsNotMe.ForEach(o =>
             {
-                o.SetActive(!IsOwner);
+                // o.SetActive(!IsOwner)
                 if (IsOwner)
                     Destroy(o);
             });
+        }
+
+        public void SetEnabled(bool value)
+        {
+            if (IsOwner)
+                ifIsMe.ForEach(o => o.SetActive(value));
+            else
+                ifIsNotMe.ForEach(o => o.SetActive(value));
         }
     }
 }

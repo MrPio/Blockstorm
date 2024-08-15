@@ -96,6 +96,7 @@ namespace UI
                 var players = FindObjectsOfType<Player>();
                 foreach (var player in players)
                 {
+                    if (player.Team is Team.None) continue;
                     var stat = Instantiate(playerStat,
                         player.Team switch
                         {

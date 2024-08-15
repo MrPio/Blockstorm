@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Model;
 using Network;
 using Prefabs;
+using Prefabs.Player;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
@@ -122,7 +124,7 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            serverManager.RespawnServerRpc((byte)team, new PlayerStats(username: lobbyManager.Username));
+            FindObjectsOfType<Player>().First(it => it.IsOwner).SpawnRpc(team, new PlayerStats(username: lobbyManager.Username));
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
         }

@@ -153,7 +153,7 @@ namespace Prefabs.Player
 
             // Spawn the weapon effect
             if (_weaponModel.IsGun && !_weaponModel.HasScope)
-                player.SpawnWeaponEffect(_weaponModel!.Type);
+                player.SpawnWeaponEffectRpc();
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {

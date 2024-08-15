@@ -5,6 +5,7 @@ using System.Linq;
 using Managers;
 using Model;
 using Network;
+using Prefabs.Player;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -36,12 +37,7 @@ namespace UI
             if (!_canRespawn) return;
             if (Input.GetMouseButtonDown(0))
             {
-                _sm.serverManager.RespawnServerRpc((byte)PlayerTeam, PlayerStats,
-                    rpcParams: new ServerRpcParams
-                    {
-                        Send = new ServerRpcSendParams(),
-                        Receive = new ServerRpcReceiveParams { SenderClientId = _sm.clientManager.OwnerClientId }
-                    });
+                FindObjectsOfType<Player>().First(it => it.IsOwner).SpawnRpc(PlayerTeam, PlayerStats);
                 HideChildren();
                 gameObject.SetActive(false);
                 _canRespawn = false;

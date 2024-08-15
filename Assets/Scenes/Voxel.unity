@@ -6308,6 +6308,10 @@ PrefabInstance:
       value: NetworkManager
       objectReference: {fileID: 0}
     - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
+      propertyPath: NetworkConfig.PlayerPrefab
+      value: 
+      objectReference: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
+    - target: {fileID: 1956518561227635500, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: NetworkConfig.Prefabs.NetworkPrefabsLists.Array.size
       value: 1
       objectReference: {fileID: 0}
