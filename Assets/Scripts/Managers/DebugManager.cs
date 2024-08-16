@@ -12,13 +12,13 @@ namespace Managers
 {
     public class DebugManager : NetworkBehaviour
     {
-        [SerializeField] private NetworkManager networkManager;
         private readonly ISerializer _serializer = BinarySerializer.Instance;
         private Logger _logger;
         private bool _isHost;
 
         private async void Start()
         {
+            FindObjectOfType<SceneManager>().InitializeLoading();
             _logger = FindObjectOfType<Logger>();
             _isHost = _serializer.Deserialize($"{ISerializer.DebugDir}/isHost", true);
             _serializer.Serialize(!_isHost, $"{ISerializer.DebugDir}", "isHost");
@@ -37,8 +37,8 @@ namespace Managers
 
                 // Integrate Relay with Netcode for game objects
                 var relayServerData = new RelayServerData(allocation, "dtls");
-                networkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-                networkManager.StartHost();
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartHost();
             }
             else
             {
@@ -47,9 +47,10 @@ namespace Managers
 
                 // Integrate Relay with Netcode for game objects
                 var relayServerData = new RelayServerData(allocation, "dtls");
-                networkManager.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-                networkManager.StartClient();
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                NetworkManager.Singleton.StartClient();
             }
+            FindObjectOfType<SceneManager>().InitializeMatch();
 
             _logger.Log($"Connection established as {(_isHost ? "Host" : "Client")}");
         }

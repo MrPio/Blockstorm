@@ -91,6 +91,9 @@ namespace Prefabs.Player
         // Owner-only
         private void LoadStatus()
         {
+            if (!IsOwner)
+                _sm.logger.Log($"Receiving new status from {OwnerClientId}: team={Team}", Color.yellow);
+
             // Load HUD values
             if (IsOwner)
             {
@@ -171,7 +174,7 @@ namespace Prefabs.Player
         }
 
         // If the player is spawned
-        private readonly NetworkVariable<bool> active = new(false, NetworkVariableReadPermission.Everyone,
+        public NetworkVariable<bool> active = new(false, NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
 
         #endregion
@@ -218,7 +221,8 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/weapons/{newValue.Message.Value}"),
                             0.65f);
                 };
-                EquippedWeapon.OnValueChanged += (_, newValue) =>
+                /* TODO: this is propbably the source of the problem
+                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
                     print($"[EquippedWeapon.OnValueChanged] Player {OwnerClientId} has equipped {newValue.Message}");
                     var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
@@ -239,7 +243,7 @@ namespace Prefabs.Player
                     foreach (var mesh in WeaponPrefab.GetComponentsInChildren<MeshRenderer>(true))
                         if (!mesh.gameObject.name.Contains("scope") && weaponModel.Variant is not null)
                             mesh.material = Resources.Load<Material>(weaponModel.GetMaterial);
-                };
+                };*/
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {
                     var rotation = (float)(newValue - 128);
@@ -255,7 +259,7 @@ namespace Prefabs.Player
             active.OnValueChanged += (_, newValue) => _networkDestroyable.SetEnabled(newValue);
             _networkDestroyable.SetEnabled(active.Value);
 
-            print($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
+            _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
         }
 
         private void Awake()
@@ -362,7 +366,7 @@ namespace Prefabs.Player
                     MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
             if (pos.y < 0.85)
-                SpawnRpc(Team, Stats.Value);
+                Spawn(Team, Stats.Value);
 
             // Play walk sound
             if (Time.time - _lastWalkCheck > 0.1f)
@@ -422,14 +426,14 @@ namespace Prefabs.Player
                 else audioSource.PlayOneShot(weapon.noAmmoClip);
 
             // Handle sprint
-            if (Input.GetKey(KeyCode.LeftShift) && _usedStamina < stamina)
+            if (Input.GetKey(KeyCode.LeftShift) && isWalking && _usedStamina < stamina)
             {
                 _usedStamina += Time.deltaTime;
                 _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
                 _isRunning.Value = true;
                 _isCrouching.Value = false;
             }
-            else
+            else if (_isRunning.Value)
             {
                 _isRunning.Value = false;
                 if (!Input.GetKey(KeyCode.LeftShift) && _usedStamina > 0)
@@ -578,10 +582,9 @@ namespace Prefabs.Player
         /// The owner spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
         /// </summary>
-        [Rpc(SendTo.Owner)]
-        public void SpawnRpc(Team team, PlayerStats playerStats)
+        public void Spawn(Team team, PlayerStats playerStats)
         {
-            Debug.Log($"[Spawn] Spawning IsOwner={IsOwner}, team = {Team.ToString()}");
+            _sm.logger.Log($"[Spawn] Spawning {OwnerClientId}, team = {Team.ToString()}", Color.cyan);
             active.Value = true;
 
             // Spawn the player location

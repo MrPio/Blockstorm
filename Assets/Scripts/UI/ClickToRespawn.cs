@@ -37,7 +37,7 @@ namespace UI
             if (!_canRespawn) return;
             if (Input.GetMouseButtonDown(0))
             {
-                FindObjectsOfType<Player>().First(it => it.IsOwner).SpawnRpc(PlayerTeam, PlayerStats);
+                FindObjectsOfType<Player>().First(it => it.IsOwner).Spawn(PlayerTeam, PlayerStats);
                 HideChildren();
                 gameObject.SetActive(false);
                 _canRespawn = false;

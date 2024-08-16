@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VoxelEngine;
+using Logger = UI.Logger;
 
 namespace Managers
 {
@@ -41,6 +42,7 @@ namespace Managers
         public GameObject[] lobbyMenuUIs;
         public GameObject loadingBar;
         public GameObject pauseMenu;
+        public Logger logger;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;
         public SpawnCamera menuCamera;
@@ -124,7 +126,7 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            FindObjectsOfType<Player>().First(it => it.IsOwner).SpawnRpc(team, new PlayerStats(username: lobbyManager.Username));
+            FindObjectsOfType<Player>().First(it => it.IsOwner).Spawn(team, new PlayerStats(username: lobbyManager.Username??"Debug"));
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
         }
