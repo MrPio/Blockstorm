@@ -56,6 +56,7 @@
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\UI\HpHUD.cs" />
     <Compile Include="Assets\Scripts\UI\Dashboard.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\PlayerDebug.cs" />
     <Compile Include="Assets\Scripts\UI\ClickToRespawn.cs" />
     <Compile Include="Assets\Scripts\Utils\MapConverter.cs" />
     <Compile Include="Assets\Scripts\Partials\NetworkDestroyable.cs" />
@@ -89,11 +90,13 @@
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
+    <Compile Include="Assets\Scripts\Managers\DebugManager.cs" />
     <Compile Include="Assets\Scripts\UI\UsernameUI.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\JsonSerializer.cs" />
     <Compile Include="Assets\Scripts\UI\AmmoHUD.cs" />
     <Compile Include="Assets\Scripts\Managers\LobbyManager.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
+    <Compile Include="Assets\Scripts\UI\Logger.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\UI\ReloadBar.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera.cs" />

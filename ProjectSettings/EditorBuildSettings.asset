@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Voxel.unity
     guid: bd0f87bfeb0b3de4186fb0734480f494
+  - enabled: 1
+    path: Assets/Scenes/Debug.unity
+    guid: 1a6340a0e12ca4943ac71e0f1409ea52
   m_configObjects: {}

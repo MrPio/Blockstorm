@@ -127,8 +127,7 @@ namespace UI
                 Destroy(transform.parent.parent.gameObject);
                 _sm.InitializeLoading();
                  await _sm.lobbyManager.CreateLobby(newLobbyMap.text,
-                    password: newLobbyPassword.text.Length <= 0 ? null : newLobbyPassword.text,
-                    map: newLobbyMap.text);
+                    map: newLobbyMap.text, password: newLobbyPassword.text.Length <= 0 ? null : newLobbyPassword.text);
             }
 
             if (actionType is ActionType.NewLobbyMessagebox)

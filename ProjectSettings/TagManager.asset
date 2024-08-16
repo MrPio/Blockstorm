@@ -24,6 +24,7 @@ TagManager:
   - WorldCanvas
   - AmmoContainer
   - CollectablesContainer
+  - LogContainer
   layers:
   - Default
   - TransparentFX

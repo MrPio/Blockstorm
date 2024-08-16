@@ -81,7 +81,7 @@ namespace Managers
         /// <param name="gameMode"> The type of the game. Defaults to 4x8 death match.</param>
         /// <param name="map"> The name of the map. Defaults to "Harbor".</param>
         /// <param name="password"> The lobby password. If not provided, the lobby is public. </param>
-        public async Task<bool> CreateLobby(string lobbyName, string gameMode = "4 Teams",
+        public async Task CreateLobby(string lobbyName, string gameMode = "4 Teams",
             string map = "Harbor", string password = null)
         {
             try
@@ -115,13 +115,13 @@ namespace Managers
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
                 _sm.InitializeMatch();
-                return true;
+                return;
             }
             catch (LobbyServiceException e)
             {
                 Debug.LogError(e);
                 _sm.InitializeMenu();
-                return false;
+                return;
             }
         }
 
