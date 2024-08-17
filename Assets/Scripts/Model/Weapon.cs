@@ -85,7 +85,7 @@ namespace Model
             // 375
             new Weapon(name: "barrett", damage: 125, rof: 3, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
-                scope: "scope5"),
+                scope: "scope5", audio:"BARRETT"),
         };
 
         public static readonly List<Weapon> Secondaries = new()
@@ -138,7 +138,7 @@ namespace Model
             string variant = null)
         {
             Name = name;
-            Audio = audio ?? name;
+            Audio = audio ?? (variant is null ? name : $"{name.ToUpper()}_{variant.ToUpper()}");
             FireAnimation = fireAnimation ?? name;
             Damage = damage;
             Rof = rof;

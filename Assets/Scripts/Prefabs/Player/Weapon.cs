@@ -88,12 +88,10 @@ namespace Prefabs.Player
             }
         }
 
-        public void Start()
+        public void Awake()
         {
             _sm = FindObjectOfType<SceneManager>();
             isAiming = false;
-            Debug.Log($"[Player.Weapon::Start()] Equipping block");
-            SwitchEquipped(WeaponType.Block);
         }
 
         /// <summary>
@@ -128,11 +126,11 @@ namespace Prefabs.Player
             if (_weaponModel.Type is WeaponType.Block || _weaponModel.IsGun)
             {
                 // Check if the player has enough ammo
+                if (Magazine[_weaponModel.GetNetName] <= 1)
+                    audioSource.PlayOneShot(noAmmoClip);
                 if (Magazine[_weaponModel.GetNetName] <= 0)
-                {
                     audioSource.PlayOneShot(noAmmoClip);
                     return;
-                }
 
                 // Subtract ammo
                 Magazine[_weaponModel.GetNetName]--;
@@ -293,6 +291,7 @@ namespace Prefabs.Player
             // Make sure the weapon is not switching too fast.
             if (Time.time - _lastSwitch < 0.25f)
                 return;
+            _sm.logger.Log($"[SwitchEquipped] switching to {weaponType}", Color.cyan);
             _lastSwitch = Time.time;
             if (_reloadingCoroutine is not null)
             {

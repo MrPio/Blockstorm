@@ -6,6 +6,7 @@ using Model;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Collectable = Prefabs.Collectable;
 
 namespace Network
@@ -15,13 +16,13 @@ namespace Network
         private SceneManager _sm;
 
         // Used to update the map status
-        private readonly NetworkVariable<MapStatus> mapStatus = new(new MapStatus
+        private  NetworkVariable<MapStatus> mapStatus = new(new MapStatus
         {
             Xs = Array.Empty<short>(), Ys = Array.Empty<short>(), Zs = Array.Empty<short>(), Ids = Array.Empty<byte>()
         });
 
         // Used to update the collectables
-        public readonly NetworkVariable<CollectablesStatus> CollectableStatus =
+        public  NetworkVariable<CollectablesStatus> collectableStatus =
             new(new CollectablesStatus
             {
                 Xs = Array.Empty<float>(), Ys = Array.Empty<float>(), Zs = Array.Empty<float>(),
@@ -68,8 +69,8 @@ namespace Network
                 }
 
                 // React on collectable changes
-                CollectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
-                LoadCollectables(CollectableStatus.Value);
+                collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
+                LoadCollectables(collectableStatus.Value);
             }
 
             // Render the map and spawn the player
@@ -78,7 +79,7 @@ namespace Network
             {
                 // Spawn collectables on the server and across the net
                 _sm.worldManager.SpawnCollectables();
-                _sm.clientManager.CollectableStatus.Value = new CollectablesStatus(
+                _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
                     _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
                     _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
             }

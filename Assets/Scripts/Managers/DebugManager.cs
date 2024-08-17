@@ -30,26 +30,23 @@ namespace Managers
 
             if (_isHost)
             {
-                var allocation = await RelayService.Instance.CreateAllocationAsync(1);
-                var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                _logger.Log($"Relay Join Code = {joinCode}");
-                _serializer.Serialize(joinCode, $"{ISerializer.DebugDir}", "relayCode");
-
-                // Integrate Relay with Netcode for game objects
-                var relayServerData = new RelayServerData(allocation, "dtls");
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                // var allocation = await RelayService.Instance.CreateAllocationAsync(1);
+                // var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                // _logger.Log($"Relay Join Code = {joinCode}");
+                // _serializer.Serialize(joinCode, $"{ISerializer.DebugDir}", "relayCode");
+                // var relayServerData = new RelayServerData(allocation, "dtls");
+                // NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartHost();
             }
             else
             {
-                var relayCode = _serializer.Deserialize($"{ISerializer.DebugDir}/relayCode", "");
-                var allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
-
-                // Integrate Relay with Netcode for game objects
-                var relayServerData = new RelayServerData(allocation, "dtls");
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                // var relayCode = _serializer.Deserialize($"{ISerializer.DebugDir}/relayCode", "");
+                // var allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
+                // var relayServerData = new RelayServerData(allocation, "dtls");
+                // NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartClient();
             }
+
             FindObjectOfType<SceneManager>().InitializeMatch();
 
             _logger.Log($"Connection established as {(_isHost ? "Host" : "Client")}");

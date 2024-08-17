@@ -221,8 +221,7 @@ namespace Prefabs.Player
                         audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/weapons/{newValue.Message.Value}"),
                             0.65f);
                 };
-                /* TODO: this is propbably the source of the problem
-                 EquippedWeapon.OnValueChanged += (_, newValue) =>
+                EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
                     print($"[EquippedWeapon.OnValueChanged] Player {OwnerClientId} has equipped {newValue.Message}");
                     var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
@@ -243,7 +242,7 @@ namespace Prefabs.Player
                     foreach (var mesh in WeaponPrefab.GetComponentsInChildren<MeshRenderer>(true))
                         if (!mesh.gameObject.name.Contains("scope") && weaponModel.Variant is not null)
                             mesh.material = Resources.Load<Material>(weaponModel.GetMaterial);
-                };*/
+                };
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {
                     var rotation = (float)(newValue - 128);
@@ -578,6 +577,8 @@ namespace Prefabs.Player
         [Rpc(SendTo.Server)]
         private void UpdateStatServerRpc(PlayerStats playerStats) => Stats.Value = playerStats;
 
+        #endregion
+
         /// <summary>
         /// The owner spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
@@ -596,8 +597,8 @@ namespace Prefabs.Player
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 
             LoadStatus();
-        }
 
-        #endregion
+            weapon.SwitchEquipped(WeaponType.Block);
+        }
     }
 }
