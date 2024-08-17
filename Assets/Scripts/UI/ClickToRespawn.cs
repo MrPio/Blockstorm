@@ -16,7 +16,7 @@ namespace UI
     /// </summary>
     public class ClickToRespawn : MonoBehaviour
     {
-        public const float DelayBeforeRespawning = 5f;
+        public const float DelayBeforeRespawning = 5f / 5f;
         private SceneManager _sm;
         private List<Transform> _children;
         private bool _canRespawn;
@@ -37,10 +37,10 @@ namespace UI
             if (!_canRespawn) return;
             if (Input.GetMouseButtonDown(0))
             {
-                FindObjectsOfType<Player>().First(it => it.IsOwner).Spawn(PlayerTeam, PlayerStats);
                 HideChildren();
                 gameObject.SetActive(false);
                 _canRespawn = false;
+                _sm.InitializeSpawn(resetStats: false);
             }
         }
 

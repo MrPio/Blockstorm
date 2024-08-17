@@ -79,12 +79,12 @@ namespace Network
             {
                 // Spawn collectables on the server and across the net
                 _sm.worldManager.SpawnCollectables();
-                _sm.clientManager.collectableStatus.Value = new CollectablesStatus(
+                collectableStatus.Value = new CollectablesStatus(
                     _sm.worldManager.SpawnedCollectables.Select(it => it.transform.position).ToList(),
                     _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
             }
 
-            Debug.Log($"The map {_sm.worldManager.Map.name} was rendered!");
+            _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
             // _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
         }
 

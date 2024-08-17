@@ -57,6 +57,7 @@ namespace Prefabs.Player
         [SerializeField] public List<GameObject> smokes;
         [SerializeField] public GameObject circleDamage;
         [SerializeField] private GameObject helmetPrefab;
+        [SerializeField] private GameObject playerBodyPrefab;
 
         [Header("AudioClips")] [SerializeField]
         public AudioClip walkGeneric;
@@ -108,7 +109,7 @@ namespace Prefabs.Player
                 if (Status.Value.HasHelmet)
                     helmet.GetComponent<MeshRenderer>().material =
                         Resources.Load<Material>(
-                            $"Textures/helmet/Materials/helmet_{team.ToString().ToLower()}");
+                            $"Textures/helmet/Materials/helmet_{Team.ToString().ToLower()}");
             }
 
             // Add the player to the mipmap
@@ -184,9 +185,8 @@ namespace Prefabs.Player
         public override void OnNetworkSpawn()
         {
             // Listen to network variables based on ownership
-            if (IsOwner)
-                Status.OnValueChanged += (_, _) => LoadStatus();
-            else
+            Status.OnValueChanged += (_, _) => LoadStatus();
+            if (!IsOwner)
             {
                 _isWalking.OnValueChanged += (_, newValue) =>
                 {
@@ -365,7 +365,7 @@ namespace Prefabs.Player
                     MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
             if (pos.y < 0.85)
-                Spawn(Team, Stats.Value);
+                Spawn(onlyPosition: true);
 
             // Play walk sound
             if (Time.time - _lastWalkCheck > 0.1f)
@@ -432,9 +432,10 @@ namespace Prefabs.Player
                 _isRunning.Value = true;
                 _isCrouching.Value = false;
             }
-            else if (_isRunning.Value)
+            else
             {
-                _isRunning.Value = false;
+                if (_isRunning.Value)
+                    _isRunning.Value = false;
                 if (!Input.GetKey(KeyCode.LeftShift) && _usedStamina > 0)
                 {
                     _usedStamina -= Time.deltaTime * staminaRecoverSpeed;
@@ -481,25 +482,25 @@ namespace Prefabs.Player
                         helmet.IsDestroyed() ? cameraTransform.position + Vector3.up * 0.5f : helmet.transform.position,
                         helmet.IsDestroyed() ? cameraTransform.rotation : helmet.transform.rotation)
                     .GetComponent<Rigidbody>();
-                rb.AddExplosionForce(helmet.IsDestroyed() ? 400f : 700f,
+                rb.AddExplosionForce(helmet.IsDestroyed() ? 450f : 750f,
                     helmet.IsDestroyed()
                         ? cameraTransform.position
-                        : helmet.transform.position + VectorExtensions.RandomVector3(-0.6f, 0.6f), 2f);
-                rb.angularVelocity = VectorExtensions.RandomVector3(-50f, 50f);
+                        : helmet.transform.position + VectorExtensions.RandomVector3(-0.8f, 0.8f), 2f);
+                rb.angularVelocity = VectorExtensions.RandomVector3(-70f, 70f);
                 rb.GetComponent<MeshRenderer>().material =
                     Resources.Load<Material>(
                         $"Textures/helmet/Materials/helmet_{Team.ToString().ToLower()}");
 
 
                 if (!IsOwner)
-                    Destroy(helmet);
+                    helmet.SetActive(false);
                 // damage /= 2; Already halved by Fire()
             }
             else
                 audioSource.PlayOneShot(hit);
 
-            // Owner only
             if (!IsOwner) return;
+            // Owner only ========================================================================================
 
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
@@ -527,7 +528,7 @@ namespace Prefabs.Player
                     attacker.UpdateStatServerRpc(newAttackerStats);
                 }
 
-                var newAttackedStats = attacker.Stats.Value;
+                var newAttackedStats = Stats.Value;
                 newAttackedStats.Deaths += 1;
                 UpdateStatServerRpc(newAttackedStats);
                 RagdollRpc((uint)(damage * ragdollScale), bodyPart, direction);
@@ -538,6 +539,7 @@ namespace Prefabs.Player
                 {
                     yield return new WaitForSeconds(2f);
                     active.Value = false;
+                    _sm.InitializeMatch(isFirstSpawn: false);
                 }
             }
 
@@ -550,31 +552,38 @@ namespace Prefabs.Player
         }
 
         [Rpc(SendTo.Everyone)]
-        private void RagdollRpc(uint damage, string bodyPart, NetVector3 direction)
+        private void RagdollRpc(uint damage, string bodyPart, NetVector3 direction, bool reverse = false)
         {
-            isDying = true;
-            print($"{OwnerClientId} is dead!");
-            if (!IsOwner)
+            isDying = !reverse;
+            if (isDying)
+                _sm.logger.Log($"[RagdollRpc] {OwnerClientId} is dead!", IsOwner ? Color.cyan : Color.yellow);
+            if (IsOwner)
             {
-                ragdoll.ApplyForce(bodyPart, direction.ToVector3.normalized * math.clamp(damage * 5, 50f, 500f));
-                gameObject.AddComponent<Destroyable>().lifespan = 10;
-                gameObject.GetComponent<ClientNetworkTransform>().enabled = false;
+                GetComponent<CharacterController>().enabled = !isDying;
+                GetComponent<CapsuleCollider>().enabled = isDying;
+                GetComponentInChildren<CameraMovement>().enabled = !isDying;
+                GetComponentInChildren<Weapon>().enabled = !isDying;
+                GetComponentInChildren<WeaponSway>().enabled = !isDying;
+                transform.Find("WeaponCamera").gameObject.SetActive(!isDying);
+                if (isDying)
+                    gameObject.AddComponent<Rigidbody>().Apply(rb =>
+                        rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
+                            _transform.position + Vector3.up * 0.5f));
+                else if (gameObject.TryGetComponent<Rigidbody>(out var rb))
+                    Destroy(rb);
             }
             else
             {
-                GetComponent<CharacterController>().enabled = false;
-                GetComponent<CapsuleCollider>().enabled = true;
-                GetComponentInChildren<CameraMovement>().enabled = false;
-                GetComponentInChildren<Weapon>().enabled = false;
-                GetComponentInChildren<WeaponSway>().enabled = false;
-                transform.Find("WeaponCamera").gameObject.SetActive(false);
-                gameObject.AddComponent<Rigidbody>().Apply(rb =>
-                    rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
-                        _transform.position + Vector3.up * 0.5f));
+                if (isDying)
+                    ragdoll.ApplyForce(bodyPart, direction.ToVector3.normalized * math.clamp(damage * 5, 50f, 500f));
+                else
+                    ragdoll.SetRagdollState(false);
+
+                gameObject.GetComponent<ClientNetworkTransform>().enabled = !isDying;
             }
         }
 
-        [Rpc(SendTo.Server)]
+        [Rpc(SendTo.Owner)]
         private void UpdateStatServerRpc(PlayerStats playerStats) => Stats.Value = playerStats;
 
         #endregion
@@ -583,22 +592,39 @@ namespace Prefabs.Player
         /// The owner spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
         /// </summary>
-        public void Spawn(Team team, PlayerStats playerStats)
+        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, bool onlyPosition = false)
         {
-            _sm.logger.Log($"[Spawn] Spawning {OwnerClientId}, team = {Team.ToString()}", Color.cyan);
-            active.Value = true;
-
             // Spawn the player location
-            this.team.Value = team;
-            Stats.Value = playerStats;
             transform.SetPositionAndRotation(
                 position: _sm.worldManager.Map.GetRandomSpawnPoint(Team) + Vector3.up * 2.1f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 
-            LoadStatus();
+            if (onlyPosition) return;
 
-            weapon.SwitchEquipped(WeaponType.Block);
+            if (newTeam is not null)
+                team.Value = newTeam.Value;
+            if (playerStats is not null)
+                Stats.Value = playerStats.Value;
+
+            _sm.logger.Log($"[Spawn] Spawning {OwnerClientId}, team = {Team.ToString()}", Color.cyan);
+            active.Value = true;
+            Status.Value = new PlayerStatus(null);
+            RagdollRpc(0, "", new NetVector3(), true);
+            weapon.Magazine.Clear();
+            weapon.LeftAmmo.Clear();
+            weapon.WeaponModel = null;
+
+            if (newTeam is not null || playerStats is not null)
+                LoadStatus();
+            StartCoroutine(EquipBlock());
+            return;
+
+            IEnumerator EquipBlock()
+            {
+                yield return new WaitForSeconds(0.15f);
+                weapon.SwitchEquipped(WeaponType.Block);
+            }
         }
     }
 }

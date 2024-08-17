@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2718589817940452789}
   - component: {fileID: 4753803699134751158}
   - component: {fileID: 7343179613693628406}
+  - component: {fileID: 2115994620109650221}
   m_Layer: 5
   m_Name: LogContainer
   m_TagString: LogContainer
@@ -60,7 +61,7 @@ MonoBehaviour:
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
@@ -116,4 +117,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   logTextPrefab: {fileID: 7752415046905487927, guid: 7a5679e79cf817a46a247d054c85ec59, type: 3}
-  logLineLength: 36
+  logLineLength: 60
+--- !u!225 &2115994620109650221
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174158204653789279}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

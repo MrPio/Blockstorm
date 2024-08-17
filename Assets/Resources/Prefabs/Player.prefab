@@ -358,7 +358,7 @@ MonoBehaviour:
   speed: 5.5
   stamina: 2.75
   staminaRecoverSpeed: 0.6
-  runMultiplier: 14.5
+  runMultiplier: 1.45
   crouchMultiplier: 0.65
   fallSpeed: 2
   gravity: 24
@@ -414,11 +414,14 @@ MonoBehaviour:
   - {fileID: 8503936026029454668, guid: 7050b4bcf0be2734d9c4c7e8bfb5602b, type: 3}
   circleDamage: {fileID: 6303431667206910316, guid: 95b857bfeb59ff24a85579362964d179, type: 3}
   helmetPrefab: {fileID: 6964466103270957878, guid: dcf5003cd48a2684e8283206a8265a48, type: 3}
+  playerBodyPrefab: {fileID: 343774145048235354, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
   walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
   hit: {fileID: 8300000, guid: 663c2b059e2b8f14d89feba2c9240d4e, type: 3}
   helmetHit: {fileID: 8300000, guid: 34615cec92e78cb419b16a7ccc1c35ef, type: 3}
   walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
+  active:
+    m_InternalValue: 0
 --- !u!143 &6541506331053138863
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1288,17 +1291,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1263851460940361170}
     m_Modifications:
-    - target: {fileID: 239570107844548552, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 343774145048235354, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_Name
       value: PlayerBody
-      objectReference: {fileID: 0}
-    - target: {fileID: 646211689577297071, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1120978973499594720, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1339,42 +1334,6 @@ PrefabInstance:
     - target: {fileID: 1120978973499594720, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2844039068766966469, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5084348363028732311, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 4287db76126914b4d8ef6d9e28d92cbf, type: 2}
-    - target: {fileID: 5843050108895433039, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6586703407854351697, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6851036164444382825, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7444381820523562821, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8442439819712976568, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 4d64fa4903cc40f42a1c570b56432dc7, type: 2}
-    - target: {fileID: 8906882017437670573, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -113,7 +113,7 @@ namespace Prefabs
                     player.Status.Value = newStatus;
                 }
 
-                _sm.serverManager.LootCollectableServerRpc(Model.ID);
+                _sm.ServerManager.LootCollectableServerRpc(Model.ID);
                 Destroy(gameObject);
             }
         }

@@ -15,6 +15,7 @@ namespace UI
         // Print the log message to the screen and save it to the log file
         public void Log(string message, Color? color = null, bool alsoInConsole = true)
         {
+            message = $@"({DateTime.Now:hh\:mm\:ss}) - {message}";
             for (var i = 0; i < message.Length / logLineLength + 1; i++)
                 Instantiate(logTextPrefab, transform).GetComponent<TextMeshProUGUI>().Apply(it =>
                 {

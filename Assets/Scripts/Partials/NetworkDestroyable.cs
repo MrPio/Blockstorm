@@ -32,7 +32,7 @@ namespace Partials
 
         public void SetEnabled(bool value)
         {
-            _sm.logger.Log($"[Active] Player {OwnerClientId} set its active state to '{value}'!");
+            _sm.logger.Log($"[Active] Player {OwnerClientId} set its active state to '{value}'!",IsOwner?Color.cyan : Color.yellow);
             if (IsOwner)
                 ifIsMe.ForEach(o => o.SetActive(value));
             else

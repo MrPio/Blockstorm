@@ -63,7 +63,7 @@ namespace Prefabs.Player
         public Model.Weapon WeaponModel
         {
             get => _weaponModel;
-            private set
+            set
             {
                 _weaponModel = value;
                 if (value == null) return;
@@ -129,7 +129,6 @@ namespace Prefabs.Player
                 if (Magazine[_weaponModel.GetNetName] <= 1)
                     audioSource.PlayOneShot(noAmmoClip);
                 if (Magazine[_weaponModel.GetNetName] <= 0)
-                    audioSource.PlayOneShot(noAmmoClip);
                     return;
 
                 // Subtract ammo
@@ -144,7 +143,7 @@ namespace Prefabs.Player
             // Add block to map
             if (_weaponModel.Type is WeaponType.Block)
             {
-                _sm.clientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
+                _sm.ClientManager.EditVoxelClientRpc(new[] { _sm.placeBlock.transform.position },
                     player.Status.Value.BlockId(player.Team));
                 return;
             }
@@ -155,7 +154,7 @@ namespace Prefabs.Player
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {
-                _sm.serverManager.SpawnExplosiveServerRpc(
+                _sm.ServerManager.SpawnExplosiveServerRpc(
                     missile.name,
                     mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
                     mainCamera.transform.rotation.eulerAngles,
@@ -247,7 +246,7 @@ namespace Prefabs.Player
                     audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/blocks/{block.AudioClip}"));
 
                     // Broadcast the damage action
-                    _sm.clientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
+                    _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
                 }
         }
 
@@ -269,7 +268,7 @@ namespace Prefabs.Player
                 animator.SetTrigger(Animator.StringToHash("inventory_switch"));
                 rightArm.SetActive(true);
                 yield return new WaitForSeconds(0.35f);
-                _sm.serverManager.SpawnExplosiveServerRpc(
+                _sm.ServerManager.SpawnExplosiveServerRpc(
                     newStatus.Grenade!.Name.ToUpper(),
                     mainCamera.transform.position + mainCamera.transform.forward * 0.75f + Vector3.down * 0.2f,
                     VectorExtensions.RandomVector3(-180, 180f),
@@ -353,21 +352,22 @@ namespace Prefabs.Player
                 animator.speed = 0;
             else
             {
+                var model = WeaponModel ?? Model.Weapon.Blocks.First();
                 // Load the new weapon prefab
                 foreach (var child in transform.GetComponentsInChildren<Transform>().Where(it => it != transform))
                     Destroy(child.gameObject);
-                var go = Resources.Load<GameObject>(WeaponModel!.GetPrefab());
+                var go = Resources.Load<GameObject>(model.GetPrefab());
                 player.WeaponPrefab = Instantiate(go, transform).Apply(o =>
                 {
                     // Load the weapon material and the scope
                     foreach (var mesh in o.GetComponentsInChildren<MeshRenderer>(true))
                         if (mesh.gameObject.name.Contains("scope"))
                             mesh.gameObject.SetActive(_weaponModel!.Scope == mesh.gameObject.name);
-                        else if (WeaponModel!.Variant is not null)
-                            mesh.material = Resources.Load<Material>(WeaponModel.GetMaterial);
+                        else if (model.Variant is not null)
+                            mesh.material = Resources.Load<Material>(model.GetMaterial);
                     o.layer = LayerMask.NameToLayer("WeaponCamera");
                     o.AddComponent<WeaponSway>();
-                    if (WeaponModel.Type == WeaponType.Block)
+                    if (model.Type == WeaponType.Block)
                         o.GetComponent<MeshRenderer>().material =
                             Resources.Load<Material>(player.Status.Value.BlockType(player.Team).GetMaterial);
                 });

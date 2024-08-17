@@ -20,6 +20,7 @@ namespace Managers
         public Transform placeBlock;
 
         [Header("Prefabs")] public GameObject playerPrefab;
+        public GameObject clientServerManagersPrefab;
 
         [Header("UI")] public Canvas worldCanvas;
         public Canvas uiCanvas;
@@ -48,14 +49,17 @@ namespace Managers
         public SpawnCamera menuCamera;
 
         [Header("Managers")] public WorldManager worldManager;
-        public ClientManager clientManager;
-        public ServerManager serverManager;
+        [NonSerialized] public ClientManager ClientManager;
+        [NonSerialized] public ServerManager ServerManager;
         public NetworkManager networkManager;
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
 
         private void Start()
         {
+            var clientServerManagers = Instantiate(clientServerManagersPrefab);
+            ClientManager = clientServerManagers.GetComponentInChildren<ClientManager>();
+            ServerManager = clientServerManagers.GetComponentInChildren<ServerManager>();
             InitializeMenu();
         }
 
@@ -96,14 +100,16 @@ namespace Managers
         /// <summary>
         /// This is called right after the player has selected a lobby to join or has created a new one.
         /// </summary>
-        public void InitializeMatch()
+        public void InitializeMatch(bool isFirstSpawn = true)
         {
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(true);
             spawnCamera.InitializePosition();
-            teamSelector.SetActive(true);
-            ammoHUD.gameObject.SetActive(false);
+            teamSelector.SetActive(isFirstSpawn);
+            clickToRespawn.SetActive(!isFirstSpawn);
+            hpHUD.Reset();
             hpHUD.gameObject.SetActive(false);
+            ammoHUD.gameObject.SetActive(false);
             mipmap.gameObject.SetActive(true);
             crosshair.gameObject.SetActive(false);
             menuCamera.gameObject.SetActive(false);
@@ -115,7 +121,7 @@ namespace Managers
         /// <summary>
         /// This is called right after the team selection is done and the player is ready to spawn.
         /// </summary>
-        public void InitializeSpawn(Team team)
+        public void InitializeSpawn(Team? newTeam = null, bool resetStats = true)
         {
             dashboard.gameObject.SetActive(true);
             spawnCamera.gameObject.SetActive(false);
@@ -126,7 +132,8 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            FindObjectsOfType<Player>().First(it => it.IsOwner).Spawn(team, new PlayerStats(username: lobbyManager.Username??"Debug"));
+            FindObjectsOfType<Player>().First(it => it.IsOwner)
+                .Spawn(newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
         }

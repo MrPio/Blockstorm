@@ -49,7 +49,7 @@ namespace Prefabs
         {
             _hasExploded = true;
             foreach (var explosion in explosions)
-                _sm.serverManager.SpawnPrefabServerRpc(
+                _sm.ServerManager.SpawnPrefabServerRpc(
                     explosion.name,
                     transform.position,
                     Quaternion.identity.eulerAngles
@@ -59,7 +59,7 @@ namespace Prefabs
 
             // Destroy blocks
             var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);
-            _sm.clientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
+            _sm.ClientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
 
             // Checks if there was a hit on an enemy
