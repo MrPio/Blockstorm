@@ -1,3 +1,4 @@
+using System;
 using Managers.Serializer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -12,13 +13,20 @@ namespace Managers
 {
     public class DebugManager : NetworkBehaviour
     {
+        private SceneManager _sm;
         private readonly ISerializer _serializer = BinarySerializer.Instance;
         private Logger _logger;
         private bool _isHost;
 
+        private void Awake()
+        {
+            _sm = FindObjectOfType<SceneManager>();
+        }
+
         private async void Start()
         {
-            FindObjectOfType<SceneManager>().InitializeLoading();
+            _sm.lobbyManager.gameObject.SetActive(false);
+            _sm.InitializeLoading();
             _logger = FindObjectOfType<Logger>();
             _isHost = _serializer.Deserialize($"{ISerializer.DebugDir}/isHost", true);
             _serializer.Serialize(!_isHost, $"{ISerializer.DebugDir}", "isHost");

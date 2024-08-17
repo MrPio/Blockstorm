@@ -51,6 +51,7 @@
     <Compile Include="Assets\Scripts\Model\BlockType.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\VoxelData.cs" />
     <Compile Include="Assets\Scripts\Partials\Ragdoll.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\ScoreCube.cs" />
     <Compile Include="Assets\Scripts\Managers\RelayManager.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\UI\ReloadBar.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera.cs" />
+    <Compile Include="Assets\Scripts\UI\ScoresHUD.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />

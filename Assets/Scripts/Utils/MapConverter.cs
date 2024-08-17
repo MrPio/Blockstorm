@@ -275,5 +275,17 @@ namespace Utils
             Debug.Log($"Updated {count} blocks!");
             map.Save();
         }
+
+        [Header("AddScoreCube")] [SerializeField]
+        private GameObject scoreCube;
+
+        // Save the position of the score cube.
+        [Button]
+        private void AddScoreCube()
+        {
+            var map = _wm.Map;
+            map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
+            map.Save();
+        }
     }
 }

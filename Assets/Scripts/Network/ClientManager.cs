@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Managers;
 using Model;
 using Unity.Netcode;
@@ -16,13 +18,13 @@ namespace Network
         private SceneManager _sm;
 
         // Used to update the map status
-        private  NetworkVariable<MapStatus> mapStatus = new(new MapStatus
+        private NetworkVariable<MapStatus> mapStatus = new(new MapStatus
         {
             Xs = Array.Empty<short>(), Ys = Array.Empty<short>(), Zs = Array.Empty<short>(), Ids = Array.Empty<byte>()
         });
 
         // Used to update the collectables
-        public  NetworkVariable<CollectablesStatus> collectableStatus =
+        public NetworkVariable<CollectablesStatus> collectableStatus =
             new(new CollectablesStatus
             {
                 Xs = Array.Empty<float>(), Ys = Array.Empty<float>(), Zs = Array.Empty<float>(),
@@ -30,6 +32,9 @@ namespace Network
                 MedkitTypes = Array.Empty<byte>(),
                 WeaponNames = Array.Empty<NetString>()
             });
+
+        // Used to update the collectables
+        public NetworkVariable<Scores> scores = new();
 
         [SerializeField] private GameObject collectable;
 
@@ -77,6 +82,8 @@ namespace Network
             _sm.worldManager.RenderMap();
             if (IsHost)
             {
+                _sm.worldManager.SpawnScoreCube();
+
                 // Spawn collectables on the server and across the net
                 _sm.worldManager.SpawnCollectables();
                 collectableStatus.Value = new CollectablesStatus(
@@ -84,27 +91,28 @@ namespace Network
                     _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
             }
 
+            _sm.scoresHUD.Reset();
+            scores.OnValueChanged += (_, newValue) =>
+            {
+                _sm.scoresHUD.SetScores(newValue);
+                if (IsHost && newValue.Winner is not null)
+                {
+                    // TODO: automatically change the map or disconnect everyone
+                    async void Quit()
+                    {
+                        NetworkManager.Singleton.Shutdown();
+                        await _sm.lobbyManager.LeaveHostedLobby();
+                        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
+                            .GetActiveScene().buildIndex);
+                    }
+
+                    Quit();
+                }
+            };
+
             _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
             // _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
         }
-
-        /*private void OnClientConnected(ulong clientId)
-        {
-            Debug.Log("New client connected: " + clientId);
-            if (IsServer)
-            {
-                var player = Instantiate(_sm.playerPrefab);
-                player.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
-            }
-        }*/
-
-
-        /*[Rpc(SendTo.Everyone)]
-        public void SendPlayerListRpc(ulong[] playerIds, ulong clientId)
-        {
-            if (NetworkManager.Singleton.LocalClientId != clientId) return;
-            _sm.dashboard.UpdateDashboard(playerIds);
-        }*/
 
         /// <summary>
         /// Used to propagate the placement of a block through the network.

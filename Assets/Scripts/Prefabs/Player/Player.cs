@@ -218,7 +218,8 @@ namespace Prefabs.Player
                 LastShotWeapon.OnValueChanged += (_, newValue) =>
                 {
                     if (newValue.Message.Value.Length > 0)
-                        audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/weapons/{newValue.Message.Value}"),
+                        audioSource.PlayOneShot(
+                            Resources.Load<AudioClip>(Model.Weapon.Name2Weapon(newValue)!.GetAudioClip),
                             0.65f);
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
@@ -472,6 +473,9 @@ namespace Prefabs.Player
         public void DamageClientRpc(uint damage, string bodyPart, NetVector3 direction, ulong attackerID,
             float ragdollScale = 1)
         {
+            var newStatus = Status.Value;
+            newStatus.Hp -= (int)damage;
+
             // Both owner and non-owner hear the hit sound effect
             if (bodyPart == "Head" && Status.Value.HasHelmet)
             {
@@ -499,6 +503,10 @@ namespace Prefabs.Player
             else
                 audioSource.PlayOneShot(hit);
 
+            // Stop adding points
+            if (IsHost && newStatus.Hp <= 0)
+                FindObjectOfType<ScoreCube>().insidePlayers.Remove(this);
+
             if (!IsOwner) return;
             // Owner only ========================================================================================
 
@@ -508,9 +516,6 @@ namespace Prefabs.Player
             // Check if the enemy is allied
             if (attackerID != OwnerClientId && attacker.Team == Team)
                 return;
-
-            var newStatus = Status.Value;
-            newStatus.Hp -= (int)damage;
 
             if (bodyPart == "Head" && Status.Value.HasHelmet)
                 newStatus.HasHelmet = false;
@@ -596,7 +601,9 @@ namespace Prefabs.Player
         {
             // Spawn the player location
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(Team) + Vector3.up * 2.1f,
+                // position: _sm.worldManager.Map.GetRandomSpawnPoint(Team.Yellow) + Vector3.up * 2.1f,
+                position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
+                          Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 

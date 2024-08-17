@@ -67,6 +67,7 @@ namespace Prefabs.Player
             {
                 _weaponModel = value;
                 if (value == null) return;
+                Debug.Log(value.GetAudioClip);
                 _fireClip = Resources.Load<AudioClip>(value.GetAudioClip);
                 if (value.Type == WeaponType.Block)
                 {
@@ -110,7 +111,7 @@ namespace Prefabs.Player
             {
                 // Propagate the sound across the net
                 player.LastShotWeapon.Value = "";
-                player.LastShotWeapon.Value = _weaponModel.Name.ToUpper();
+                player.LastShotWeapon.Value = _weaponModel.GetNetName;
                 audioSource.PlayOneShot(_fireClip, 0.65f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
                 weaponAnimator?.SetTrigger(Animator.StringToHash("fire"));

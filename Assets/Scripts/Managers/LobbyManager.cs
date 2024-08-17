@@ -25,12 +25,18 @@ namespace Managers
 
         // The lobby is automatically destroyed after 30 seconds.
         public const float HeartbeatRate = 15f;
-        private Lobby _hostedLobby, _joinedLobby;
+        public const char PasswordFillChar = '0';
+        public Lobby HostedLobby;
+        private Lobby _joinedLobby;
         private List<Lobby> _lobbies;
+
+        private void Awake()
+        {
+            _sm = FindObjectOfType<SceneManager>();
+        }
 
         private async void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
             await Initialize();
             InvokeRepeating(nameof(UpdateLobbies), 0.1f, 2f);
         }
@@ -90,7 +96,7 @@ namespace Managers
                 var options = new CreateLobbyOptions()
                 {
                     Player = GetPlayerOptions(),
-                    IsPrivate = password is not null && password.Length >= 8,
+                    IsPrivate = password is not null,
                     Data = new Dictionary<string, DataObject>
                     {
                         {
@@ -105,12 +111,14 @@ namespace Managers
                         { "relay_code", new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
                     }
                 };
-                if (password is not null && password.Length >= 8)
-                    options.Password = password;
-                _hostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
-                _joinedLobby = _hostedLobby;
+                if (password is not null)
+                    options.Password = password.Length >= 8
+                        ? password
+                        : password + new string(PasswordFillChar, 8 - password.Length);
+                HostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
+                _joinedLobby = HostedLobby;
                 InvokeRepeating(nameof(SendHeartbeat), 1f, HeartbeatRate);
-                Debug.Log($"Lobby '{_hostedLobby.Name}' created!");
+                Debug.Log($"Lobby '{HostedLobby.Name}' created!");
                 CancelInvoke(nameof(UpdateLobbies));
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
@@ -132,10 +140,10 @@ namespace Managers
         public async Task LeaveHostedLobby()
         {
             await LobbyService.Instance.RemovePlayerAsync(_joinedLobby.Id, AuthenticationService.Instance.PlayerId);
-            if (_hostedLobby is not null)
+            if (HostedLobby is not null)
             {
                 CancelInvoke(nameof(SendHeartbeat));
-                _hostedLobby = null;
+                HostedLobby = null;
                 // TODO Host transfer
             }
 
@@ -185,8 +193,10 @@ namespace Managers
                 {
                     Player = GetPlayerOptions(),
                 };
-                if (password is not null && password.Length >= 8)
-                    options.Password = password;
+                if (password is not null)
+                    options.Password = password.Length >= 8
+                        ? password
+                        : password + new string(PasswordFillChar, 8 - password.Length);
                 _joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
                 CancelInvoke(nameof(UpdateLobbies));
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
@@ -256,7 +266,7 @@ namespace Managers
         {
             try
             {
-                _hostedLobby = await Lobbies.Instance.UpdateLobbyAsync(_hostedLobby.Id, new UpdateLobbyOptions
+                HostedLobby = await Lobbies.Instance.UpdateLobbyAsync(HostedLobby.Id, new UpdateLobbyOptions
                 {
                     Data = new Dictionary<string, DataObject>
                     {
@@ -265,7 +275,7 @@ namespace Managers
                         { "relay_code", new(DataObject.VisibilityOptions.Member, relayCode) },
                     }
                 });
-                PrintLobby(_hostedLobby);
+                PrintLobby(HostedLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -275,9 +285,9 @@ namespace Managers
 
         private async void SendHeartbeat()
         {
-            if (_hostedLobby is not null)
+            if (HostedLobby is not null)
             {
-                await LobbyService.Instance.SendHeartbeatPingAsync(_hostedLobby.Id);
+                await LobbyService.Instance.SendHeartbeatPingAsync(HostedLobby.Id);
                 print("Heartbeat sent!");
             }
         }

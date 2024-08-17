@@ -68,6 +68,7 @@ namespace Prefabs
                         newStatus.Tertiary = Model.WeaponItem;
                     if (Model.WeaponItem!.Type is WeaponType.Grenade)
                         newStatus.Grenade = Model.WeaponItem;
+                    
 
                     // Add ammo
                     if (Model.WeaponItem!.Type is WeaponType.Grenade)
@@ -82,11 +83,10 @@ namespace Prefabs
                         player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Ammo!.Value;
                         player.weapon.Magazine[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Magazine!.Value;
                     }
-
                     player.Status.Value = newStatus;
 
                     // Refresh the equipped weapon and Ammo HUD
-                    if (player.weapon.WeaponModel!.Type is not WeaponType.Grenade)
+                    if (Model.WeaponItem!.Type is not WeaponType.Grenade)
                     {
                         player.weapon.SwitchEquipped(Model.WeaponItem!.Type);
                         _sm.ammoHUD.SetAmmo(player.weapon.Magazine[Model.WeaponItem!.GetNetName],

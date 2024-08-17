@@ -1,11 +1,14 @@
 using System;
+using System.Linq;
 using Managers;
 using Model;
+using Prefabs.Player;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VoxelEngine;
 
 namespace UI
 {
@@ -44,15 +47,15 @@ namespace UI
         [SerializeField] private UsernameUI usernameUI;
 
         [Header("JoinPrivateLobby")] [SerializeField]
-        private TextMeshProUGUI joinSessionCodeText;
+        private TMP_InputField joinSessionCodeText;
 
-        [SerializeField] private TextMeshProUGUI joinSessionPasswordText;
+        [SerializeField] private TMP_InputField joinSessionPasswordText;
 
         [Header("JoinPrivateLobbyMessagebox")] [SerializeField]
         private GameObject joinPrivateLobbyMessagebox;
 
         [Header("NewLobby")] [SerializeField] private TextMeshProUGUI newLobbyMap;
-        [SerializeField] private TextMeshProUGUI newLobbyPassword;
+        [SerializeField] private TMP_InputField newLobbyPassword;
 
         [Header("NewLobbyMessagebox")] [SerializeField]
         private GameObject newLobbyMessagebox;
@@ -126,7 +129,7 @@ namespace UI
             {
                 Destroy(transform.parent.parent.gameObject);
                 _sm.InitializeLoading();
-                 await _sm.lobbyManager.CreateLobby(newLobbyMap.text,
+                await _sm.lobbyManager.CreateLobby(newLobbyMap.text,
                     map: newLobbyMap.text, password: newLobbyPassword.text.Length <= 0 ? null : newLobbyPassword.text);
             }
 
@@ -134,7 +137,11 @@ namespace UI
                 Instantiate(newLobbyMessagebox, _sm.uiCanvas.transform);
 
             if (actionType is ActionType.SelectTeam)
-                _sm.InitializeSpawn(team);
+            {
+                if (FindObjectsOfType<Player>().Select(it => it.Team == team).Count() < LobbyManager.MaxPlayers / 4)
+                    _sm.InitializeSpawn(team);
+            }
+
             if (actionType is ActionType.QuitLobby)
             {
                 NetworkManager.Singleton.Shutdown();

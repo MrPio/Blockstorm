@@ -28,6 +28,7 @@ namespace VoxelEngine
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
         [SerializeField] public List<CameraSpawn> cameraSpawns;
+        [SerializeField] public SerializableVector3Int scoreCubePosition;
 
         public Map(string name, List<BlockEncoding> blocksList, Vector3Int size)
         {
@@ -65,7 +66,7 @@ namespace VoxelEngine
             return BlocksHealth[pos];
         }
 
-        public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == Team.Yellow /* TODO */).GetRandomSpawnPoint;
+        public Vector3 GetRandomSpawnPoint(Team team) => spawns.Find(it => it.team == team).GetRandomSpawnPoint;
 
         public void Save([CanBeNull] ISerializer serializer = null)
         {

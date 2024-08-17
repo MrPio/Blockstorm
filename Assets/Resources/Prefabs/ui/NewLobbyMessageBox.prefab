@@ -102,6 +102,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!1 &859846375733238346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1860,6 +1861,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!1 &6678197301041572216
 GameObject:
   m_ObjectHideFlags: 0
@@ -1962,6 +1964,7 @@ MonoBehaviour:
   newLobbyMap: {fileID: 0}
   newLobbyPassword: {fileID: 0}
   newLobbyMessagebox: {fileID: 0}
+  team: 0
 --- !u!1 &6707660400043999605
 GameObject:
   m_ObjectHideFlags: 0
@@ -2519,5 +2522,6 @@ MonoBehaviour:
   joinSessionPasswordText: {fileID: 0}
   joinPrivateLobbyMessagebox: {fileID: 0}
   newLobbyMap: {fileID: 1401417850546979652}
-  newLobbyPassword: {fileID: 6003581309378023713}
+  newLobbyPassword: {fileID: 2107893512493855155}
   newLobbyMessagebox: {fileID: 0}
+  team: 0

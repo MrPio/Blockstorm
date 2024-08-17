@@ -22,6 +22,7 @@ namespace UI
         [SerializeField] private Transform blueStats, redStats, greenStats, yellowStats;
         [SerializeField] private float refreshRate = 1f;
         [SerializeField] private bool isTeamSelector;
+        [SerializeField] private TextMeshProUGUI title;
         private List<ulong> _lastPlayerIds = new();
         private bool _isLooping;
 
@@ -29,7 +30,11 @@ namespace UI
         {
             _sm = FindObjectOfType<SceneManager>();
             if (!isTeamSelector)
+            {
                 transform.GetChild(0).gameObject.SetActive(false);
+                title.text =
+                    $"{_sm.worldManager.Map.name}{(_sm.lobbyManager.HostedLobby is null ? "" : $" - {_sm.lobbyManager.HostedLobby.LobbyCode}")}";
+            }
         }
 
         private void Update()
@@ -107,6 +112,8 @@ namespace UI
                         });
                     stat.name = $"{player.Stats.Value.Username.Value} ({player.OwnerClientId})";
                     stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().text = stat.name;
+                    if (!player.active.Value)
+                        stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().color = Color.grey;
                     stat.transform.Find("KillsText").GetComponent<TextMeshProUGUI>().text =
                         player.Stats.Value.Kills.ToString();
                     stat.transform.Find("DeathsText").GetComponent<TextMeshProUGUI>().text =

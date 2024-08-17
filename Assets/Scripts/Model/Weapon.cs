@@ -85,7 +85,7 @@ namespace Model
             // 375
             new Weapon(name: "barrett", damage: 125, rof: 3, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
-                scope: "scope5", audio:"BARRETT"),
+                scope: "scope5", audio: "BARRETT"),
         };
 
         public static readonly List<Weapon> Secondaries = new()
@@ -138,7 +138,7 @@ namespace Model
             string variant = null)
         {
             Name = name;
-            Audio = audio ?? (variant is null ? name : $"{name.ToUpper()}_{variant.ToUpper()}");
+            Audio = audio ?? (variant is null ? name : $"{name}_{variant}");
             FireAnimation = fireAnimation ?? name;
             Damage = damage;
             Rof = rof;
@@ -173,26 +173,26 @@ namespace Model
         public static Weapon Name2Weapon(string netName) =>
             Blocks.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]) ??
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Melees.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]) ??
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Primaries.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]) ??
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Secondaries.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]) ??
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Tertiaries.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]) ??
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Grenades.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (it.Variant ?? "") == netName.Split(":")[1]);
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1]));
 
         public static readonly List<Weapon> Weapons = Blocks.Concat(Melees).Concat(Primaries).Concat(Secondaries)
             .Concat(Tertiaries).Concat(Grenades).ToList();
 
-        public string GetNetName => $"{Name}:{Variant}";
+        public string GetNetName => $"{Name}:{Variant ?? ""}";
     }
 }

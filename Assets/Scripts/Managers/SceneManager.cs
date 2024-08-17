@@ -44,6 +44,7 @@ namespace Managers
         public GameObject loadingBar;
         public GameObject pauseMenu;
         public Logger logger;
+        public ScoresHUD scoresHUD;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;
         public SpawnCamera menuCamera;
@@ -81,6 +82,7 @@ namespace Managers
                 lobbyMenuUI.SetActive(true);
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
+            scoresHUD.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -95,6 +97,7 @@ namespace Managers
                 lobbyMenuUI.SetActive(false);
             loadingBar.SetActive(true);
             pauseMenu.SetActive(false);
+            scoresHUD.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -116,6 +119,7 @@ namespace Managers
             lobbyMenuUIContainer.SetActive(false);
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
+            scoresHUD.gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -136,6 +140,7 @@ namespace Managers
                 .Spawn(newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
+            scoresHUD.gameObject.SetActive(true);
         }
     }
 }

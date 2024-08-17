@@ -125,7 +125,7 @@ namespace Network
             skinName, blockName, meleeName, primaryName, secondaryName, tertiaryName, grenadeName;
 
 
-        public PlayerStatus( int? hp = null, int? armor = null,
+        public PlayerStatus(int? hp = null, int? armor = null,
             bool? hasHelmet = null,
             byte? leftGrenades = null, bool? hasArmoredBlock = null, FixedString32Bytes? skinName = null,
             FixedString32Bytes? blockName = null,
@@ -163,69 +163,43 @@ namespace Network
         [CanBeNull]
         public Weapon Block
         {
-            get
-            {
-                var name = blockName.Value;
-                return Weapon.Blocks.FirstOrDefault(it => it.Name == name);
-            }
-            set => blockName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(blockName.Value);
+            set => blockName = value?.GetNetName;
         }
 
         [CanBeNull]
         public Weapon Melee
         {
-            get
-            {
-                var name = meleeName.Value;
-                return Weapon.Melees.FirstOrDefault(it => it.Name == name);
-            }
-            set => meleeName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(meleeName.Value);
+            set => meleeName = value?.GetNetName;
         }
 
         [CanBeNull]
         public Weapon Primary
         {
-            get
-            {
-                var name = primaryName.Value;
-                return Weapon.Primaries.FirstOrDefault(it =>
-                    it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
-            }
-            set => primaryName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(primaryName.Value);
+            set => primaryName = value?.GetNetName;
         }
 
         [CanBeNull]
         public Weapon Secondary
         {
-            get
-            {
-                var name = secondaryName.Value;
-                return Weapon.Secondaries.FirstOrDefault(it =>
-                    it.Name == name.Split(':')[0] && (it.Variant ?? "") == name.Split(':')[1]);
-            }
-            set => secondaryName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(secondaryName.Value);
+            set => secondaryName = value?.GetNetName;
         }
 
         [CanBeNull]
         public Weapon Tertiary
         {
-            get
-            {
-                var name = tertiaryName.Value;
-                return Weapon.Tertiaries.FirstOrDefault(it => it.Name == name);
-            }
-            set => tertiaryName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(tertiaryName.Value);
+            set => tertiaryName = value?.GetNetName;
         }
 
         [CanBeNull]
         public Weapon Grenade
         {
-            get
-            {
-                var name = grenadeName.Value;
-                return Weapon.Grenades.FirstOrDefault(it => it.Name == name);
-            }
-            set => grenadeName = value is null ? null : $"{value.Name}:{value.Variant}";
+            get => Weapon.Name2Weapon(grenadeName.Value);
+            set => grenadeName = value?.GetNetName;
         }
 
         public byte BlockId(Team team) =>
@@ -315,6 +289,24 @@ namespace Network
                     ));
                 return collectables;
             }
+        }
+    }
+
+    public struct Scores : INetworkSerializeByMemcpy
+    {
+        public const ushort WinScore = 500;
+        public ushort Red, Blue, Green, Yellow;
+
+        public Team? Winner =>
+            Red >= WinScore ? Team.Red :
+            Blue >= WinScore ? Team.Blue :
+            Green >= WinScore ? Team.Green :
+            Yellow >= WinScore ? Team.Yellow : null;
+
+        public override string ToString()
+        {
+            return
+                $"{nameof(Red)}: {Red}, {nameof(Blue)}: {Blue}, {nameof(Green)}: {Green}, {nameof(Yellow)}: {Yellow}";
         }
     }
 }

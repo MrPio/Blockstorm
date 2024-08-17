@@ -1,12 +1,13 @@
 ﻿# TODO
+
 - Convert Weapon collectable in weapon level increment! + rarity lights
 - React on host disconnect
-- The player respawns after a kill
 - Tnt
-  - The explosion is handled by WorldManager::EditVoxel(*, 0).
-  - Recursively, when another TNT is met, another explosion is triggered.
+    - The explosion is handled by WorldManager::EditVoxel(*, 0).
+    - Recursively, when another TNT is met, another explosion is triggered.
 - Multiple lobby spawns lots of entries in menu. Code not always rendered
-- ~~Skin and helmet texture not loading for both owner and non-owner. PlayerMarker are of wrong color.~~ 
+- ~~The player respawns after a kill~~
+- ~~Skin and helmet texture not loading for both owner and non-owner. PlayerMarker are of wrong color.~~
 - ~~Helmet not spawning. After death, clients cannot throw grenades nor bazooka. Audio clip across the map~~
 - ~~Take kills & deaths into consideration in dashboard~~
 - ~~Add in-game esc menu~~
@@ -23,7 +24,7 @@
 - ~~Shift to run with stamina bar~~
 - ~~Ctrl to crunch and avoid falling~~
 - ~~Bazooka weapon~~
-  - ~~Automatically switch to the previous weapon when ammo runs over~~
+    - ~~Automatically switch to the previous weapon when ammo runs over~~
 - ~~Friendly fire must be disabled~~
 - ~~Scopes~~
 - ~~Mipmap with positions~~

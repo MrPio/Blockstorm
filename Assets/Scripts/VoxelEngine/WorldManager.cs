@@ -6,9 +6,8 @@ using JetBrains.Annotations;
 using Model;
 using Network;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Utils;
 using Collectable = Prefabs.Collectable;
 
 namespace VoxelEngine
@@ -31,6 +30,7 @@ namespace VoxelEngine
         [SerializeField] private string mapName = "Harbor";
         [NonSerialized] public bool HasRendered;
         [SerializeField] private GameObject collectable;
+        [SerializeField] private GameObject scoreCube;
         [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
         [NonSerialized] public List<Collectable> SpawnedCollectables = new();
 
@@ -270,7 +270,7 @@ namespace VoxelEngine
                 .ToList();
             FreeCollectablesSpawnPoints = transforms.Select(it => (NetVector3)it.position).ToList();
             foreach (var collectablesSpawnPoint in
-                     transforms.RandomSublist(transforms.Count / 2).ToList())
+                     transforms.RandomSublist((int)(transforms.Count / 1.75)).ToList())
                 SpawnCollectableWithID(collectablesSpawnPoint.position, log: false);
         }
 
@@ -290,6 +290,12 @@ namespace VoxelEngine
             SpawnedCollectables.Add(newCollectable);
             FreeCollectablesSpawnPoints.Remove(id);
             newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));
+        }
+
+        public void SpawnScoreCube()
+        {
+            var scoreCubeGo = Instantiate(scoreCube, (Vector3Int)Map.scoreCubePosition, Quaternion.identity);
+            scoreCubeGo.GetComponent<NetworkObject>().Spawn(true);
         }
     }
 }
