@@ -112,7 +112,7 @@ namespace Prefabs.Player
                 // Propagate the sound across the net
                 player.LastShotWeapon.Value = "";
                 player.LastShotWeapon.Value = _weaponModel.GetNetName;
-                audioSource.PlayOneShot(_fireClip, 0.65f);
+                audioSource.PlayOneShot(_fireClip, 1f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
                 weaponAnimator?.SetTrigger(Animator.StringToHash("fire"));
 
@@ -190,7 +190,7 @@ namespace Prefabs.Player
                     var helmetHit = hit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
 
                     var damage = (uint)(_weaponModel.Damage * multiplier *
-                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.5f : 1f));
+                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
 
                     // Spawn blood effect on the enemy
                     Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,

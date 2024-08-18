@@ -152,7 +152,7 @@ namespace Network
                                         Weapon.GrenadesSecondary.Where(it => it.Variant is null).ToList().RandomItem()
                                             .GetNetName;
             Hp = hp ?? 100;
-            Armor = armor ?? 0;
+            Armor = armor ?? 50;
             HasHelmet = hasHelmet ?? true;
             LeftGrenades = leftGrenades ?? 2;
             LeftSecondaryGrenades = leftSecondaryGrenades ?? (this.grenadeSecondaryName.Value.ToLower() == "smoke"

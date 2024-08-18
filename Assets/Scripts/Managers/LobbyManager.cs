@@ -72,7 +72,7 @@ namespace Managers
             _sm.usernameUI.Initialize();
 
             var options = new InitializationOptions();
-            // options.SetProfile(Username); // TODO
+            // options.SetProfile(Username);
             await UnityServices.InitializeAsync(options);
             if (AuthenticationService.Instance.IsSignedIn)
                 AuthenticationService.Instance.SignOut();

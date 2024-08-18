@@ -81,7 +81,8 @@ namespace Prefabs
                     if (distanceFactor <= 0) continue;
                     var damage = (uint)(Damage * distanceFactor);
                     player.DamageClientRpc(damage, "Chest",
-                        new NetVector3(transform.position - player.transform.position),
+                        new NetVector3((transform.position - player.transform.position).normalized +
+                                       VectorExtensions.RandomVector3(-0.25f, 0.25f)),
                         attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
                 }
             }

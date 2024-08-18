@@ -23,7 +23,7 @@ namespace Model
 
         public static readonly Dictionary<string, float> BodyPartMultipliers = new()
         {
-            ["Head"] = 1.5f,
+            ["Head"] = 2f,
             ["Body"] = 0.85f,
             ["Chest"] = 1f,
 
@@ -79,12 +79,12 @@ namespace Model
 
             // BARRETT =====================================================================================
             // 300
-            new Weapon(name: "barrett", damage: 100, rof: 3, distance: 200, type: WeaponType.Primary,
+            new Weapon(name: "barrett", damage: 140, rof: 3, distance: 200, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600,
                 scope: "scope5"),
 
             // 375
-            new Weapon(name: "barrett", damage: 125, rof: 3, distance: 150, type: WeaponType.Primary,
+            new Weapon(name: "barrett", damage: 200, rof: 3, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
                 scope: "scope5", audio: "BARRETT"),
         };

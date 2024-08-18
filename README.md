@@ -62,6 +62,15 @@ This solution is not only faster, but also more general, as it can be applied to
 changing the layer on which the ray is cast to "Enemy", we can detect whether the shot has reached the enemy and, if so,
 which part of his body has been hit, thanks to the multiple colliders.
 
+## 🌍 Relay service
+The relay service was used in conjunction with the lobby service to provide remote multiplayer.
+To avoid interfering with the host's router, firewall, and port forwarding, the relay system inserts a server between the host and the clients.
+
+In this project, to switch between localhost and remote modes you should:
+- Deactivate the `LobbyManager`,
+- Activate the `DebugManager`,
+- Set the `NetworkManager`'s transport protocol type to "Relay Unity Transport".
+
 ## 🧭 Roadmap
 
 |               Task               | Done |
@@ -75,7 +84,7 @@ which part of his body has been hit, thanks to the multiple colliders.
 |   Creating and deleting blocks   |  ✅   |
 | Submeshes for transparent blocks |  ✅   |
 |       Inventory management       |  ✅   |
-|    Multiplayer implementation    |  🕓  |
+|    Multiplayer implementation    |  ✅  |
 
 ## 🖼️ Misc
 

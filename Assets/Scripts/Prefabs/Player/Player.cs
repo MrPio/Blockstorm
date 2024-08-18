@@ -99,7 +99,7 @@ namespace Prefabs.Player
             // Load HUD values
             if (IsOwner)
             {
-                _sm.hpHUD.SetHp(Status.Value.Hp, Status.Value.HasHelmet);
+                _sm.hpHUD.SetHp(Status.Value.Hp, Status.Value.Armor, Status.Value.HasHelmet);
                 _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades, Status.Value.LeftSecondaryGrenades);
             }
 
@@ -222,7 +222,7 @@ namespace Prefabs.Player
                     if (newValue.Message.Value.Length > 0)
                         audioSource.PlayOneShot(
                             Resources.Load<AudioClip>(Model.Weapon.Name2Weapon(newValue)!.GetAudioClip),
-                            0.65f);
+                            1f);
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
@@ -282,8 +282,6 @@ namespace Prefabs.Player
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-                _sm.killPlusOne.Activate(Team.Blue, false);
             if (!IsOwner || isDying || !active.Value) return;
 
             // Show the pause menu
@@ -478,7 +476,9 @@ namespace Prefabs.Player
             float ragdollScale = 1)
         {
             var newStatus = Status.Value;
-            newStatus.Hp -= (int)damage;
+            var absorbedByArmor = math.min((int)damage, newStatus.Armor);
+            newStatus.Armor -= absorbedByArmor;
+            newStatus.Hp -= ((int)damage - absorbedByArmor);
 
             // Both owner and non-owner hear the hit sound effect
             if (bodyPart == "Head" && Status.Value.HasHelmet)
@@ -505,12 +505,12 @@ namespace Prefabs.Player
                 // damage /= 2; Already halved by Fire()
             }
             else
-                audioSource.PlayOneShot(newStatus.Hp > 0 ? hit : deadHit);
+                audioSource.PlayOneShot(newStatus.IsDead ? deadHit : hit);
 
             // Stop adding points
-            if (IsHost && newStatus.Hp <= 0)
+            if (IsHost && newStatus.IsDead)
                 FindObjectOfType<ScoreCube>().insidePlayers.Remove(this);
-            else if (_sm.networkManager.LocalClientId == attackerID && newStatus.Hp <= 0)
+            if (_sm.networkManager.LocalClientId == attackerID && newStatus.IsDead)
                 _sm.killPlusOne.Activate(Team, OwnerClientId == attackerID);
 
             if (!IsOwner) return;
@@ -530,7 +530,7 @@ namespace Prefabs.Player
             Status.Value = newStatus;
 
             // Ragdoll
-            if (newStatus.Hp <= 0)
+            if (newStatus.IsDead)
             {
                 // If it's not a suicide, add the kill
                 if (attackerID != OwnerClientId /*AKA: attackedID*/)

@@ -72,6 +72,8 @@ namespace Managers
         /// </summary>
         public void InitializeMenu()
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(false);
             teamSelector.SetActive(false);

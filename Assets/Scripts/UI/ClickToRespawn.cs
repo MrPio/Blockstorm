@@ -5,8 +5,6 @@ using System.Linq;
 using Managers;
 using Model;
 using Network;
-using Prefabs.Player;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace UI
@@ -16,7 +14,7 @@ namespace UI
     /// </summary>
     public class ClickToRespawn : MonoBehaviour
     {
-        public const float DelayBeforeRespawning = 5f / 5f;
+        public const float DelayBeforeRespawning = 5f;
         private SceneManager _sm;
         private List<Transform> _children;
         private bool _canRespawn;

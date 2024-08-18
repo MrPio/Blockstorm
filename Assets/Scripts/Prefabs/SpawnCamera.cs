@@ -15,6 +15,12 @@ namespace Prefabs
             _sm = FindObjectOfType<SceneManager>();
         }
 
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+                InitializePosition();
+        }
+
         public void InitializePosition()
         {
             var cameraSpawn = _sm.worldManager.Map.cameraSpawns.RandomItem();
@@ -23,7 +29,6 @@ namespace Prefabs
 
             // Render the map at the current position
             _sm.worldManager.UpdatePlayerPos(cameraSpawn.position);
-
         }
     }
 }

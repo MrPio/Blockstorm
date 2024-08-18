@@ -82,8 +82,6 @@ namespace Network
                     _sm.logger.Log($"Client {clientId} Disconnected!");
                     if (clientId == 0 || clientId == _sm.networkManager.LocalClientId)
                     {
-                        Cursor.lockState = CursorLockMode.None;
-                        Cursor.visible = true;
                         NetworkManager.Singleton.Shutdown();
                         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
                             .GetActiveScene().buildIndex);
@@ -109,7 +107,6 @@ namespace Network
                 _sm.scoresHUD.SetScores(newValue);
                 if (IsHost && newValue.Winner is not null)
                 {
-                    // TODO: automatically change the map or disconnect everyone
                     async void Quit()
                     {
                         NetworkManager.Singleton.Shutdown();

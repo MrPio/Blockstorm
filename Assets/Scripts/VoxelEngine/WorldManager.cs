@@ -301,7 +301,7 @@ namespace VoxelEngine
                 .ToList();
             FreeCollectablesSpawnPoints = transforms.Select(it => (NetVector3)it.position).ToList();
             foreach (var collectablesSpawnPoint in
-                     transforms.RandomSublist((int)(transforms.Count / 1.75)).ToList())
+                     transforms.RandomSublist((int)(transforms.Count / 1.5)).ToList())
                 SpawnCollectableWithID(collectablesSpawnPoint.position, log: false);
         }
 
