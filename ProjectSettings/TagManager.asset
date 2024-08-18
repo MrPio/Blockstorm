@@ -25,6 +25,7 @@ TagManager:
   - AmmoContainer
   - CollectablesContainer
   - LogContainer
+  - ScoreCube
   layers:
   - Default
   - TransparentFX

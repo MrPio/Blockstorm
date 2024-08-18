@@ -27,9 +27,7 @@ namespace Partials
                 if (gameObject == null || gameObject.IsDestroyed())
                     return;
                 var networkObject = GetComponent<NetworkObject>();
-                if (networkObject is not null && networkObject.IsOwner)
-                    networkObject.Despawn();
-                else
+                if (networkObject is null || NetworkManager.Singleton.IsHost)
                     Destroy(gameObject);
             }
         }

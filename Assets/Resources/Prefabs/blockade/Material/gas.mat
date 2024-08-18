@@ -42,13 +42,14 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _Parallax: 0.005
-    - _Smoothness: 0.1
+    - _Smoothness: 0
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _WorkflowMode: 1
     m_Colors:
     - _BaseColor: {r: 0, g: 0, b: 0, a: 0.5529412}
     - _Color: {r: 0, g: 0, b: 0, a: 0.5529412}
-    - _EmissionColor: {r: 0.0019908147, g: 0.07604915, b: 0, a: 1}
+    - _EmissionColor: {r: 0.0012254902, g: 0.04681374, b: 0, a: 1}
     - _TintColor: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_BuildTextureStacks: []
 --- !u!114 &8231218159152009894

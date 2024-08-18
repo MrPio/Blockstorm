@@ -13,7 +13,8 @@ namespace Model
         Primary,
         Secondary,
         Tertiary,
-        Grenade
+        Grenade,
+        GrenadeSecondary
     }
 
     public class Weapon
@@ -109,22 +110,31 @@ namespace Model
 
         public static readonly List<Weapon> Tertiaries = new()
         {
-            new Weapon(name: "shmel", damage: 175, rof: 10 * 5, zoom: 3f, explosionRange: 2.15f,
-                type: WeaponType.Tertiary, ammo: 1,
+            new Weapon(name: "shmel", damage: 240, rof: 10 * 2, zoom: 3f, explosionRange: 1.85f,
+                type: WeaponType.Tertiary, ammo: 0,
                 reloadTime: 200, magazine: 1, scope: "scope7", fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()
         {
-            new Weapon(name: "M61", damage: 100, explosionRange: 1.65f, explosionTime: 3.25f, type: WeaponType.Grenade),
+            new Weapon(name: "M61", damage: 100, explosionRange: 1.6f, explosionTime: 3.25f, type: WeaponType.Grenade),
             new Weapon(name: "M61_NY", damage: 150, explosionRange: 1.4f, explosionTime: 2.25f,
                 type: WeaponType.Grenade),
         };
 
+        public static readonly List<Weapon> GrenadesSecondary = new()
+        {
+            new Weapon(name: "smoke", damage: 0, explosionTime: 3f, fogDuration: 22f,
+                type: WeaponType.GrenadeSecondary),
+            new Weapon(name: "gas", damage: 25, explosionRange: 1.4f, explosionTime: 2.75f, fogDuration: 20f, rof: 15,
+                type: WeaponType.GrenadeSecondary),
+        };
+
+
         public string Name, Audio, FireAnimation;
         public uint Damage, Rof, Distance;
         public ushort? Magazine, Ammo, ReloadTime;
-        public float? ExplosionRange, ExplosionTime;
+        public float? ExplosionRange, ExplosionTime, FogDuration;
         public float Zoom; // ex: 1.5x
         public WeaponType Type;
         [CanBeNull] public string Scope;
@@ -134,7 +144,8 @@ namespace Model
             [CanBeNull] string fireAnimation = null,
             ushort? magazine = null, ushort? ammo = null, ushort? reloadTime = null,
             WeaponType type = WeaponType.Primary,
-            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, string scope = null,
+            float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, float fogDuration = 0,
+            string scope = null,
             string variant = null)
         {
             Name = name;
@@ -150,6 +161,7 @@ namespace Model
             Zoom = zoom;
             ExplosionRange = explosionRange;
             ExplosionTime = explosionTime;
+            FogDuration = fogDuration;
             Scope = scope;
             Variant = variant;
         }
@@ -188,10 +200,13 @@ namespace Model
                 (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             Grenades.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1]));
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
+            GrenadesSecondary.FirstOrDefault(it =>
+                string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ;
 
         public static readonly List<Weapon> Weapons = Blocks.Concat(Melees).Concat(Primaries).Concat(Secondaries)
-            .Concat(Tertiaries).Concat(Grenades).ToList();
+            .Concat(Tertiaries).Concat(Grenades).Concat(GrenadesSecondary).ToList();
 
         public string GetNetName => $"{Name}:{Variant ?? ""}";
     }

@@ -64,8 +64,9 @@ namespace Model
                     return new Collectable(key, id,
                         key is CollectableType.Weapon
                             ? Weapon.Weapons.Where(it =>
-                                    (it.IsGun && (it.Type is WeaponType.Tertiary || (it.Variant is not null && it.Variant != ""))) ||
-                                    it.Type is WeaponType.Grenade)
+                                    (it.IsGun && (it.Type is WeaponType.Tertiary ||
+                                                  (it.Variant is not null && it.Variant != ""))) ||
+                                    it.Type is WeaponType.Grenade or WeaponType.GrenadeSecondary)
                                 .ToList().RandomItem()
                             : null,
                         key is CollectableType.Hp

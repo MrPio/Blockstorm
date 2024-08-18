@@ -63,6 +63,7 @@ namespace Prefabs.Player
         public AudioClip walkGeneric;
 
         [SerializeField] private AudioClip hit;
+        [SerializeField] private AudioClip deadHit;
         [SerializeField] private AudioClip helmetHit;
 
         [SerializeField] public AudioClip walkMetal;
@@ -99,7 +100,7 @@ namespace Prefabs.Player
             if (IsOwner)
             {
                 _sm.hpHUD.SetHp(Status.Value.Hp, Status.Value.HasHelmet);
-                _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades);
+                _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades,Status.Value.LeftSecondaryGrenades);
             }
 
             // Load the enemy helmet, if any
@@ -502,7 +503,7 @@ namespace Prefabs.Player
                 // damage /= 2; Already halved by Fire()
             }
             else
-                audioSource.PlayOneShot(hit);
+                audioSource.PlayOneShot(newStatus.Hp > 0 ? hit : deadHit);
 
             // Stop adding points
             if (IsHost && newStatus.Hp <= 0)
@@ -565,6 +566,7 @@ namespace Prefabs.Player
                 _sm.logger.Log($"[RagdollRpc] {OwnerClientId} is dead!", IsOwner ? Color.cyan : Color.yellow);
             if (IsOwner)
             {
+                walkAudioSource.Pause();
                 GetComponent<CharacterController>().enabled = !isDying;
                 GetComponent<CapsuleCollider>().enabled = isDying;
                 GetComponentInChildren<CameraMovement>().enabled = !isDying;
@@ -573,7 +575,7 @@ namespace Prefabs.Player
                 transform.Find("WeaponCamera").gameObject.SetActive(!isDying);
                 if (isDying)
                     gameObject.AddComponent<Rigidbody>().Apply(rb =>
-                        rb.AddForceAtPosition(direction.ToVector3 * (damage * 3f),
+                        rb.AddForceAtPosition(direction.ToVector3.normalized * (damage * 5f),
                             _transform.position + Vector3.up * 0.5f));
                 else if (gameObject.TryGetComponent<Rigidbody>(out var rb))
                     Destroy(rb);

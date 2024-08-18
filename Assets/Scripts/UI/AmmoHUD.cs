@@ -5,10 +5,10 @@ namespace UI
 {
     public class AmmoHUD : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI ammoText, ammoLeftText, grenadesText;
+        [SerializeField] private TextMeshProUGUI ammoText, ammoLeftText, grenadesText, grenadesSecondaryText;
         [SerializeField] private GameObject ammoIcon, blockIcon, rocketIcon;
 
-        public void SetAmmo(int ammo, int? ammoLeft = null, bool isTertiary=false)
+        public void SetAmmo(int ammo, int? ammoLeft = null, bool isTertiary = false)
         {
             ammoIcon.SetActive(!isTertiary);
             blockIcon.SetActive(false);
@@ -30,9 +30,10 @@ namespace UI
             ammoText.text = blocks.ToString();
         }
 
-        public void SetGrenades(int grenades)
+        public void SetGrenades(int grenades, int grenadesSecondary)
         {
             grenadesText.text = grenades.ToString();
+            grenadesSecondaryText.text = grenadesSecondary.ToString();
         }
 
         public void SetMelee()

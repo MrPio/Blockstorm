@@ -175,6 +175,17 @@ namespace Prefabs.Player
                 _canThrow = false;
                 _throwingAcc = 0;
             }
+            
+            // Throw the secondary grenade
+            if ((Input.GetKeyUp(KeyCode.H) || _throwingAcc > MaxThrowingAcc) &&
+                player.Status.Value.GrenadeSecondary is not null && player.Status.Value.LeftSecondaryGrenades > 0)
+            {
+                _lastFire = Time.time;
+                if (_canThrow)
+                    weapon.ThrowGrenade(_throwingAcc / MaxThrowingAcc,true);
+                _canThrow = false;
+                _throwingAcc = 0;
+            }
 
             if (Input.GetKeyUp(KeyCode.G))
                 _canThrow = true;

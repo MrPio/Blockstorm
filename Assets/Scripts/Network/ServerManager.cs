@@ -57,12 +57,11 @@ namespace Network
         [ServerRpc(RequireOwnership = false)]
         public void SpawnPrefabServerRpc(string prefabName, NetVector3 position, NetVector3 rotation)
         {
-            if (!IsServer) return;
             var go = Instantiate(networkPrefabsList.PrefabList.First(it => it.Prefab.name == prefabName).Prefab,
                 position.ToVector3,
                 Quaternion.Euler(rotation.ToVector3)
             );
-            go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
+            go.GetComponent<NetworkObject>().Spawn(true);
         }
 
         [ServerRpc(RequireOwnership = false)]

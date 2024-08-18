@@ -254,11 +254,16 @@ namespace Prefabs.Player
         /// <summary>
         /// Throw a grenade with a certain strength amount
         /// </summary>
-        /// <param name="force"> A normalised value of throwing strength</param>
-        public void ThrowGrenade(float force)
+        /// <param name="force"> A normalized value of throwing strength</param>
+        /// <param name="isSecondary"> If the thrown grenade is a secondary grenade,
+        /// i.e., it was thrown with the "H" key</param>
+        public void ThrowGrenade(float force, bool isSecondary = false)
         {
             var newStatus = player.Status.Value;
-            newStatus.LeftGrenades--;
+            if (isSecondary)
+                newStatus.LeftSecondaryGrenades--;
+            else
+                newStatus.LeftGrenades--;
             player.Status.Value = newStatus;
 
             StartCoroutine(Throw());
@@ -269,14 +274,15 @@ namespace Prefabs.Player
                 animator.SetTrigger(Animator.StringToHash("inventory_switch"));
                 rightArm.SetActive(true);
                 yield return new WaitForSeconds(0.35f);
+                var grenadeModel = isSecondary ? newStatus.GrenadeSecondary : newStatus.Grenade;
                 _sm.ServerManager.SpawnExplosiveServerRpc(
-                    newStatus.Grenade!.Name.ToUpper(),
+                    grenadeModel!.Name.ToUpper(),
                     mainCamera.transform.position + mainCamera.transform.forward * 0.75f + Vector3.down * 0.2f,
                     VectorExtensions.RandomVector3(-180, 180f),
                     mainCamera.transform.forward,
-                    newStatus.Grenade!.Damage,
-                    newStatus.Grenade!.ExplosionTime!.Value,
-                    newStatus.Grenade!.ExplosionRange!.Value,
+                    grenadeModel!.Damage,
+                    grenadeModel!.ExplosionTime!.Value,
+                    grenadeModel!.ExplosionRange!.Value,
                     force
                 );
             }
@@ -319,7 +325,7 @@ namespace Prefabs.Player
             if (newWeapon is null)
                 return;
             WeaponModel = newWeapon;
-            if (newWeapon.Type is not WeaponType.Grenade and not WeaponType.Tertiary)
+            if (newWeapon.Type is not WeaponType.Grenade and not WeaponType.Tertiary and not WeaponType.GrenadeSecondary)
                 _lastWeapon = newWeapon.Type;
 
             // Update Ammo HUD

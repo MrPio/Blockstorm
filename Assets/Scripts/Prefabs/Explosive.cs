@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
 using Managers;
 using Network;
 using Partials;
-using TMPro;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -40,7 +37,7 @@ namespace Prefabs
 
             // Prevent the missile to explode on the player itself
             var player = other.gameObject.GetComponentInParent<Player.Player>();
-            if (player is null || player.OwnerClientId != AttackerId)
+            if ((player is null || player.OwnerClientId != AttackerId) && !other.gameObject.CompareTag("ScoreCube"))
                 Explode();
         }
 
@@ -49,84 +46,56 @@ namespace Prefabs
         {
             if (!IsHost) return;
             _hasExploded = true;
+            var isSmokeOrGas = false;
             foreach (var explosion in explosions)
-                _sm.ServerManager.SpawnPrefabServerRpc(
-                    explosion.name,
-                    transform.position,
-                    Quaternion.identity.eulerAngles
-                );
-            HideRpc();
-            Destroy(gameObject, 8f);
-
-            // Destroy blocks
-            var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);
-            _sm.ClientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
-
-
-            // Checks if there was a hit on an enemy
-            var colliders = new Collider[100];
-            Physics.OverlapSphereNonAlloc(transform.position, ExplosionRange * RangeMultiplierForDamage, colliders,
-                1 << LayerMask.NameToLayer("Enemy"));
-            var hitEnemies = new List<ulong>();
-            foreach (var enemy in colliders.Where(it => it is not null))
             {
-                var attackedPlayer = enemy.transform.GetComponentInParent<Player.Player>();
-                if (hitEnemies.Contains(attackedPlayer.OwnerClientId) || !attackedPlayer.active.Value ||
-                    attackedPlayer.Status.Value.IsDead)
-                    continue;
-                var distanceFactor =
-                    1 - Vector3.Distance(enemy.transform.position, transform.position) /
-                    (ExplosionRange * RangeMultiplierForDamage);
-                var damage = (uint)(Damage * distanceFactor);
-
-                // Check if the enemy is allied
-                if (attackedPlayer.IsOwner ||
-                    attackedPlayer.Team != attackerPlayer.Team)
+                var go = Instantiate(explosion,
+                    transform.position,
+                    Quaternion.identity);
+                go.GetComponent<NetworkObject>().Spawn(true);
+                if (go.TryGetComponent(out Gas gas))
                 {
-                    // Spawn the damage text
-                    var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                    damageTextGo.transform.position =
-                        enemy.transform.position - attackerPlayer.cameraTransform.forward * 0.35f;
-                    damageTextGo.transform.rotation = attackerPlayer.transform.rotation;
-                    damageTextGo.GetComponent<FollowRotation>().follow = attackerPlayer.transform;
-                    damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
-                    {
-                        text.text = damage.ToString();
-                        text.color = Color.Lerp(Color.white, Color.red, distanceFactor);
-                    });
-                    damageTextGo.transform.localScale = Vector3.one * math.sqrt(distanceFactor + 0.5f);
-
-                    // Send the damage to the enemy
-                    attackedPlayer.DamageClientRpc(damage, enemy.transform.gameObject.name,
-                        new NetVector3(transform.position - attackerPlayer.transform.position),
-                        attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
-                    hitEnemies.Add(attackedPlayer.OwnerClientId);
+                    isSmokeOrGas = true;
+                    gas.AttackerId.Value = AttackerId;
                 }
             }
 
-            // Check if the player hit himself
-            if (!attackerPlayer.Status.Value.IsDead)
+            HideRpc(isSmokeOrGas);
+            Destroy(gameObject, 8f);
+
+            if (!isSmokeOrGas)
             {
-                var distanceFactor = 1 - Vector3.Distance(attackerPlayer.transform.position, transform.position) /
-                    (ExplosionRange * RangeMultiplierForDamage);
-                if (distanceFactor > 0)
+                // Destroy blocks
+                var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);
+                _sm.ClientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
+
+                // Check if any player was hit
+                foreach (var player in FindObjectsOfType<Player.Player>())
                 {
-                    var damage = (uint)(attackerPlayer.Status.Value.Grenade!.Damage * distanceFactor);
-                    attackerPlayer.DamageClientRpc(damage, "Chest",
-                        new NetVector3(transform.position - attackerPlayer.transform.position),
+                    // Skip if the player is dead or inactive or allied with the attacker
+                    if (!player.active.Value || player.Status.Value.IsDead || !(
+                            player.OwnerClientId == attackerPlayer.OwnerClientId || player.Team != attackerPlayer.Team))
+                        continue;
+                    var distanceFactor = 1 - Vector3.Distance(player.transform.position, transform.position) /
+                        (ExplosionRange * RangeMultiplierForDamage);
+                    if (distanceFactor <= 0) continue;
+                    var damage = (uint)(Damage * distanceFactor);
+                    player.DamageClientRpc(damage, "Chest",
+                        new NetVector3(transform.position - player.transform.position),
                         attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
                 }
             }
         }
 
         [Rpc(SendTo.Everyone)]
-        private void HideRpc()
+        private void HideRpc(bool isSmoke)
         {
             if (smoke != null)
                 smoke.Stop();
             foreach (var meshRenderer in meshes)
                 meshRenderer.enabled = false;
-            GetComponent<AudioSource>().Play();
+            if (!isSmoke)
+                GetComponent<AudioSource>().Play();
         }
 
         [Rpc(SendTo.Everyone)]

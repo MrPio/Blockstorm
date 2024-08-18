@@ -334,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 519613176
+  GlobalObjectIdHash: 1893801084
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -417,6 +417,7 @@ MonoBehaviour:
   playerBodyPrefab: {fileID: 343774145048235354, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
   walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
   hit: {fileID: 8300000, guid: 663c2b059e2b8f14d89feba2c9240d4e, type: 3}
+  deadHit: {fileID: 8300000, guid: c07f210df131be342a1b716e714adfc5, type: 3}
   helmetHit: {fileID: 8300000, guid: 34615cec92e78cb419b16a7ccc1c35ef, type: 3}
   walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}

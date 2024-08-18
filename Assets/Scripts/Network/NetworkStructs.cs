@@ -119,26 +119,29 @@ namespace Network
     {
         public int Hp, Armor;
         public bool HasHelmet;
-        public byte LeftGrenades;
+        public byte LeftGrenades, LeftSecondaryGrenades;
         public bool HasArmoredBlock;
 
         private FixedString32Bytes
-            skinName, blockName, meleeName, primaryName, secondaryName, tertiaryName, grenadeName;
+            skinName, blockName, meleeName, primaryName, secondaryName, tertiaryName, grenadeName, grenadeSecondaryName;
 
 
         public PlayerStatus(int? hp = null, int? armor = null,
             bool? hasHelmet = null,
-            byte? leftGrenades = null, bool? hasArmoredBlock = null, FixedString32Bytes? skinName = null,
+            byte? leftGrenades = null, byte? leftSecondaryGrenades = null, bool? hasArmoredBlock = null,
+            FixedString32Bytes? skinName = null,
             FixedString32Bytes? blockName = null,
             FixedString32Bytes? meleeName = null,
             FixedString32Bytes? primaryName = null, FixedString32Bytes? secondaryName = null,
             FixedString32Bytes? tertiaryName = null,
-            FixedString32Bytes? grenadeName = null)
+            FixedString32Bytes? grenadeName = null,
+            FixedString32Bytes? grenadeSecondaryName = null)
         {
             Hp = hp ?? 100;
             Armor = armor ?? 0;
             HasHelmet = hasHelmet ?? true;
-            LeftGrenades = leftGrenades ?? 5;
+            LeftGrenades = leftGrenades ?? 2;
+            LeftSecondaryGrenades = leftSecondaryGrenades ?? 1;
             HasArmoredBlock = hasArmoredBlock ?? new List<bool> { true, false }.RandomItem();
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
@@ -151,6 +154,9 @@ namespace Network
             this.tertiaryName = tertiaryName ?? "shmel";
             this.grenadeName = grenadeName ??
                                Weapon.Grenades.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
+            this.grenadeSecondaryName = grenadeSecondaryName ??
+                                        Weapon.GrenadesSecondary.Where(it => it.Variant is null).ToList().RandomItem()
+                                            .GetNetName;
         }
 
         public bool IsDead => Hp <= 0;
@@ -207,6 +213,13 @@ namespace Network
             set => grenadeName = value?.GetNetName;
         }
 
+        [CanBeNull]
+        public Weapon GrenadeSecondary
+        {
+            get => Weapon.Name2Weapon(grenadeSecondaryName.Value);
+            set => grenadeSecondaryName = value?.GetNetName;
+        }
+
         public byte BlockId(Team team) =>
             VoxelData.Name2Id($"player_block_{(HasArmoredBlock ? "armored_" : "")}{team.ToString().ToLower()}");
 
@@ -218,6 +231,7 @@ namespace Network
             serializer.SerializeValue(ref Armor);
             serializer.SerializeValue(ref HasHelmet);
             serializer.SerializeValue(ref LeftGrenades);
+            serializer.SerializeValue(ref LeftSecondaryGrenades);
             serializer.SerializeValue(ref HasArmoredBlock);
             serializer.SerializeValue(ref skinName);
             serializer.SerializeValue(ref blockName);
@@ -226,6 +240,7 @@ namespace Network
             serializer.SerializeValue(ref secondaryName);
             serializer.SerializeValue(ref tertiaryName);
             serializer.SerializeValue(ref grenadeName);
+            serializer.SerializeValue(ref grenadeSecondaryName);
         }
     }
 

@@ -107,6 +107,7 @@ namespace Managers
         /// </summary>
         public void InitializeMatch(bool isFirstSpawn = true)
         {
+            RenderSettings.fog = false;
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(true);
             spawnCamera.InitializePosition();
@@ -129,6 +130,7 @@ namespace Managers
         /// </summary>
         public void InitializeSpawn(Team? newTeam = null, bool resetStats = true)
         {
+            RenderSettings.fog = true;
             dashboard.gameObject.SetActive(true);
             spawnCamera.gameObject.SetActive(false);
             teamSelector.SetActive(false);
