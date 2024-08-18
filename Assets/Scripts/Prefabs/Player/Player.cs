@@ -113,7 +113,8 @@ namespace Prefabs.Player
             }
 
             // Add the player to the mipmap
-            _sm.mipmap.AddPlayerMarker(Team, transform);
+            if (Team is not Team.None)
+                _sm.mipmap.AddPlayerMarker(Team, transform);
 
             // Load the body skin
             foreach (var bodyMesh in bodyMeshes)

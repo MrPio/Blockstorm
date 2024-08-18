@@ -12,6 +12,11 @@ namespace UI
         [SerializeField] private ushort logLineLength = 30;
         private bool _isVisible = true;
 
+        private void Start()
+        {
+            GetComponent<CanvasGroup>().alpha = 0;
+        }
+
         // Print the log message to the screen and save it to the log file
         public void Log(string message, Color? color = null, bool alsoInConsole = true)
         {

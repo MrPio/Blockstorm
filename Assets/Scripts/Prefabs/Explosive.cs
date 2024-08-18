@@ -35,7 +35,7 @@ namespace Prefabs
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!IsServer && !IsHost) return;
+            if (!IsHost) return;
             if (!isMissile || _hasExploded) return;
 
             // Prevent the missile to explode on the player itself
@@ -47,6 +47,7 @@ namespace Prefabs
         // Server/Host only
         private void Explode()
         {
+            if (!IsHost) return;
             _hasExploded = true;
             foreach (var explosion in explosions)
                 _sm.ServerManager.SpawnPrefabServerRpc(
@@ -70,38 +71,36 @@ namespace Prefabs
             foreach (var enemy in colliders.Where(it => it is not null))
             {
                 var attackedPlayer = enemy.transform.GetComponentInParent<Player.Player>();
-                if (hitEnemies.Contains(attackedPlayer.OwnerClientId))
+                if (hitEnemies.Contains(attackedPlayer.OwnerClientId) || !attackedPlayer.active.Value ||
+                    attackedPlayer.Status.Value.IsDead)
                     continue;
                 var distanceFactor =
                     1 - Vector3.Distance(enemy.transform.position, transform.position) /
                     (ExplosionRange * RangeMultiplierForDamage);
                 var damage = (uint)(Damage * distanceFactor);
 
-                if (!attackedPlayer.Status.Value.IsDead)
+                // Check if the enemy is allied
+                if (attackedPlayer.IsOwner ||
+                    attackedPlayer.Team != attackerPlayer.Team)
                 {
-                    // Check if the enemy is allied
-                    if (attackedPlayer.IsOwner ||
-                        attackedPlayer.Team != attackerPlayer.Team)
+                    // Spawn the damage text
+                    var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
+                    damageTextGo.transform.position =
+                        enemy.transform.position - attackerPlayer.cameraTransform.forward * 0.35f;
+                    damageTextGo.transform.rotation = attackerPlayer.transform.rotation;
+                    damageTextGo.GetComponent<FollowRotation>().follow = attackerPlayer.transform;
+                    damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
                     {
-                        // Spawn the damage text
-                        var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                        damageTextGo.transform.position =
-                            enemy.transform.position - attackerPlayer.cameraTransform.forward * 0.35f;
-                        damageTextGo.transform.rotation = attackerPlayer.transform.rotation;
-                        damageTextGo.GetComponent<FollowRotation>().follow = attackerPlayer.transform;
-                        damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
-                        {
-                            text.text = damage.ToString();
-                            text.color = Color.Lerp(Color.white, Color.red, distanceFactor);
-                        });
-                        damageTextGo.transform.localScale = Vector3.one * math.sqrt(distanceFactor + 0.5f);
+                        text.text = damage.ToString();
+                        text.color = Color.Lerp(Color.white, Color.red, distanceFactor);
+                    });
+                    damageTextGo.transform.localScale = Vector3.one * math.sqrt(distanceFactor + 0.5f);
 
-                        // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(damage, enemy.transform.gameObject.name,
-                            new NetVector3(transform.position - attackerPlayer.transform.position),
-                            attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
-                        hitEnemies.Add(attackedPlayer.OwnerClientId);
-                    }
+                    // Send the damage to the enemy
+                    attackedPlayer.DamageClientRpc(damage, enemy.transform.gameObject.name,
+                        new NetVector3(transform.position - attackerPlayer.transform.position),
+                        attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
+                    hitEnemies.Add(attackedPlayer.OwnerClientId);
                 }
             }
 
@@ -154,12 +153,8 @@ namespace Prefabs
             _sm = FindObjectOfType<SceneManager>();
             attackerPlayer = FindObjectsOfType<Player.Player>().First(it => it.OwnerClientId == attackerId);
 
-            if (IsServer || IsHost)
-            {
-                // Set explosion condition
-                if (!isMissile)
-                    InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
-            }
+            if (IsHost && !isMissile)
+                InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
         }
     }
 }

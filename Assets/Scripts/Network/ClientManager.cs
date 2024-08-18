@@ -76,6 +76,19 @@ namespace Network
                 // React on collectable changes
                 collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
                 LoadCollectables(collectableStatus.Value);
+
+                _sm.networkManager.OnClientDisconnectCallback += clientId =>
+                {
+                    _sm.logger.Log($"Client {clientId} Disconnected!");
+                    if (clientId == 0 || clientId == _sm.networkManager.LocalClientId)
+                    {
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                        NetworkManager.Singleton.Shutdown();
+                        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
+                            .GetActiveScene().buildIndex);
+                    }
+                };
             }
 
             // Render the map and spawn the player
@@ -100,7 +113,7 @@ namespace Network
                     async void Quit()
                     {
                         NetworkManager.Singleton.Shutdown();
-                        await _sm.lobbyManager.LeaveHostedLobby();
+                        await _sm.lobbyManager.LeaveLobby();
                         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
                             .GetActiveScene().buildIndex);
                     }

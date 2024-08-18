@@ -39,6 +39,7 @@ namespace Managers
         {
             await Initialize();
             InvokeRepeating(nameof(UpdateLobbies), 0.1f, 2f);
+            InvokeRepeating(nameof(SendHeartbeat), 1f, HeartbeatRate);
         }
 
         private async Task UpdateLobbies()
@@ -118,7 +119,6 @@ namespace Managers
                         : password + new string(PasswordFillChar, 8 - password.Length);
                 HostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
                 _joinedLobby = HostedLobby;
-                InvokeRepeating(nameof(SendHeartbeat), 1f, HeartbeatRate);
                 Debug.Log($"Lobby '{HostedLobby.Name}' created!");
                 CancelInvoke(nameof(UpdateLobbies));
                 while (!_sm.worldManager.HasRendered)
@@ -135,17 +135,21 @@ namespace Managers
         }
 
         /// <summary>
-        /// Quit the hosted lobby. Stop sending the heartbeat.
+        /// Quit the joined lobby. Stop sending the heartbeat.
         /// </summary>
         /// <remarks> Lobbies have automatic host migration. </remarks>
-        public async Task LeaveHostedLobby()
+        public async Task LeaveLobby()
         {
+            CancelInvoke(nameof(SendHeartbeat));
             await LobbyService.Instance.RemovePlayerAsync(_joinedLobby.Id, AuthenticationService.Instance.PlayerId);
+
+            // If the there is at least another player, migrate the lobby host
             if (HostedLobby is not null)
             {
-                CancelInvoke(nameof(SendHeartbeat));
+                if (HostedLobby.Players.Count > 1)
+                    HostedLobby = await Lobbies.Instance.UpdateLobbyAsync(HostedLobby.Id,
+                        new UpdateLobbyOptions { HostId = HostedLobby.Players[1].Id });
                 HostedLobby = null;
-                // TODO Host transfer
             }
 
             _joinedLobby = null;
@@ -198,7 +202,7 @@ namespace Managers
                     options.Password = password.Length >= 8
                         ? password
                         : password + new string(PasswordFillChar, 8 - password.Length);
-                _joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
+                _joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code.ToUpper(), options);
                 CancelInvoke(nameof(UpdateLobbies));
                 await _sm.worldManager.RenderMap(_joinedLobby.Data["map"].Value);
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
@@ -288,10 +292,16 @@ namespace Managers
 
         private async void SendHeartbeat()
         {
+            if (_joinedLobby is null) return;
+            if (HostedLobby is null && _joinedLobby.HostId == AuthenticationService.Instance.PlayerId)
+            {
+                _sm.logger.Log("Migration has occurred! You are now the host of this lobby!");
+                HostedLobby = _joinedLobby;
+            }
             if (HostedLobby is not null)
             {
+                _sm.logger.Log("Sending Heartbeat...");
                 await LobbyService.Instance.SendHeartbeatPingAsync(HostedLobby.Id);
-                print("Heartbeat sent!");
             }
         }
 
@@ -315,7 +325,7 @@ namespace Managers
         {
             print("exiting...");
             if (_joinedLobby is not null)
-                await LeaveHostedLobby();
+                await LeaveLobby();
         }
     }
 }

@@ -145,7 +145,7 @@ namespace UI
             if (actionType is ActionType.QuitLobby)
             {
                 NetworkManager.Singleton.Shutdown();
-                await _sm.lobbyManager.LeaveHostedLobby();
+                await _sm.lobbyManager.LeaveLobby();
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
                     .GetActiveScene().buildIndex);
             }
