@@ -100,7 +100,7 @@ namespace Prefabs.Player
             if (IsOwner)
             {
                 _sm.hpHUD.SetHp(Status.Value.Hp, Status.Value.HasHelmet);
-                _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades,Status.Value.LeftSecondaryGrenades);
+                _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades, Status.Value.LeftSecondaryGrenades);
             }
 
             // Load the enemy helmet, if any
@@ -282,6 +282,8 @@ namespace Prefabs.Player
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Space))
+                _sm.killPlusOne.Activate(Team.Blue, false);
             if (!IsOwner || isDying || !active.Value) return;
 
             // Show the pause menu
@@ -508,6 +510,8 @@ namespace Prefabs.Player
             // Stop adding points
             if (IsHost && newStatus.Hp <= 0)
                 FindObjectOfType<ScoreCube>().insidePlayers.Remove(this);
+            else if (_sm.networkManager.LocalClientId == attackerID && newStatus.Hp <= 0)
+                _sm.killPlusOne.Activate(Team, OwnerClientId == attackerID);
 
             if (!IsOwner) return;
             // Owner only ========================================================================================
@@ -528,7 +532,8 @@ namespace Prefabs.Player
             // Ragdoll
             if (newStatus.Hp <= 0)
             {
-                if (attackerID != OwnerClientId)
+                // If it's not a suicide, add the kill
+                if (attackerID != OwnerClientId /*AKA: attackedID*/)
                 {
                     var newAttackerStats = attacker.Stats.Value;
                     newAttackerStats.Kills += 1;

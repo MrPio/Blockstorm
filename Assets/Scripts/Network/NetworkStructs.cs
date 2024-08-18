@@ -137,12 +137,6 @@ namespace Network
             FixedString32Bytes? grenadeName = null,
             FixedString32Bytes? grenadeSecondaryName = null)
         {
-            Hp = hp ?? 100;
-            Armor = armor ?? 0;
-            HasHelmet = hasHelmet ?? true;
-            LeftGrenades = leftGrenades ?? 2;
-            LeftSecondaryGrenades = leftSecondaryGrenades ?? 1;
-            HasArmoredBlock = hasArmoredBlock ?? new List<bool> { true, false }.RandomItem();
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
             this.meleeName =
@@ -157,6 +151,14 @@ namespace Network
             this.grenadeSecondaryName = grenadeSecondaryName ??
                                         Weapon.GrenadesSecondary.Where(it => it.Variant is null).ToList().RandomItem()
                                             .GetNetName;
+            Hp = hp ?? 100;
+            Armor = armor ?? 0;
+            HasHelmet = hasHelmet ?? true;
+            LeftGrenades = leftGrenades ?? 2;
+            LeftSecondaryGrenades = leftSecondaryGrenades ?? (this.grenadeSecondaryName.Value.ToLower() == "smoke"
+                ? (byte)2
+                : (byte)1);
+            HasArmoredBlock = hasArmoredBlock ?? new List<bool> { true, false }.RandomItem();
         }
 
         public bool IsDead => Hp <= 0;

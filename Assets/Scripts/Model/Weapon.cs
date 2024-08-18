@@ -126,7 +126,7 @@ namespace Model
         {
             new Weapon(name: "smoke", damage: 0, explosionTime: 3f, fogDuration: 22f,
                 type: WeaponType.GrenadeSecondary),
-            new Weapon(name: "gas", damage: 25, explosionRange: 1.4f, explosionTime: 2.75f, fogDuration: 20f, rof: 15,
+            new Weapon(name: "gas", damage: 25, explosionRange: 1.4f, explosionTime: 2.75f, fogDuration: 20f, rof: 10,
                 type: WeaponType.GrenadeSecondary),
         };
 

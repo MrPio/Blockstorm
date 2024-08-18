@@ -32,6 +32,8 @@ namespace Managers
             _serializer.Serialize(!_isHost, $"{ISerializer.DebugDir}", "isHost");
 
             await UnityServices.InitializeAsync();
+            if (AuthenticationService.Instance.IsSignedIn)
+                AuthenticationService.Instance.SignOut();
             AuthenticationService.Instance.SignedIn +=
                 () => Debug.Log($"Signed in as {AuthenticationService.Instance.PlayerId}");
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
