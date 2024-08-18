@@ -11,13 +11,14 @@ using Random = UnityEngine.Random;
 
 namespace VoxelEngine
 {
-
     [Serializable]
     public class Map
     {
+        // The list of game maps. It is assumed that each map is stored, 2 times gzip compressed, inside the Firebase storage
+        public static readonly string[] AvailableMaps = { "Harbor" };
         public static ISerializer Serializer => JsonSerializer.Instance;
         public const short MaxHeight = 128;
-        
+
         public string name;
 
         // We assume that we have no more than 256 types of blocks.
@@ -39,7 +40,7 @@ namespace VoxelEngine
             BlocksEdits = new Dictionary<Vector3Int, byte>();
         }
 
-        private Map DeserializeMap()
+        public Map DeserializeMap()
         {
             // From blocksList list to blocks array
             Blocks = new byte[size.y, size.x, size.z];
@@ -49,8 +50,6 @@ namespace VoxelEngine
             BlocksEdits = new Dictionary<Vector3Int, byte>();
             return this;
         }
-
-        public static Map GetMap(string mapName) => Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName, null).DeserializeMap();
 
         public BlockType GetBlock(Vector3Int pos) => VoxelData.BlockTypes[Blocks[pos.y, pos.x, pos.z]];
 
@@ -141,10 +140,10 @@ namespace VoxelEngine
     public class CameraSpawn
     {
         [SerializeField] public Utils.Nullable<Team> team;
-        [SerializeField] public Vector3 position;
-        [SerializeField] public Vector3 rotation;
+        [SerializeField] public SerializableVector3 position;
+        [SerializeField] public SerializableVector3 rotation;
 
-        public CameraSpawn(Vector3 position, Vector3 rotation, Utils.Nullable<Team> team)
+        public CameraSpawn(SerializableVector3 position, SerializableVector3 rotation, Utils.Nullable<Team> team)
         {
             this.position = position;
             this.rotation = rotation;

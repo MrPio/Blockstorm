@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ExtensionFunctions;
 using JetBrains.Annotations;
+using Managers;
+using Managers.Encoder;
+using Managers.Serializer;
 using Model;
 using Network;
 using Unity.Mathematics;
@@ -14,6 +18,8 @@ namespace VoxelEngine
 {
     public class WorldManager : MonoBehaviour
     {
+        private SceneManager _sm;
+
         public byte BlockTypeIndex(string blockName) =>
             (byte)VoxelData.BlockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 
@@ -24,25 +30,50 @@ namespace VoxelEngine
         public float AtlasBlockSize => 1f / atlasCount;
         private Chunk[,] _chunks;
         [ItemCanBeNull] private Chunk[,] _nonSolidChunks;
-        [CanBeNull] private List<Chunk> _brokenChunks = new();
+        [CanBeNull] private readonly List<Chunk> _brokenChunks = new();
         [NonSerialized] public Map Map;
         private Vector3 _playerLastPos;
-        [SerializeField] private string mapName = "Harbor";
         [NonSerialized] public bool HasRendered;
         [SerializeField] private GameObject collectable;
         [SerializeField] private GameObject scoreCube;
         [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
-        [NonSerialized] public List<Collectable> SpawnedCollectables = new();
+        [NonSerialized] public readonly List<Collectable> SpawnedCollectables = new();
 
         private void Start()
         {
+            _sm = FindObjectOfType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
             viewDistance = math.max(1, viewDistance);
-            Map = Map.GetMap(mapName);
         }
 
-        public void RenderMap()
+        private async Task LoadMap(string mapName)
         {
+            if (!Map.AvailableMaps.Contains(mapName))
+                throw new Exception("This map does not exist! Check the Map.AvailableMaps list.");
+            Map = Map.Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName, null);
+            if (Map is null)
+            {
+                _sm.logger.Log($"Downloading the map [{mapName}]...");
+                // Download the map from Firebase storage
+                var filePath = ISerializer.MapsDir + mapName + ".json.gz.gz";
+                await _sm.storageManager.DownloadFileAsync(filePath);
+
+                _sm.logger.Log($"Decompressing the map [{mapName}]...");
+                // Decompress the file
+                while (filePath.Contains(".gz"))
+                    filePath = GzipEncoder.Instance.Decode(filePath);
+
+                _sm.logger.Log($"Deserializing the map [{mapName}]...");
+                // Load the newly downloaded map file
+                Map = Map.Serializer.Deserialize<Map>(ISerializer.MapsDir + mapName, null);
+            }
+
+            Map.DeserializeMap();
+        }
+
+        public async Task RenderMap(string mapName)
+        {
+            await LoadMap(mapName);
             var mapSize = Map.size;
             var chunksX = Mathf.CeilToInt((float)mapSize.x / chunkSize);
             var chunksZ = Mathf.CeilToInt((float)mapSize.z / chunkSize);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Managers.Firebase;
 using Model;
 using Network;
 using Prefabs;
@@ -55,6 +56,7 @@ namespace Managers
         public NetworkManager networkManager;
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
+        public StorageManager storageManager;
 
         private void Start()
         {

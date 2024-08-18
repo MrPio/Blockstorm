@@ -79,7 +79,6 @@ namespace Network
             }
 
             // Render the map and spawn the player
-            _sm.worldManager.RenderMap();
             if (IsHost)
             {
                 _sm.worldManager.SpawnScoreCube();

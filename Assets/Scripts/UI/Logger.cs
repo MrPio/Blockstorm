@@ -27,6 +27,8 @@ namespace UI
             if (alsoInConsole) Debug.Log(message);
         }
 
+        public void LogError(string message) => Log(message, Color.red);
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.KeypadMinus))

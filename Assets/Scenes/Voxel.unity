@@ -18,8 +18,8 @@ RenderSettings:
   m_FogColor: {r: 0.78039217, g: 0.90588236, b: 0.9882353, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.01
-  m_LinearFogStart: 95
-  m_LinearFogEnd: 110
+  m_LinearFogStart: 90
+  m_LinearFogEnd: 105
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
@@ -2755,7 +2755,6 @@ MonoBehaviour:
   chunkSize: 10
   viewDistance: 192
   atlasCount: 16
-  mapName: Harbor
   collectable: {fileID: 2791876225109273032, guid: 38c460983c04cfb4ea333447d2264182, type: 3}
   scoreCube: {fileID: 2921159031840815111, guid: f2de9b2ca063927419e75cb4641d4636, type: 3}
 --- !u!114 &958774639
@@ -3381,6 +3380,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 754e7bf76a4845d1a3a927fd863c0996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1145990818
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1145990820}
+  - component: {fileID: 1145990819}
+  m_Layer: 0
+  m_Name: StorageManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1145990819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145990818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c003edd584fd40dab3e1152cfb15d4f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1145990820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145990818}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 156.80772, y: 29.118753, z: 237.49611}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1152843761
 GameObject:
   m_ObjectHideFlags: 0
@@ -5382,6 +5425,7 @@ MonoBehaviour:
   networkManager: {fileID: 689162637}
   lobbyManager: {fileID: 1607405885}
   relayManager: {fileID: 1236175146}
+  storageManager: {fileID: 1145990819}
 --- !u!4 &1804926417
 Transform:
   m_ObjectHideFlags: 0
@@ -7606,6 +7650,7 @@ SceneRoots:
   - {fileID: 1804926417}
   - {fileID: 1607405886}
   - {fileID: 1236175147}
+  - {fileID: 1145990820}
   - {fileID: 30371042}
   - {fileID: 1404352929}
   - {fileID: 1611321448}

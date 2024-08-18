@@ -38,6 +38,7 @@ namespace Managers
 
             if (_isHost)
             {
+                await _sm.worldManager.RenderMap("Harbor");
                 // var allocation = await RelayService.Instance.CreateAllocationAsync(1);
                 // var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
                 // _logger.Log($"Relay Join Code = {joinCode}");
@@ -48,6 +49,7 @@ namespace Managers
             }
             else
             {
+                await _sm.worldManager.RenderMap("Harbor");
                 // var relayCode = _serializer.Deserialize($"{ISerializer.DebugDir}/relayCode", "");
                 // var allocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                 // var relayServerData = new RelayServerData(allocation, "dtls");

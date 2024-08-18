@@ -41,6 +41,21 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Editor\Firebase.Editor.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Analytics.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Auth.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.TaskExtension.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Google.MiniJson.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\ExternalDependencyManager\Editor\1.2.182\Google.JarResolver.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\ExternalDependencyManager\Editor\1.2.182\Google.IOSResolver.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\ExternalDependencyManager\Editor\1.2.182\Google.VersionHandlerImpl.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\iOS\Firebase.Analytics.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\iOS\Firebase.App.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Storage.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Platform.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.App.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\ExternalDependencyManager\Editor\Google.VersionHandler.dll" />
+    <Analyzer Include="C:\Users\MrPio\Blockstorm\Assets\ExternalDependencyManager\Editor\1.2.182\Google.PackageManagerResolver.dll" />
     <Analyzer Include="D:\Programmi\Unity\2022.3.33f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\Programmi\Unity\2022.3.33f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
@@ -56,6 +71,7 @@
     <Compile Include="Assets\Scripts\Prefabs\Player\WeaponSway.cs" />
     <Compile Include="Assets\Scripts\Model\Weapon.cs" />
     <Compile Include="Assets\Scripts\UI\HpHUD.cs" />
+    <Compile Include="Assets\Scripts\Managers\Firebase\StorageManager.cs" />
     <Compile Include="Assets\Scripts\UI\Dashboard.cs" />
     <Compile Include="Assets\Scripts\Prefabs\PlayerDebug.cs" />
     <Compile Include="Assets\Scripts\UI\ClickToRespawn.cs" />
@@ -68,6 +84,7 @@
     <Compile Include="Assets\Scripts\Model\Team.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\Encoder\GzipEncoder.cs" />
     <Compile Include="Assets\Scripts\Model\Skin.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\Network\ClientManager.cs" />
@@ -88,6 +105,7 @@
     <Compile Include="Assets\Scripts\UI\CrosshairFire.cs" />
     <Compile Include="Assets\Scripts\UI\Mipmap.cs" />
     <Compile Include="Assets\Scripts\UI\MouseSensitivity.cs" />
+    <Compile Include="Assets\Scripts\Utils\SerializableVector3.cs" />
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />
     <Compile Include="Assets\Scripts\Partials\Stack.cs" />
@@ -104,6 +122,7 @@
     <Compile Include="Assets\Scripts\UI\ScoresHUD.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />
+    <Compile Include="Assets\Scripts\Managers\Encoder\IEncoder.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />
@@ -118,6 +137,7 @@
     <None Include="Assets\Resources\Fonts\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\Resources\Fonts\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
@@ -125,11 +145,14 @@
     <None Include="Assets\Resources\Fonts\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-analytics-unity\maven-metadata.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Resources\Fonts\Shaders\TITLE.shader" />
     <None Include="Assets\Resources\Fonts\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\StreamingAssets\google-services.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\SkySeries Freebie\Hdri setup.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
@@ -137,6 +160,7 @@
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne.json" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-storage-unity\maven-metadata.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
     <Reference Include="UnityEngine">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
@@ -404,6 +428,27 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\PackageCache\com.unity.nuget.mono-cecil@1.11.4\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.App">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.App.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.TaskExtension">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.TaskExtension.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Analytics">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.MiniJson">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Platform">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Storage">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Auth">
+      <HintPath>C:\Users\MrPio\Blockstorm\Assets\Firebase\Plugins\Firebase.Auth.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>D:\Programmi\Unity\2022.3.33f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>

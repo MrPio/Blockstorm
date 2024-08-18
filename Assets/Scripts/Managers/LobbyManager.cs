@@ -92,6 +92,7 @@ namespace Managers
         {
             try
             {
+                await _sm.worldManager.RenderMap(map);
                 var relayCode = await _sm.relayManager.CreateRelay();
                 var options = new CreateLobbyOptions()
                 {
@@ -199,6 +200,7 @@ namespace Managers
                         : password + new string(PasswordFillChar, 8 - password.Length);
                 _joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code, options);
                 CancelInvoke(nameof(UpdateLobbies));
+                await _sm.worldManager.RenderMap(_joinedLobby.Data["map"].Value);
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
@@ -223,6 +225,7 @@ namespace Managers
                 };
                 _joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(id, options);
                 CancelInvoke(nameof(UpdateLobbies));
+                await _sm.worldManager.RenderMap(_joinedLobby.Data["map"].Value);
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
