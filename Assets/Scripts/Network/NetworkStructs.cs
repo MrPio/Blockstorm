@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Utils;
 using VoxelEngine;
+using Random = System.Random;
 
 namespace Network
 {
@@ -138,14 +139,18 @@ namespace Network
             Armor = armor ?? 0;
             HasHelmet = hasHelmet ?? true;
             LeftGrenades = leftGrenades ?? 5;
-            HasArmoredBlock = hasArmoredBlock ?? false;
+            HasArmoredBlock = hasArmoredBlock ?? new List<bool> { true, false }.RandomItem();
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
-            this.meleeName = meleeName ?? "shovel";
-            this.primaryName = primaryName ?? "ak47:";
-            this.secondaryName = secondaryName ?? "m1911:";
+            this.meleeName =
+                meleeName ?? Weapon.Melees.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
+            this.primaryName = primaryName ??
+                               Weapon.Primaries.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
+            this.secondaryName = secondaryName ??
+                                 Weapon.Secondaries.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
             this.tertiaryName = tertiaryName ?? "shmel";
-            this.grenadeName = grenadeName ?? "M61_NY";
+            this.grenadeName = grenadeName ??
+                               Weapon.Grenades.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
         }
 
         public bool IsDead => Hp <= 0;

@@ -383,7 +383,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3967566760417111834, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7670799607742067249, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1394,7 +1394,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174158204653789279, guid: eca0526f3016a874f86f84371fa7b69d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3899936763445696651, guid: eca0526f3016a874f86f84371fa7b69d, type: 3}
       propertyPath: m_Pivot.x
@@ -4496,7 +4496,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1607405885
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ namespace ExtensionFunctions
     public static class ListExtensions
     {
         public static T RandomItem<T>(this List<T> list) =>
-            list[Random.Range(0, list.Count)];
+            list[new System.Random().Next(0, list.Count)];
 
         public static List<T> Shuffle<T>(this List<T> list)
         {
@@ -31,7 +31,7 @@ namespace ExtensionFunctions
 
         public static List<T> RandomSublist<T>(this List<T> list, int length)
             => list.ToList().Shuffle().Take(length).ToList();
-        
+
         public static void Print<T>(this List<T> list)
         {
             foreach (var item in list)

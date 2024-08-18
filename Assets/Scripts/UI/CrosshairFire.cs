@@ -15,7 +15,7 @@ namespace UI
         [SerializeField] private RectTransform[] toAnimate;
         [SerializeField] private float baseIntensity;
         [SerializeField] [CanBeNull] private Volume volume;
-        private float _acc, _duration, _intensity;
+        private float _startTime, _duration, _intensity;
         private bool _isAnimating;
         private List<Vector2> startPositions;
         private Vignette vignette;
@@ -32,10 +32,10 @@ namespace UI
         private void Update()
         {
             if (!_isAnimating) return;
-            _acc += Time.deltaTime;
+            var acc = Time.time - _startTime;
             var t = _duration > 1f
-                ? _acc > 0.2f ? _acc / _duration + 0.2f / _duration : _acc
-                : (_acc / _duration);
+                ? acc > 0.2f ? acc / _duration + 0.2f / _duration : acc
+                : (acc / _duration);
             var value = baseIntensity * _intensity * animationCurve.Evaluate(t);
             toAnimate.ToList().ForEach((rect, i) =>
             {
@@ -44,8 +44,7 @@ namespace UI
                         startPositions[i] + Vector2.up.RotateByAngle(rect.rotation.eulerAngles.z) * value;
                 else
                     rect.localScale = Vector3.one * (1f + value);
-                if (vignette is not null)
-                    vignette.intensity.Override(_baseVignetteIntensity - value / 2f);
+                vignette?.intensity.Override(_baseVignetteIntensity - value / 2f);
             });
             if (t > 1)
                 _isAnimating = false;
@@ -54,7 +53,7 @@ namespace UI
         public void Animate(float duration, float intensity)
         {
             _isAnimating = true;
-            _acc = 0;
+            _startTime = Time.time;
             _duration = duration;
             _intensity = intensity;
         }
