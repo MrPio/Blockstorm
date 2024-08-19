@@ -36,6 +36,7 @@ namespace Prefabs.Player
         [SerializeField] private float cameraBounceDuration;
         [SerializeField] private AnimationCurve cameraBounceCurve;
         [SerializeField] private LayerMask groundLayerMask;
+        [SerializeField] private float spawnInvincibilityDuration = 5f;
 
         [Header("Components")] [SerializeField]
         private CharacterController characterController;
@@ -128,7 +129,7 @@ namespace Prefabs.Player
             foreach (var bodyMesh in bodyMeshes)
             {
                 if (bodyMesh.IsDestroyed()) continue;
-                var skinName = Status.Value.Skin.GetSkinForTeam(Team);
+                var skinName = Status.Value.Skin.GetSkinForTeam(Team, invincible: invincible.Value);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
 
@@ -190,6 +191,10 @@ namespace Prefabs.Player
 
         // If the player is spawned
         public NetworkVariable<bool> active = new(false, NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Owner);
+
+        // If the player is invincible
+        public NetworkVariable<bool> invincible = new(false, NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
 
         #endregion
@@ -269,9 +274,26 @@ namespace Prefabs.Player
                 team.OnValueChanged += (_, _) => LoadStatus();
                 if (team.Value is not Team.None) LoadStatus();
             }
+            else
+                invincible.Value = false;
 
             active.OnValueChanged += (_, newValue) => _networkDestroyable.SetEnabled(newValue);
             _networkDestroyable.SetEnabled(active.Value);
+
+            invincible.OnValueChanged += (_, newValue) =>
+            {
+                if (IsOwner)
+                    _sm.invincibilityHUD.SetActive(newValue);
+                else
+                {
+                    foreach (var bodyMesh in bodyMeshes)
+                    {
+                        if (bodyMesh.IsDestroyed()) continue;
+                        var skinName = Status.Value.Skin.GetSkinForTeam(Team, invincible: newValue);
+                        bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
+                    }
+                }
+            };
 
             _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
         }
@@ -558,8 +580,8 @@ namespace Prefabs.Player
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
 
-            // Check if the enemy is allied
-            if (attackerID != OwnerClientId && attacker.Team == Team)
+            // Check if the enemy is allied or invincible
+            if ((attackerID != OwnerClientId && attacker.Team == Team) || invincible.Value)
                 return;
 
             if (bodyPart == "Head" && Status.Value.HasHelmet)
@@ -650,7 +672,7 @@ namespace Prefabs.Player
             transform.SetPositionAndRotation(
                 position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                // Vector3.forward * 4.5f,
+                          // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 
@@ -663,6 +685,7 @@ namespace Prefabs.Player
 
             _sm.logger.Log($"[Spawn] Spawning {OwnerClientId}, team = {Team.ToString()}", Color.cyan);
             active.Value = true;
+            invincible.Value = true;
             Status.Value = new PlayerStatus(null);
             RagdollRpc(0, "", new NetVector3(), true);
             weapon.Magazine.Clear();
@@ -672,12 +695,19 @@ namespace Prefabs.Player
             if (newTeam is not null || playerStats is not null)
                 LoadStatus();
             StartCoroutine(EquipBlock());
+            StartCoroutine(EndInvincibility());
             return;
 
             IEnumerator EquipBlock()
             {
                 yield return new WaitForSeconds(0.15f);
                 weapon.SwitchEquipped(WeaponType.Block);
+            }
+
+            IEnumerator EndInvincibility()
+            {
+                yield return new WaitForSeconds(spawnInvincibilityDuration);
+                invincible.Value = false;
             }
         }
     }

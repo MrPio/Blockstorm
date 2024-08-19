@@ -74,7 +74,8 @@ namespace Prefabs
                 {
                     // Skip if the player is dead or inactive or allied with the attacker
                     if (!player.active.Value || player.Status.Value.IsDead || !(
-                            player.OwnerClientId == attackerPlayer.OwnerClientId || player.Team != attackerPlayer.Team))
+                            player.OwnerClientId == attackerPlayer.OwnerClientId ||
+                            player.Team != attackerPlayer.Team) || player.invincible.Value)
                         continue;
                     var distanceFactor = 1 - Vector3.Distance(player.transform.position, transform.position) /
                         (ExplosionRange * RangeMultiplierForDamage);

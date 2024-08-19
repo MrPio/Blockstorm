@@ -335,7 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 519613176
+  GlobalObjectIdHash: 1893801084
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -393,6 +393,7 @@ MonoBehaviour:
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
+  spawnInvincibilityDuration: 5
   characterController: {fileID: 6541506331053138863}
   groundCheck: {fileID: 2809431145089976558}
   bodyAnimator: {fileID: 6789867817577817733}
@@ -424,6 +425,8 @@ MonoBehaviour:
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
   active:
     m_InternalValue: 0
+  invincible:
+    m_InternalValue: 1
 --- !u!143 &6541506331053138863
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1343,7 +1346,7 @@ PrefabInstance:
     - target: {fileID: 5804113441685958889, guid: 168866c74ce07e94186f5481176e7ebb, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: b4421c640510ac2409a7b27898322164, type: 2}
+      objectReference: {fileID: 2100000, guid: 3abe0ddb5d3cccc4295eb1e946552967, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

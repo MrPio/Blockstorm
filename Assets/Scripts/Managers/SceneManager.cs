@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Managers.Firebase;
 using Model;
 using Network;
@@ -51,6 +52,7 @@ namespace Managers
         public ScoresHUD scoresHUD;
         public KillPlusOne killPlusOne;
         public BottomBar bottomBar;
+        public GameObject invincibilityHUD;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;
         public SpawnCamera menuCamera;
@@ -63,6 +65,7 @@ namespace Managers
         public RelayManager relayManager;
         public StorageManager storageManager;
         private Team? _newTeam = null;
+        [CanBeNull] private Dictionary<WeaponType, Weapon> _lastSelectedWeapons = null;
 
         private void Start()
         {
@@ -94,6 +97,7 @@ namespace Managers
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(false);
+            invincibilityHUD.SetActive(false);
         }
 
         /// <summary>
@@ -109,6 +113,7 @@ namespace Managers
             loadingBar.SetActive(true);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(false);
+            invincibilityHUD.SetActive(false);
         }
 
         /// <summary>
@@ -135,6 +140,7 @@ namespace Managers
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
+            invincibilityHUD.SetActive(false);
         }
 
         /// <summary>
@@ -158,6 +164,7 @@ namespace Managers
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
+            invincibilityHUD.SetActive(false);
             _newTeam = newTeam;
         }
 
@@ -180,8 +187,10 @@ namespace Managers
             lobbyMenuUIContainer.SetActive(false);
             var player = FindObjectsOfType<Player>().First(it => it.IsOwner);
             player.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
-            if (selectedWeapons is not null)
+            if (selectedWeapons is not null || _lastSelectedWeapons is not null)
             {
+                selectedWeapons ??= _lastSelectedWeapons;
+                _lastSelectedWeapons = selectedWeapons;
                 var newStatus = player.Status.Value;
                 newStatus.Melee = selectedWeapons[WeaponType.Melee];
                 newStatus.Primary = selectedWeapons[WeaponType.Primary];
@@ -190,10 +199,11 @@ namespace Managers
                 newStatus.Grenade = selectedWeapons[WeaponType.Grenade];
                 newStatus.GrenadeSecondary = selectedWeapons[WeaponType.GrenadeSecondary];
                 player.Status.Value = newStatus;
-                
+
                 // Initialize the BottomBar
                 bottomBar.Initialize(newStatus, WeaponType.Block);
             }
+
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);

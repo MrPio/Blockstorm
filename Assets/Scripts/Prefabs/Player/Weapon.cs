@@ -200,9 +200,9 @@ namespace Prefabs.Player
 
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
-                        // Check if the enemy is not allied
-                        if (attackedPlayer.IsOwner ||
-                            attackedPlayer.Team != player.Team)
+                        // Check if the enemy is not allied nor invincible
+                        if ((attackedPlayer.IsOwner ||
+                             attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
                         {
                             // Spawn the damage text
                             var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);

@@ -18,6 +18,7 @@ namespace Model
             Name = name;
         }
 
-        public string GetSkinForTeam(Team team) => $"{Name.ToUpper()}_{team.ToString().ToUpper()}";
+        public string GetSkinForTeam(Team team, bool invincible = false) =>
+            $"{Name.ToUpper()}_{team.ToString().ToUpper()}{(invincible ? "_INVINCIBLE" : "")}";
     }
 }
