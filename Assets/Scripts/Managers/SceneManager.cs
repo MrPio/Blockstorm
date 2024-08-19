@@ -47,6 +47,7 @@ namespace Managers
         public Logger logger;
         public ScoresHUD scoresHUD;
         public KillPlusOne killPlusOne;
+        public BottomBar bottomBar;
 
         [Header("Cameras")] public SpawnCamera spawnCamera;
         public SpawnCamera menuCamera;

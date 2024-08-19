@@ -76,6 +76,7 @@
     <Compile Include="Assets\Scripts\Network\NetworkSpawner.cs" />
     <Compile Include="Assets\Scripts\UI\LowHpHUD.cs" />
     <Compile Include="Assets\Scripts\Managers\SceneManager.cs" />
+    <Compile Include="Assets\BottomBar.cs" />
     <Compile Include="Assets\Scripts\Partials\FollowRotation.cs" />
     <Compile Include="Assets\Scripts\UI\ClickableUI.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Player.cs" />

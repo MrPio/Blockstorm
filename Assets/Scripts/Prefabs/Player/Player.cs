@@ -262,6 +262,9 @@ namespace Prefabs.Player
             _networkDestroyable.SetEnabled(active.Value);
 
             _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
+            
+            // Initialize the BottomBar
+            _sm.bottomBar.Initialize(Status.Value,WeaponType.Block);
         }
 
         private void Awake()

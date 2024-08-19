@@ -203,11 +203,12 @@ namespace Model
                 (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ??
             GrenadesSecondary.FirstOrDefault(it =>
                 string.Equals(it.Name, netName.Split(":")[0], StringComparison.CurrentCultureIgnoreCase) &&
-                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1])) ;
+                (!netName.Contains(":") || (it.Variant ?? "") == netName.Split(":")[1]));
 
         public static readonly List<Weapon> Weapons = Blocks.Concat(Melees).Concat(Primaries).Concat(Secondaries)
             .Concat(Tertiaries).Concat(Grenades).Concat(GrenadesSecondary).ToList();
 
         public string GetNetName => $"{Name}:{Variant ?? ""}";
+        public string GetThumbnail => $"Textures/weapons/thumbnail/{Name.ToUpper()}";
     }
 }

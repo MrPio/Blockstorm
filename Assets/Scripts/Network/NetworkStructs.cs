@@ -225,6 +225,18 @@ namespace Network
         public byte BlockId(Team team) =>
             VoxelData.Name2Id($"player_block_{(HasArmoredBlock ? "armored_" : "")}{team.ToString().ToLower()}");
 
+        public Weapon WeaponType2Weapon(WeaponType type) => type switch
+        {
+            WeaponType.Block => Block,
+            WeaponType.Melee => Melee,
+            WeaponType.Primary => Primary,
+            WeaponType.Secondary => Secondary,
+            WeaponType.Tertiary => Tertiary,
+            WeaponType.Grenade => Grenade,
+            WeaponType.GrenadeSecondary => GrenadeSecondary,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+
         public BlockType BlockType(Team team) => VoxelData.BlockTypes[BlockId(team)];
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter

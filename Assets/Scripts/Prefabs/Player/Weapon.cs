@@ -266,6 +266,9 @@ namespace Prefabs.Player
                 newStatus.LeftGrenades--;
             player.Status.Value = newStatus;
 
+            // Show the bottom bar
+            _sm.bottomBar.Initialize(null, isSecondary ? WeaponType.GrenadeSecondary : WeaponType.Grenade);
+
             StartCoroutine(Throw());
             return;
 
@@ -325,7 +328,8 @@ namespace Prefabs.Player
             if (newWeapon is null)
                 return;
             WeaponModel = newWeapon;
-            if (newWeapon.Type is not WeaponType.Grenade and not WeaponType.Tertiary and not WeaponType.GrenadeSecondary)
+            if (newWeapon.Type is not WeaponType.Grenade and not WeaponType.Tertiary
+                and not WeaponType.GrenadeSecondary)
                 _lastWeapon = newWeapon.Type;
 
             // Update Ammo HUD
@@ -347,6 +351,9 @@ namespace Prefabs.Player
 
             // Broadcast the new equipment
             player.EquippedWeapon.Value = $"{WeaponModel!.Name}:{WeaponModel!.Variant}";
+
+            // Show the bottom bar
+            _sm.bottomBar.Initialize(null, weaponType);
         }
 
         /// <summary>
