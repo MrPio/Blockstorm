@@ -114,7 +114,7 @@ namespace Prefabs.Player
             transform.localRotation = Quaternion.AngleAxis(-_mouseLook.y, Vector3.right);
             playerTransform.rotation *= Quaternion.AngleAxis(_mouseLook.x, Vector3.up);
             _mouseLook -= Vector2.right * _mouseLook.x;
-            player.CameraRotationX.Value = (byte)(-(int)_mouseLook.y + 128);
+            player.CameraRotationX.Value = (byte)(-(int)_mouseLook.y + 135);
 
             // Handle green & red block indicators
             if ((_canDig || _canPlace) && !_isPlaceCursorBlocksStarted)
@@ -197,6 +197,20 @@ namespace Prefabs.Player
 
             if (Input.GetMouseButtonUp(0) && _sm.blockDigEffect.isPlaying)
                 _sm.blockDigEffect.Stop();
+
+            // Handle HighlightArea
+            if (weapon.WeaponModel is not null && weapon.WeaponModel.Name.ToUpper() == "TACT")
+            {
+                var newHighlightAreaPos =
+                    _transform.position + new Vector3(_transform.forward.x + 0.01f, 0, _transform.forward.z + 0.01f)
+                        .normalized * 80;
+                var ray = new Ray(_transform.position + _transform.forward * 0.45f, _transform.forward);
+                if (Physics.Raycast(ray, out var hit, 80, 1 << LayerMask.NameToLayer("Ground")))
+                    if (hit.collider is not null)
+                        newHighlightAreaPos = new Vector3(hit.point.x, 0, hit.point.z);
+                _sm.highlightArea.position =
+                    new Vector3(newHighlightAreaPos.x, _sm.highlightArea.position.y, newHighlightAreaPos.z);
+            }
         }
 
         /**

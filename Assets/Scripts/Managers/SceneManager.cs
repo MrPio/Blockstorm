@@ -10,7 +10,6 @@ using Prefabs.Player;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VoxelEngine;
 using Logger = UI.Logger;
 using Weapon = Model.Weapon;
@@ -22,6 +21,7 @@ namespace Managers
         [Header("Ground")] public ParticleSystem blockDigEffect;
         public Transform highlightBlock;
         public Transform placeBlock;
+        public Transform highlightArea;
 
         [Header("Prefabs")] public GameObject playerPrefab;
         public GameObject clientServerManagersPrefab;
