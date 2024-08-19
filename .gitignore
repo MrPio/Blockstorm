@@ -6,6 +6,7 @@ obj/
 Assets/Firebase
 Assets/ExternalDependencyManager/
 Assets/Editor Default Resources
+Assets/TODO.md
 
 # This .gitignore file should be placed at the root of your Unity project directory
 #
