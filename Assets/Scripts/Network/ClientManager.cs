@@ -30,7 +30,7 @@ namespace Network
                 Xs = Array.Empty<float>(), Ys = Array.Empty<float>(), Zs = Array.Empty<float>(),
                 CollectableTypes = Array.Empty<byte>(),
                 MedkitTypes = Array.Empty<byte>(),
-                WeaponNames = Array.Empty<NetString>()
+                WeaponTypes = Array.Empty<byte>()
             });
 
         // Used to update the collectables
@@ -53,30 +53,11 @@ namespace Network
                 for (var i = 0; i < status.Ids.Length; i++)
                     _sm.worldManager.Map.Blocks[status.Ys[i], status.Xs[i], status.Zs[i]] = status.Ids[i];
 
-                void LoadCollectables(CollectablesStatus newStatus)
-                {
-                    var newCollectables = newStatus.ToCollectables;
-                    foreach (var model in newCollectables)
-                        _sm.worldManager.SpawnCollectableWithID(model.ID, model);
-
-                    var removed = new List<Collectable>();
-                    foreach (var spawnedCollectable in _sm.worldManager.SpawnedCollectables)
-                        if (newCollectables.All(it =>
-                                it.ID != spawnedCollectable.Model.ID && !spawnedCollectable.IsDestroyed()))
-                        {
-                            print($"Destroying {spawnedCollectable.Model.ID}");
-                            removed.Add(spawnedCollectable);
-                            _sm.worldManager.FreeCollectablesSpawnPoints.Add(spawnedCollectable.Model.ID);
-                            Destroy(spawnedCollectable.gameObject);
-                        }
-
-                    removed.ForEach(it => _sm.worldManager.SpawnedCollectables.Remove(it));
-                }
-
                 // React on collectable changes
                 collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
                 LoadCollectables(collectableStatus.Value);
 
+                // Quit to the main menu if the host disconnects or kicks me
                 _sm.networkManager.OnClientDisconnectCallback += clientId =>
                 {
                     _sm.logger.Log($"Client {clientId} Disconnected!");
@@ -92,6 +73,7 @@ namespace Network
             // Render the map and spawn the player
             if (IsHost)
             {
+                // Spawn the score cube for all the players
                 _sm.worldManager.SpawnScoreCube();
 
                 // Spawn collectables on the server and across the net
@@ -101,6 +83,7 @@ namespace Network
                     _sm.worldManager.SpawnedCollectables.Select(it => it.Model).ToList());
             }
 
+            // Update the score HUD. If any team wins, quit to the main menu.
             _sm.scoresHUD.Reset();
             scores.OnValueChanged += (_, newValue) =>
             {
@@ -118,9 +101,32 @@ namespace Network
                     Quit();
                 }
             };
+        }
 
-            _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
-            // _sm.networkManager.OnClientConnectedCallback += OnClientConnected;
+        /// <summary>
+        /// Client-only.
+        /// Added the new spawned collectibles and removed the ones that no longer exist
+        /// </summary>
+        /// <param name="newStatus">The new collectable status received from the server.</param>
+        private void LoadCollectables(CollectablesStatus newStatus)
+        {
+            var newCollectables = newStatus.ToCollectables;
+            
+            // Spawn the new collectibles. Only collectables with free ids will be spawned.
+            foreach (var model in newCollectables)
+                _sm.worldManager.SpawnCollectableWithID(model.ID, model);
+
+            // Remove looted collectables
+            var removed = new List<Collectable>();
+            foreach (var c in _sm.worldManager.SpawnedCollectables.Where(c =>
+                         newCollectables.All(it => it.ID != c.Model.ID && !c.IsDestroyed())))
+            {
+                removed.Add(c);
+                _sm.worldManager.FreeCollectablesSpawnPoints.Add(c.Model.ID);
+                Destroy(c.gameObject);
+            }
+
+            removed.ForEach(it => _sm.worldManager.SpawnedCollectables.Remove(it));
         }
 
         /// <summary>

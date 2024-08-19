@@ -105,14 +105,20 @@ namespace Model
 
             // 2_250
             new Weapon(name: "m1911", damage: 75, rof: 30, distance: 50, type: WeaponType.Secondary,
-                fireAnimation: "gun", zoom: 1.55f, ammo: 60, magazine: 5, reloadTime: 160, variant: "GOLD"),
+                fireAnimation: "gun", zoom: 1.55f, ammo: 60, magazine: 5, reloadTime: 80, variant: "GOLD"),
         };
 
         public static readonly List<Weapon> Tertiaries = new()
         {
-            new Weapon(name: "shmel", damage: 240, rof: 10 * 2, zoom: 3f, explosionRange: 1.85f,
+            new Weapon(name: "shmel", damage: 240, rof: 10, zoom: 2.75f, explosionRange: 1.75f,
                 type: WeaponType.Tertiary, ammo: 0,
                 reloadTime: 200, magazine: 1, scope: "scope7", fireAnimation: "gun"),
+            new Weapon(name: "shmel", damage: 210, rof: 50, zoom: 3.15f, explosionRange: 1.5f,
+                type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
+                reloadTime: 300, magazine: 2, scope: "scope7", fireAnimation: "gun", variant: "ICE"),
+            new Weapon(name: "shmel", damage: 300, rof: 35, zoom: 3.5f, explosionRange: 1.95f,
+                type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
+                reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD"),
         };
 
         public static readonly List<Weapon> Grenades = new()
@@ -210,5 +216,18 @@ namespace Model
 
         public string GetNetName => $"{Name}:{Variant ?? ""}";
         public string GetThumbnail => $"Textures/weapons/thumbnail/{Name.ToUpper()}";
+
+        // Return the upgraded variant of the current weapon, if any
+        [CanBeNull]
+        public Weapon GetUpgraded
+        {
+            get
+            {
+                var weapons = Weapons;
+                var index = weapons.IndexOf(this);
+                if (index >= weapons.Count - 1) return null;
+                return weapons[index + 1].Name == Name ? weapons[index + 1] : null;
+            }
+        }
     }
 }

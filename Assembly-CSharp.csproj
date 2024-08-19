@@ -826,14 +826,14 @@
     <Reference Include="Unity.Networking.Transport">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Networking.Transport.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.PixelPerfect.Editor">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.PixelPerfect.Editor">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.PixelPerfect.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
@@ -889,11 +889,11 @@
     <Reference Include="Unity.Netcode.Editor.PackageChecker">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Netcode.Editor.PackageChecker.dll</HintPath>
     </Reference>
-    <Reference Include="PPv2URPConverters">
-      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.2D.PixelPerfect">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.2D.PixelPerfect.dll</HintPath>
+    </Reference>
+    <Reference Include="PPv2URPConverters">
+      <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\PPv2URPConverters.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Multiplayer.Tools.MetricTestData">
       <HintPath>C:\Users\MrPio\Blockstorm\Library\ScriptAssemblies\Unity.Multiplayer.Tools.MetricTestData.dll</HintPath>

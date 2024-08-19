@@ -166,9 +166,9 @@ namespace Prefabs.Player
                 );
 
                 // Switch to the previous weapon if ran out of ammo
-                if (LeftAmmo[_weaponModel.GetNetName] <= 0)
+                if (LeftAmmo[_weaponModel.GetNetName] <= 0 && Magazine[_weaponModel.GetNetName] <= 0)
                     SwitchEquipped(_lastWeapon);
-                else
+                else if (Magazine[_weaponModel.GetNetName] <= 0)
                     SwitchEquipped(WeaponType.Tertiary, silent: true);
                 return;
             }
@@ -295,10 +295,10 @@ namespace Prefabs.Player
         /// Switch the currently selected weapon.
         /// </summary>
         /// <param name="weaponType"> The weapon to equip. </param>
-        public void SwitchEquipped(WeaponType weaponType, bool silent = false)
+        public void SwitchEquipped(WeaponType weaponType, bool silent = false, bool force = false)
         {
             // Make sure the weapon is not switching too fast.
-            if (Time.time - _lastSwitch < 0.085f)
+            if (!force && Time.time - _lastSwitch < 0.085f)
                 return;
             _sm.logger.Log($"[SwitchEquipped] switching to {weaponType}", Color.cyan);
             _lastSwitch = Time.time;

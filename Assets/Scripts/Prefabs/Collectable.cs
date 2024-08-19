@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using ExtensionFunctions;
 using Managers;
 using Model;
+using Network;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -36,18 +39,48 @@ namespace Prefabs
             {
                 CollectableType.Ammo => ammoPrefab,
                 CollectableType.Hp => medkitPrefabs[(int)collectable.MedkitType!.Value],
-                CollectableType.Weapon =>
-                    Resources.Load<GameObject>(collectable.WeaponItem!.GetPrefab(collectable: true)),
+                CollectableType.Weapon => null,
                 _ => throw new ArgumentOutOfRangeException()
             };
-            var go = Instantiate(item, collectableContainer.transform);
+            if (item is not null)
+                Instantiate(item, collectableContainer.transform);
             collectableContainer.transform.rotation = Quaternion.Euler(0f, Random.Range(-180, 180f), 90f);
-            if (collectable.Type is CollectableType.Weapon && collectable.WeaponItem!.Variant is not null)
+        }
 
-                // Load the weapon material and the scope
-                foreach (var mesh in go.GetComponentsInChildren<MeshRenderer>(true))
-                    if (!mesh.gameObject.name.Contains("scope"))
-                        mesh.material = Resources.Load<Material>(collectable.WeaponItem!.GetMaterial);
+        /// <summary>
+        /// If the collectable is a weapon, load the next upgrade for the current player.
+        /// If the player's current weapon has no more upgrades, change the collectable type to ammo.
+        /// </summary>
+        /// <param name="playerStatus">The current player arsenal</param>
+        public void TryUpdateWeaponPrefab(PlayerStatus playerStatus)
+        {
+            if (Model.Type is not CollectableType.Weapon || Model.WeaponType is null)
+                return;
+            var currentWeapon = playerStatus.WeaponType2Weapon(Model.WeaponType.Value);
+
+            var upgradedWeapon = currentWeapon.GetUpgraded ?? currentWeapon;
+
+            // Skip if the weapon is already loaded
+            if (Model.WeaponItem is not null && Model.WeaponItem.GetNetName == upgradedWeapon.GetNetName)
+                return;
+            Model.WeaponItem = upgradedWeapon;
+
+            // If the player has no more upgrades, change the collectable type to ammo
+            // if (upgradedWeapon is null)
+            // {
+            //     Model.Type = CollectableType.Ammo;
+            //     Initialize(Model);
+            //     return;
+            // }
+
+            var upgradedWeaponPrefab = Resources.Load<GameObject>(Model.WeaponItem.GetPrefab(collectable: true));
+            foreach (Transform child in collectableContainer.transform)
+                Destroy(child.gameObject);
+            var go = Instantiate(upgradedWeaponPrefab, collectableContainer.transform);
+            // Load the weapon material and the scope
+            foreach (var mesh in go.GetComponentsInChildren<MeshRenderer>(true))
+                if (!mesh.gameObject.name.Contains("scope"))
+                    mesh.material = Resources.Load<Material>(Model.WeaponItem.GetMaterial);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -70,7 +103,7 @@ namespace Prefabs
                         newStatus.Grenade = Model.WeaponItem;
                     if (Model.WeaponItem!.Type is WeaponType.GrenadeSecondary)
                         newStatus.GrenadeSecondary = Model.WeaponItem;
-                    
+
 
                     // Add ammo
                     if (Model.WeaponItem!.Type is WeaponType.Grenade)
@@ -87,15 +120,17 @@ namespace Prefabs
                         player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Ammo!.Value;
                         player.weapon.Magazine[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Magazine!.Value;
                     }
+
+                    var lootedModel = Model.WeaponItem!;
                     player.Status.Value = newStatus;
 
                     // Refresh the equipped weapon and Ammo HUD
-                    if (Model.WeaponItem!.Type is not WeaponType.Grenade and not WeaponType.GrenadeSecondary)
+                    if (lootedModel.Type is not WeaponType.Grenade and not WeaponType.GrenadeSecondary)
                     {
-                        player.weapon.SwitchEquipped(Model.WeaponItem!.Type);
-                        _sm.ammoHUD.SetAmmo(player.weapon.Magazine[Model.WeaponItem!.GetNetName],
-                            player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName],
-                            isTertiary: Model.WeaponItem!.Type is WeaponType.Tertiary);
+                        player.weapon.SwitchEquipped(lootedModel.Type, force: true);
+                        _sm.ammoHUD.SetAmmo(player.weapon.Magazine[lootedModel.GetNetName],
+                            player.weapon.LeftAmmo[lootedModel.GetNetName],
+                            isTertiary: lootedModel.Type is WeaponType.Tertiary);
                     }
                 }
                 else if (Model.Type is CollectableType.Ammo)

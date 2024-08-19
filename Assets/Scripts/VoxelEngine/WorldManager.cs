@@ -104,6 +104,7 @@ namespace VoxelEngine
             }
 
             HasRendered = true;
+            _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
         }
 
         public bool IsVoxelInWorld(Vector3Int posNorm) =>
@@ -307,13 +308,16 @@ namespace VoxelEngine
         // Server only
         public void SpawnCollectables()
         {
+            // Load the collectable spawn points for the current map. 
             var spawnPoints = Resources.Load<GameObject>($"Prefabs/collectablePoints/{Map.name}");
-            var transforms = spawnPoints.GetComponentsInChildren<Transform>().Where(it => it != spawnPoints.transform)
-                .ToList();
+            var transforms = spawnPoints.GetComponentsInChildren<Transform>()
+                .Where(it => it != spawnPoints.transform).ToList();
             FreeCollectablesSpawnPoints = transforms.Select(it => (NetVector3)it.position).ToList();
+
+            // Spawn random collectable prefabs at some of these spawn points
             foreach (var collectablesSpawnPoint in
-                     transforms.RandomSublist((int)(transforms.Count / 1.5)).ToList())
-                SpawnCollectableWithID(collectablesSpawnPoint.position, log: false);
+                     transforms.RandomSublist((int)(transforms.Count / 1.55)).ToList())
+                SpawnCollectableWithID(collectablesSpawnPoint.position);
         }
 
         /// <summary>
@@ -322,16 +326,14 @@ namespace VoxelEngine
         /// </summary>
         /// <param name="id"> The id of the new collectable. </param>
         /// <param name="model"> The collectable model. If not provided, a random collectable will be spawned. </param>
-        public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null, bool log = false)
+        public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null)
         {
             if (SpawnedCollectables.Any(it => it.Model.ID == id)) return;
-            if (log) Debug.Log($"Spawning collectable at {id}");
-            var newCollectable =
-                Instantiate(collectable, id, Quaternion.identity,
-                    GameObject.FindGameObjectWithTag("CollectablesContainer").transform).GetComponent<Collectable>();
+            var newCollectable = Instantiate(collectable, id, Quaternion.identity,
+                GameObject.FindGameObjectWithTag("CollectablesContainer").transform).GetComponent<Collectable>();
+            newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));
             SpawnedCollectables.Add(newCollectable);
             FreeCollectablesSpawnPoints.Remove(id);
-            newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));
         }
 
         public void SpawnScoreCube()

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ExtensionFunctions;
-using JetBrains.Annotations;
 using Network;
-using Utils;
 
 namespace Model
 {
@@ -25,11 +22,17 @@ namespace Model
 
     public class Collectable
     {
-        private static readonly Dictionary<CollectableType, float> Probabilities = new()
+        private static readonly Dictionary<CollectableType, float> TypeProbabilities = new()
         {
-            { CollectableType.Hp, 0.35f },
-            { CollectableType.Ammo, 0.35f },
-            { CollectableType.Weapon, 0.35f },
+            { CollectableType.Hp, 2 },
+            { CollectableType.Ammo, 2 },
+            { CollectableType.Weapon, 3 },
+        };
+        private static readonly Dictionary<WeaponType, float> WeaponProbabilities = new()
+        {
+            { Model.WeaponType.Primary, 2 },
+            { Model.WeaponType.Secondary, 2 },
+            { Model.WeaponType.Tertiary, 1 },
         };
 
         public static readonly Dictionary<Medkit, ushort> MedkitHps = new()
@@ -40,42 +43,29 @@ namespace Model
         };
 
         public CollectableType Type;
-        [CanBeNull] public Weapon WeaponItem;
+        public WeaponType? WeaponType;
         public Medkit? MedkitType;
         public NetVector3 ID;
+        [NonSerialized] public Weapon WeaponItem;
 
-        public Collectable(CollectableType type, NetVector3 id, Weapon weaponItem = null,
-            Medkit? medkitType = null)
+        public Collectable(CollectableType type, NetVector3 id, Medkit? medkitType = null,
+            WeaponType? weaponType = null)
         {
             Type = type;
-            WeaponItem = weaponItem;
-            MedkitType = medkitType;
             ID = id;
+            MedkitType = medkitType;
+            WeaponType = weaponType;
         }
 
         public static Collectable GetRandomCollectable(NetVector3 id)
         {
-            var p = new Random().NextDouble();
-            var acc = 0f;
-            foreach (var (key, value) in Probabilities)
-            {
-                acc += value;
-                if (acc >= p)
-                    return new Collectable(key, id,
-                        key is CollectableType.Weapon
-                            ? Weapon.Weapons.Where(it =>
-                                    (it.IsGun && (it.Type is WeaponType.Tertiary ||
-                                                  (it.Variant is not null && it.Variant != ""))) ||
-                                    it.Type is WeaponType.Grenade or WeaponType.GrenadeSecondary)
-                                .ToList().RandomItem()
-                            : null,
-                        key is CollectableType.Hp
-                            ? (Medkit)Enum.GetValues(typeof(Medkit))
-                                .GetValue(new Random().Next(Enum.GetNames(typeof(Medkit)).Length))
-                            : null);
-            }
-
-            return null;
+            var type = TypeProbabilities.DrawRandom();
+            return new Collectable(
+                type: type,
+                id: id,
+                medkitType: type is CollectableType.Hp ? EnumExtensions.RandomItem<Medkit>() : null,
+                weaponType: WeaponProbabilities.DrawRandom()
+            );
         }
     }
 }

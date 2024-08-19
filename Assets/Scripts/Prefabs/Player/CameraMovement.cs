@@ -30,6 +30,7 @@ namespace Prefabs.Player
         [SerializeField] private Player player;
         [SerializeField] public Weapon weapon;
         [SerializeField] private AudioSource audioSource;
+        [SerializeField] private Camera weaponCamera;
 
         [Header("AudioClips")] [SerializeField]
         private AudioClip blockDamageLightClip;
@@ -263,9 +264,12 @@ namespace Prefabs.Player
         /// Set the fov
         /// </summary>
         /// <param name="value"> A value normalized in [0, 1]. </param>
-        public void SetFOV(float value) {
+        public void SetFOV(float value)
+        {
             FOVMain = math.lerp(68 - 10f, 68 + 10f, value);
+            FOVWeapon = math.lerp(52 - 6f, 52 + 6f, value);
             _camera.fieldOfView = FOVMain;
+            weaponCamera.fieldOfView = FOVWeapon;
         }
     }
 }

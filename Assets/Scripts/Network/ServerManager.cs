@@ -29,30 +29,6 @@ namespace Network
         {
             _sm = FindObjectOfType<SceneManager>();
         }
-
-        /*[ServerRpc(RequireOwnership = false)]
-        public void RequestPlayerListServerRpc(ServerRpcParams rpcParams = default)
-        {
-            if (!IsServer) return;
-            var players = NetworkManager.Singleton.ConnectedClientsList.Select(it => it.ClientId);
-            _sm.clientManager.SendPlayerListRpc(players.ToArray(), rpcParams.Receive.SenderClientId);
-        }*/
-
-        /*
-        [ServerRpc(RequireOwnership = false)]
-        public void KillPlayerServerRpc(ServerRpcParams rpcParams = default)
-        {
-            if (!IsServer) return;
-            StartCoroutine(Respawn());
-            return;
-
-            IEnumerator Respawn()
-            {
-                yield return new WaitForSeconds(4f);
-                Destroy(GameObject.FindGameObjectsWithTag("Player").First(it =>
-                    it.GetComponent<NetworkObject>().OwnerClientId == rpcParams.Receive.SenderClientId));
-            }
-        }*/
         
         [ServerRpc(RequireOwnership = false)]
         public void SpawnPrefabServerRpc(string prefabName, NetVector3 position, NetVector3 rotation)

@@ -281,15 +281,15 @@ namespace Network
     {
         public float[] Xs, Ys, Zs;
         public byte[] MedkitTypes, CollectableTypes;
-        public NetString[] WeaponNames;
+        public byte[] WeaponTypes;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref Xs);
             serializer.SerializeValue(ref Ys);
             serializer.SerializeValue(ref Zs);
-            serializer.SerializeValue(ref WeaponNames);
             serializer.SerializeValue(ref MedkitTypes);
+            serializer.SerializeValue(ref WeaponTypes);
             serializer.SerializeValue(ref CollectableTypes);
         }
 
@@ -300,7 +300,7 @@ namespace Network
             Zs = positions.Select(it => it.z).ToArray();
             CollectableTypes = collectables.Select(it => (byte)it.Type).ToArray();
             MedkitTypes = collectables.Select(it => it.MedkitType is null ? (byte)0 : (byte)it.MedkitType).ToArray();
-            WeaponNames = collectables.Select(it => (NetString)(it.WeaponItem?.GetNetName ?? "")).ToArray();
+            WeaponTypes = collectables.Select(it => it.WeaponType is null ? (byte)0 : (byte)it.WeaponType).ToArray();
         }
 
         public List<Collectable> ToCollectables
@@ -312,8 +312,8 @@ namespace Network
                     collectables.Add(new Collectable(
                         (CollectableType)Enum.GetValues(typeof(CollectableType)).GetValue(CollectableTypes[i]),
                         new NetVector3(Xs[i], Ys[i], Zs[i]),
-                        Weapon.Name2Weapon(WeaponNames[i]),
-                        (Medkit)Enum.GetValues(typeof(Medkit)).GetValue(MedkitTypes[i])
+                        (Medkit)Enum.GetValues(typeof(Medkit)).GetValue(MedkitTypes[i]),
+                        (WeaponType)Enum.GetValues(typeof(WeaponType)).GetValue(WeaponTypes[i])
                     ));
                 return collectables;
             }

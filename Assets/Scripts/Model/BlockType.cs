@@ -8,9 +8,9 @@ namespace Model
     {
         NonDiggable = 0,
         OneHit = 1,
-        Low = 50,
-        Medium = 85,
-        High = 140,
+        Low = 40,
+        Medium = 75,
+        High = 120,
         Indestructible = int.MaxValue,
     }
 

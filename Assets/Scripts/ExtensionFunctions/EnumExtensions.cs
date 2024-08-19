@@ -4,7 +4,7 @@ namespace ExtensionFunctions
 {
     public static class EnumExtensions
     {
-        private static readonly Random Random = new Random();
+        private static readonly Random Random = new();
 
         public static T RandomItem<T>() where T : Enum
         {

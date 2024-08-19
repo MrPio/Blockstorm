@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
+using System.Linq;
 
 namespace ExtensionFunctions
 {
@@ -10,6 +10,20 @@ namespace ExtensionFunctions
         {
             foreach (var item in dictionary)
                 action(item.Key, item.Value);
+        }
+
+        public static TK DrawRandom<TK>(this Dictionary<TK, float> dictionary)
+        {
+            var p = new Random().NextDouble() * dictionary.Values.Sum();
+            var acc = 0f;
+            foreach (var (key, value) in dictionary)
+            {
+                acc += value;
+                if (acc >= p)
+                    return key;
+            }
+
+            return dictionary.Keys.First();
         }
     }
 }

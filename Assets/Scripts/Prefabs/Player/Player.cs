@@ -131,6 +131,11 @@ namespace Prefabs.Player
                 var skinName = Status.Value.Skin.GetSkinForTeam(Team);
                 bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
             }
+
+            // Load collectables weapon prefabs
+            if (IsOwner)
+                foreach (var colletable in _sm.worldManager.SpawnedCollectables)
+                    colletable.TryUpdateWeaponPrefab(Status.Value);
         }
 
         #endregion
