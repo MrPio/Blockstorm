@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Partials\NetworkDestroyable.cs" />
     <Compile Include="Assets\Scripts\Utils\ClientNetworkTransform.cs" />
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
+    <Compile Include="Assets\Scripts\UI\SliderSetting.cs" />
     <Compile Include="Assets\Scripts\Utils\Vector2XZ.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
     <Compile Include="Assets\Scripts\Model\Team.cs" />
@@ -91,7 +92,6 @@
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />
     <Compile Include="Assets\Scripts\UI\CrosshairFire.cs" />
     <Compile Include="Assets\Scripts\UI\Mipmap.cs" />
-    <Compile Include="Assets\Scripts\UI\MouseSensitivity.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3.cs" />
     <Compile Include="Assets\Scripts\Utils\Nullable.cs" />
     <Compile Include="Assets\Scripts\UI\KillPlusOne.cs" />

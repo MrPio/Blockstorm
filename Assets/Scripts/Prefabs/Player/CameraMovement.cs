@@ -17,7 +17,7 @@ namespace Prefabs.Player
     /// <seealso cref="Weapon"/>
     public class CameraMovement : MonoBehaviour
     {
-        public const float FOVMain = 68, FOVWeapon = 54;
+        public float FOVMain = 68, FOVWeapon = 54;
         private SceneManager _sm;
 
         [Header("Params")] [SerializeField] public float sensitivity, smoothing;
@@ -88,7 +88,8 @@ namespace Prefabs.Player
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _transform = transform;
-            SetSensitivity(BinarySerializer.Instance.Deserialize<float>($"{ISerializer.ConfigsDir}/sensitivity", 0.2f));
+            SetSensitivity(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/sensitivity", 0.2f));
+            SetFOV(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/fov", 0.5f));
         }
 
         private void LateUpdate()
@@ -175,14 +176,14 @@ namespace Prefabs.Player
                 _canThrow = false;
                 _throwingAcc = 0;
             }
-            
+
             // Throw the secondary grenade
             if ((Input.GetKeyUp(KeyCode.H) || _throwingAcc > MaxThrowingAcc) &&
                 player.Status.Value.GrenadeSecondary is not null && player.Status.Value.LeftSecondaryGrenades > 0)
             {
                 _lastFire = Time.time;
                 if (_canThrow)
-                    weapon.ThrowGrenade(_throwingAcc / MaxThrowingAcc,true);
+                    weapon.ThrowGrenade(_throwingAcc / MaxThrowingAcc, true);
                 _canThrow = false;
                 _throwingAcc = 0;
             }
@@ -257,5 +258,14 @@ namespace Prefabs.Player
         /// <param name="value"> A value normalized in [0, 1]. </param>
         public void SetSensitivity(float value) =>
             sensitivity = (value * 4f + 0.25f) * 100f;
+
+        /// <summary>
+        /// Set the fov
+        /// </summary>
+        /// <param name="value"> A value normalized in [0, 1]. </param>
+        public void SetFOV(float value) {
+            FOVMain = math.lerp(68 - 10f, 68 + 10f, value);
+            _camera.fieldOfView = FOVMain;
+        }
     }
 }

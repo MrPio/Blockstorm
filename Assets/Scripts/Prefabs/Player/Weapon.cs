@@ -447,8 +447,8 @@ namespace Prefabs.Player
             }
 
             // Set the camera zoom according to the weapon scope
-            mainCamera.fieldOfView = CameraMovement.FOVMain / (isAiming ? _weaponModel!.Zoom : 1);
-            weaponCamera.fieldOfView = CameraMovement.FOVWeapon / (isAiming ? _weaponModel!.Zoom : 1);
+            mainCamera.fieldOfView = cameraMovement.FOVMain / (isAiming ? _weaponModel!.Zoom : 1);
+            weaponCamera.fieldOfView = cameraMovement.FOVWeapon / (isAiming ? _weaponModel!.Zoom : 1);
         }
 
         /// <summary>

@@ -39,11 +39,22 @@ namespace VoxelEngine
         [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
         [NonSerialized] public readonly List<Collectable> SpawnedCollectables = new();
 
+        /// <summary>
+        /// Set the render distance
+        /// </summary>
+        /// <param name="value"> A value normalized in [0, 1]. </param>
+        public void SetRenderDistance(float value)
+        {
+            viewDistance = (int)math.lerp(32f, 256f, value);
+            if (HasRendered)
+                UpdatePlayerPos(_playerLastPos, force: true);
+        }
+
         private void Start()
         {
             _sm = FindObjectOfType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
-            viewDistance = math.max(1, viewDistance);
+            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/render_distance", 0.5f));
         }
 
         private async Task LoadMap(string mapName)
@@ -104,9 +115,9 @@ namespace VoxelEngine
             IsVoxelInWorld(posNorm) ? VoxelData.BlockTypes[Map.Blocks[posNorm.y, posNorm.x, posNorm.z]] : null;
 
         // This is used to update the rendered chunks
-        public void UpdatePlayerPos(Vector3 playerPos)
+        public void UpdatePlayerPos(Vector3 playerPos, bool force = false)
         {
-            if (!HasRendered || Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9)
+            if (!HasRendered || (!force && Vector3.Distance(_playerLastPos, playerPos) < chunkSize * .9))
                 return;
             _playerLastPos = playerPos;
             for (var x = 0; x < _chunks.GetLength(0); x++)
