@@ -298,7 +298,7 @@ namespace Prefabs.Player
         public void SwitchEquipped(WeaponType weaponType, bool silent = false)
         {
             // Make sure the weapon is not switching too fast.
-            if (Time.time - _lastSwitch < 0.25f)
+            if (Time.time - _lastSwitch < 0.085f)
                 return;
             _sm.logger.Log($"[SwitchEquipped] switching to {weaponType}", Color.cyan);
             _lastSwitch = Time.time;

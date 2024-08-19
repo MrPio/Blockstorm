@@ -262,9 +262,9 @@ namespace Prefabs.Player
             _networkDestroyable.SetEnabled(active.Value);
 
             _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
-            
+
             // Initialize the BottomBar
-            _sm.bottomBar.Initialize(Status.Value,WeaponType.Block);
+            _sm.bottomBar.Initialize(Status.Value, WeaponType.Block);
         }
 
         private void Awake()
@@ -416,6 +416,26 @@ namespace Prefabs.Player
                     weapon = WeaponType.Secondary;
                 else if (Input.GetKeyDown(KeyCode.Q) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
                     weapon = WeaponType.Tertiary;
+                else if (Input.GetAxis("Mouse ScrollWheel") > 0.05f)
+                    weapon = this.weapon.WeaponModel.Type switch
+                    {
+                        WeaponType.Block => WeaponType.Melee,
+                        WeaponType.Melee => WeaponType.Primary,
+                        WeaponType.Primary => WeaponType.Secondary,
+                        WeaponType.Secondary => WeaponType.Tertiary,
+                        WeaponType.Tertiary => WeaponType.Block,
+                        _ => null
+                    };
+                else if (Input.GetAxis("Mouse ScrollWheel") < -0.05f)
+                    weapon = this.weapon.WeaponModel.Type switch
+                    {
+                        WeaponType.Block => WeaponType.Tertiary,
+                        WeaponType.Melee => WeaponType.Block,
+                        WeaponType.Primary => WeaponType.Melee,
+                        WeaponType.Secondary => WeaponType.Primary,
+                        WeaponType.Tertiary => WeaponType.Secondary,
+                        _ => null
+                    };
                 if (weapon is not null)
                     this.weapon.SwitchEquipped(weapon.Value);
 
