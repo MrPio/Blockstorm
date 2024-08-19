@@ -84,8 +84,15 @@ namespace Prefabs.Player
         private float _usedStamina;
         private NetworkDestroyable _networkDestroyable;
 
+        private bool CanUseInventory => Team is not Team.None && active.Value &&
+                                        _sm.worldManager.Map.spawns.First(it => it.team == Team)
+                                            .IsInside(transform.position);
+
+        // Owner-only
         private void UpdateChunks()
         {
+            if (!IsOwner) return;
+            _sm.ammoHUD.SetInventoryIcon(CanUseInventory);
             if (active.Value)
                 _sm.worldManager.UpdatePlayerPos(_transform.position);
         }
@@ -262,9 +269,6 @@ namespace Prefabs.Player
             _networkDestroyable.SetEnabled(active.Value);
 
             _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
-
-            // Initialize the BottomBar
-            _sm.bottomBar.Initialize(Status.Value, WeaponType.Block);
         }
 
         private void Awake()
@@ -478,6 +482,13 @@ namespace Prefabs.Player
 
             else if (Input.GetKeyUp(KeyCode.LeftControl) && _isCrouching.Value)
                 _isCrouching.Value = false;
+
+            // Handle Inventory
+            if (Input.GetKeyDown(KeyCode.I) && CanUseInventory)
+            {
+                active.Value = false;
+                _sm.InitializeInventory();
+            }
         }
 
         # endregion
@@ -574,7 +585,7 @@ namespace Prefabs.Player
                 {
                     yield return new WaitForSeconds(2f);
                     active.Value = false;
-                    _sm.InitializeMatch(isFirstSpawn: false);
+                    _sm.InitializeTeamSelection(isFirstSpawn: false);
                 }
             }
 
@@ -632,9 +643,9 @@ namespace Prefabs.Player
         {
             // Spawn the player location
             transform.SetPositionAndRotation(
-                // position: _sm.worldManager.Map.GetRandomSpawnPoint(Team.Yellow) + Vector3.up * 2.1f,
-                position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                          Vector3.forward * 4.5f,
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
+                // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
+                // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 

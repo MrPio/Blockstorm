@@ -14,5 +14,7 @@ namespace Utils
             this.x = x;
             this.z = z;
         }
+
+        public Vector3 ToVector3(float y = 0) => new(x, y, z);
     }
 }

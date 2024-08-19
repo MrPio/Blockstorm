@@ -6,7 +6,7 @@ namespace UI
     public class AmmoHUD : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI ammoText, ammoLeftText, grenadesText, grenadesSecondaryText;
-        [SerializeField] private GameObject ammoIcon, blockIcon, rocketIcon;
+        [SerializeField] private GameObject ammoIcon, blockIcon, rocketIcon, inventoryIcon;
 
         public void SetAmmo(int ammo, int? ammoLeft = null, bool isTertiary = false)
         {
@@ -43,6 +43,11 @@ namespace UI
             rocketIcon.SetActive(false);
             ammoLeftText.gameObject.SetActive(false);
             ammoText.gameObject.SetActive(false);
+        }
+
+        public void SetInventoryIcon(bool value)
+        {
+            inventoryIcon.SetActive(value);
         }
     }
 }

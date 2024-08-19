@@ -103,6 +103,7 @@
     <Compile Include="Assets\Scripts\UI\AmmoHUD.cs" />
     <Compile Include="Assets\Scripts\Managers\LobbyManager.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\Weapon.cs" />
+    <Compile Include="Assets\Scripts\UI\InventoryTab.cs" />
     <Compile Include="Assets\Scripts\UI\Logger.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\UI\ReloadBar.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\Scripts\Managers\Encoder\IEncoder.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ArrayExtensions.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
+    <Compile Include="Assets\Scripts\UI\InventoryWeaponTile.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ListExtensions.cs" />
     <Compile Include="Assets\Scripts\UI\Inventory.cs" />

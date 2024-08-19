@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers.Serializer;
@@ -108,6 +109,11 @@ namespace VoxelEngine
         }
 
         public Vector3 GetRandomSpawnPoint => spawnLayers.RandomItem().GetRandomSpawnPoint;
+
+        public bool IsInside(Vector3 point) => spawnLayers.Any(it =>
+            point.x > it.bottomLeft.x && point.x < it.topRight.x &&
+            point.z > it.bottomLeft.z && point.z < it.topRight.z &&
+            point.y > spawnLayers.Select(sp => sp.y).Min() - 2f && point.y < spawnLayers.Select(sp => sp.y).Max() + 2f);
     }
 
     /**
@@ -129,6 +135,8 @@ namespace VoxelEngine
 
         public Vector3 GetRandomSpawnPoint =>
             new(Random.Range(bottomLeft.x, topRight.x), y, Random.Range(bottomLeft.z, topRight.z));
+
+        public Vector3 Center => (bottomLeft.ToVector3(y) + topRight.ToVector3(y)) / 2;
     }
 
     /**

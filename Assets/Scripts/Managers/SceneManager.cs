@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Managers.Firebase;
 using Model;
@@ -11,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using VoxelEngine;
 using Logger = UI.Logger;
+using Weapon = Model.Weapon;
 
 namespace Managers
 {
@@ -39,6 +41,7 @@ namespace Managers
         public CrosshairFire scopeFire;
         public GameObject clickToRespawn;
         public GameObject teamSelector;
+        public GameObject inventory;
         public UsernameUI usernameUI;
         public GameObject lobbyMenuUIContainer;
         public GameObject[] lobbyMenuUIs;
@@ -59,6 +62,7 @@ namespace Managers
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
         public StorageManager storageManager;
+        private Team? _newTeam = null;
 
         private void Start()
         {
@@ -78,6 +82,7 @@ namespace Managers
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(false);
             teamSelector.SetActive(false);
+            inventory.SetActive(false);
             ammoHUD.gameObject.SetActive(false);
             hpHUD.gameObject.SetActive(false);
             mipmap.gameObject.SetActive(false);
@@ -109,13 +114,16 @@ namespace Managers
         /// <summary>
         /// This is called right after the player has selected a lobby to join or has created a new one.
         /// </summary>
-        public void InitializeMatch(bool isFirstSpawn = true)
+        public void InitializeTeamSelection(bool isFirstSpawn = true)
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             RenderSettings.fog = false;
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(true);
             spawnCamera.InitializePosition();
             teamSelector.SetActive(isFirstSpawn);
+            inventory.SetActive(false);
             clickToRespawn.SetActive(!isFirstSpawn);
             hpHUD.Reset();
             hpHUD.gameObject.SetActive(false);
@@ -130,10 +138,36 @@ namespace Managers
         }
 
         /// <summary>
-        /// This is called right after the team selection is done and the player is ready to spawn.
+        /// This is called right after the team selection.
         /// </summary>
-        public void InitializeSpawn(Team? newTeam = null, bool resetStats = true)
+        public void InitializeInventory(Team? newTeam = null)
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            RenderSettings.fog = false;
+            dashboard.gameObject.SetActive(false);
+            spawnCamera.gameObject.SetActive(true);
+            teamSelector.SetActive(false);
+            inventory.gameObject.SetActive(true);
+            ammoHUD.gameObject.SetActive(false);
+            hpHUD.gameObject.SetActive(false);
+            mipmap.gameObject.SetActive(true);
+            crosshair.gameObject.SetActive(false);
+            menuCamera.gameObject.SetActive(false);
+            lobbyMenuUIContainer.SetActive(false);
+            loadingBar.SetActive(false);
+            pauseMenu.SetActive(false);
+            scoresHUD.gameObject.SetActive(true);
+            _newTeam = newTeam;
+        }
+
+        /// <summary>
+        /// This is called right after the inventory selection and the player is ready to spawn.
+        /// </summary>
+        public void InitializeSpawn(bool resetStats = true, Dictionary<WeaponType, Weapon> selectedWeapons = null)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
             RenderSettings.fog = true;
             dashboard.gameObject.SetActive(true);
             spawnCamera.gameObject.SetActive(false);
@@ -144,11 +178,26 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            FindObjectsOfType<Player>().First(it => it.IsOwner)
-                .Spawn(newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
+            var player = FindObjectsOfType<Player>().First(it => it.IsOwner);
+            player.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
+            if (selectedWeapons is not null)
+            {
+                var newStatus = player.Status.Value;
+                newStatus.Melee = selectedWeapons[WeaponType.Melee];
+                newStatus.Primary = selectedWeapons[WeaponType.Primary];
+                newStatus.Secondary = selectedWeapons[WeaponType.Secondary];
+                newStatus.Tertiary = selectedWeapons[WeaponType.Tertiary];
+                newStatus.Grenade = selectedWeapons[WeaponType.Grenade];
+                newStatus.GrenadeSecondary = selectedWeapons[WeaponType.GrenadeSecondary];
+                player.Status.Value = newStatus;
+                
+                // Initialize the BottomBar
+                bottomBar.Initialize(newStatus, WeaponType.Block);
+            }
             loadingBar.SetActive(false);
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
+            inventory.SetActive(false);
         }
     }
 }

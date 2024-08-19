@@ -92,7 +92,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.1
+  m_fontSize: 10
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -143,6 +143,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 767944499158575615}
+  - component: {fileID: 630136238296173907}
   m_Layer: 5
   m_Name: Tab
   m_TagString: Untagged
@@ -172,6 +173,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &630136238296173907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3503044523854807296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf111bc288a6bdc4496ad8a307847c92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponType: 1
+  bg: {fileID: 3525877063244586753}
 --- !u!1 &6758741172903158705
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,7 +198,6 @@ GameObject:
   - component: {fileID: 6564061717370827223}
   - component: {fileID: 2347012562819109493}
   - component: {fileID: 3525877063244586753}
-  - component: {fileID: 2801027154368947215}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -248,33 +262,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2801027154368947215
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6758741172903158705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fcbcf86fd275674cb5e2e9e1a2e9cd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hoverColor: {r: 1, g: 0.7427106, b: 0, a: 0.9607843}
-  image: {fileID: 3525877063244586753}
-  text: {fileID: 0}
-  actionType: 0
-  editText: {fileID: 0}
-  confirmIcon: {fileID: 0}
-  editTextText: {fileID: 0}
-  usernameUI: {fileID: 0}
-  joinSessionCodeText: {fileID: 0}
-  joinSessionPasswordText: {fileID: 0}
-  joinPrivateLobbyMessagebox: {fileID: 0}
-  newLobbyMap: {fileID: 0}
-  newLobbyPassword: {fileID: 0}
-  newLobbyMessagebox: {fileID: 0}
-  team: 0
 --- !u!1 &9023954986401469326
 GameObject:
   m_ObjectHideFlags: 0

@@ -59,7 +59,7 @@ namespace Managers
                 NetworkManager.Singleton.StartClient();
             }
 
-            FindObjectOfType<SceneManager>().InitializeMatch();
+            FindObjectOfType<SceneManager>().InitializeTeamSelection();
 
             _logger.Log($"Connection established as {(_isHost ? "Host" : "Client")}");
         }

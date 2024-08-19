@@ -316,6 +316,7 @@ namespace Prefabs.Player
 
             // Find the new weapon in the player's inventory
             var status = player.Status.Value;
+
             var newWeapon = weaponType switch
             {
                 WeaponType.Block => status.Block,

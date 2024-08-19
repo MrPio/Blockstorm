@@ -139,18 +139,12 @@ namespace Network
         {
             this.skinName = skinName ?? "soldier";
             this.blockName = blockName ?? "block";
-            this.meleeName =
-                meleeName ?? Weapon.Melees.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
-            this.primaryName = primaryName ??
-                               Weapon.Primaries.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
-            this.secondaryName = secondaryName ??
-                                 Weapon.Secondaries.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
-            this.tertiaryName = tertiaryName ?? "shmel";
-            this.grenadeName = grenadeName ??
-                               Weapon.Grenades.Where(it => it.Variant is null).ToList().RandomItem().GetNetName;
-            this.grenadeSecondaryName = grenadeSecondaryName ??
-                                        Weapon.GrenadesSecondary.Where(it => it.Variant is null).ToList().RandomItem()
-                                            .GetNetName;
+            this.meleeName = meleeName ?? Weapon.Melees[0].GetNetName;
+            this.primaryName = primaryName ?? Weapon.Primaries[0].GetNetName;
+            this.secondaryName = secondaryName ?? Weapon.Secondaries[0].GetNetName;
+            this.tertiaryName = tertiaryName ?? Weapon.Tertiaries[0].GetNetName;
+            this.grenadeName = grenadeName ?? Weapon.Grenades[0].GetNetName;
+            this.grenadeSecondaryName = grenadeSecondaryName ?? Weapon.GrenadesSecondary[0].GetNetName;
             Hp = hp ?? 100;
             Armor = armor ?? 50;
             HasHelmet = hasHelmet ?? true;

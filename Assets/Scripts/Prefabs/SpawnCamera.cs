@@ -17,12 +17,18 @@ namespace Prefabs
 
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Space))
                 InitializePosition();
+        }
+
+        private void OnEnable()
+        {
+            InitializePosition();
         }
 
         public void InitializePosition()
         {
+            if (!_sm.worldManager.HasRendered) return;
             var cameraSpawn = _sm.worldManager.Map.cameraSpawns.RandomItem();
             transform.position = cameraSpawn.position;
             transform.rotation = Quaternion.Euler(cameraSpawn.rotation);

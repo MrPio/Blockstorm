@@ -28,6 +28,7 @@ namespace UI
         CloseMessageBox,
         SelectTeam,
         QuitLobby,
+        InventorySpawn
     }
 
     public class ClickableUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -139,7 +140,7 @@ namespace UI
             if (actionType is ActionType.SelectTeam)
             {
                 if (FindObjectsOfType<Player>().Select(it => it.Team == team).Count() < LobbyManager.MaxPlayers / 4)
-                    _sm.InitializeSpawn(team);
+                    _sm.InitializeInventory(team);
             }
 
             if (actionType is ActionType.QuitLobby)
@@ -148,6 +149,12 @@ namespace UI
                 await _sm.lobbyManager.LeaveLobby();
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
                     .GetActiveScene().buildIndex);
+            }
+
+            if (actionType is ActionType.InventorySpawn)
+            {
+                var inventory = FindObjectOfType<Inventory>();
+                _sm.InitializeSpawn(selectedWeapons:inventory.selectedWeapons);
             }
         }
     }

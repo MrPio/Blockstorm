@@ -123,7 +123,7 @@ namespace Managers
                 CancelInvoke(nameof(UpdateLobbies));
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
-                _sm.InitializeMatch();
+                _sm.InitializeTeamSelection();
                 return;
             }
             catch (LobbyServiceException e)
@@ -208,7 +208,7 @@ namespace Managers
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
-                _sm.InitializeMatch();
+                _sm.InitializeTeamSelection();
                 return true;
             }
             catch (LobbyServiceException e)
@@ -233,7 +233,7 @@ namespace Managers
                 await _sm.relayManager.JoinRelay(_joinedLobby.Data["relay_code"].Value);
                 while (!_sm.worldManager.HasRendered)
                     await Task.Delay(500);
-                _sm.InitializeMatch();
+                _sm.InitializeTeamSelection();
                 return true;
             }
             catch (LobbyServiceException e)
