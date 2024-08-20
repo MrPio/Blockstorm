@@ -29,7 +29,7 @@ namespace Network
         {
             _sm = FindObjectOfType<SceneManager>();
         }
-        
+
         [ServerRpc(RequireOwnership = false)]
         public void SpawnPrefabServerRpc(string prefabName, NetVector3 position, NetVector3 rotation)
         {
@@ -42,17 +42,16 @@ namespace Network
 
         [ServerRpc(RequireOwnership = false)]
         public void SpawnExplosiveServerRpc(string prefabName, NetVector3 position, NetVector3 rotation,
-            NetVector3 forward, uint damage, float explosionTime, float explosionRange, float force = 0,
-            ServerRpcParams rpcParams = default)
+            NetVector3 direction, uint damage, float explosionTime, float explosionRange, float groundDamageFactor,
+            float force = 0, ServerRpcParams rpcParams = default)
         {
-            if (!IsServer) return;
             var go = Instantiate(networkPrefabsList.PrefabList.First(it => it.Prefab.name == prefabName).Prefab,
                 position.ToVector3,
                 Quaternion.Euler(rotation.ToVector3)
             );
             go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
-            go.GetComponent<Explosive>().InitializeRpc(forward, damage, explosionTime, explosionRange,
-                rpcParams.Receive.SenderClientId, force);
+            go.GetComponent<Explosive>().InitializeRpc(direction, damage, explosionTime, explosionRange,
+                groundDamageFactor, rpcParams.Receive.SenderClientId, force);
         }
 
         [ServerRpc(RequireOwnership = false)]

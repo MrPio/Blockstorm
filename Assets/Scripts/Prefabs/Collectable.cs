@@ -6,6 +6,7 @@ using Managers;
 using Model;
 using Network;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Weapon = Model.Weapon;
@@ -75,12 +76,14 @@ namespace Prefabs
 
             var upgradedWeaponPrefab = Resources.Load<GameObject>(Model.WeaponItem.GetPrefab(collectable: true));
             foreach (Transform child in collectableContainer.transform)
-                Destroy(child.gameObject);
+                if (!child.gameObject.IsDestroyed())
+                    Destroy(child.gameObject);
             var go = Instantiate(upgradedWeaponPrefab, collectableContainer.transform);
             // Load the weapon material and the scope
-            foreach (var mesh in go.GetComponentsInChildren<MeshRenderer>(true))
-                if (!mesh.gameObject.name.Contains("scope"))
-                    mesh.material = Resources.Load<Material>(Model.WeaponItem.GetMaterial);
+            if (Model.WeaponItem.Variant is not null)
+                foreach (var mesh in go.GetComponentsInChildren<MeshRenderer>(true))
+                    if (!mesh.gameObject.name.Contains("scope"))
+                        mesh.material = Resources.Load<Material>(Model.WeaponItem.GetMaterial);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -113,7 +116,7 @@ namespace Prefabs
                     else if (player.weapon.LeftAmmo.ContainsKey(Model.WeaponItem!.GetNetName))
                         player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] +=
                             Model.WeaponItem!.Type is WeaponType.Tertiary
-                                ? Random.Range(1, 3)
+                                ? Random.Range(1, Model.WeaponItem.Ammo!.Value + 1)
                                 : (int)(Model.WeaponItem.Ammo!.Value / Random.Range(2f, 4f));
                     else
                     {

@@ -11,6 +11,7 @@ using Model;
 using Network;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using Collectable = Prefabs.Collectable;
 
@@ -301,7 +302,6 @@ namespace VoxelEngine
                         voxels.Add(posNorm);
                 }
             }
-
             return voxels;
         }
 

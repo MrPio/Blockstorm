@@ -186,6 +186,8 @@ MonoBehaviour:
   - {fileID: 6596028330307384508}
   isMissile: 0
   smoke: {fileID: 0}
+  rb: {fileID: 7801186516557851054}
+  maxVelocity: 100
 --- !u!82 &6374599167877546130
 AudioSource:
   m_ObjectHideFlags: 0

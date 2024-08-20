@@ -19,23 +19,28 @@ namespace UI
             plusOne.gameObject.SetActive(false);
         }
 
-        public void Activate(Team killTeam, bool isSuicide)
+        public void Activate(Team killTeam, bool isSuicide, bool isKill = true)
         {
             if (IsInvoking(nameof(DeactivateCrosshairHit)))
                 CancelInvoke(nameof(DeactivateCrosshairHit));
             if (IsInvoking(nameof(DeactivateAll)))
                 CancelInvoke(nameof(DeactivateAll));
 
-            if (isSuicide)
-                _killAcc = 0;
-            else
-                _killAcc++;
             crosshairHit.SetActive(true);
-            plusOne.gameObject.SetActive(true);
-            plusOne.color = TeamData.Colors[killTeam];
-            plusOne.text = $"+{_killAcc}";
-            InvokeRepeating(nameof(DeactivateCrosshairHit), crosshairHitDuration, 99999f);
-            InvokeRepeating(nameof(DeactivateAll), allDuration, 99999f);
+            crosshairHit.transform.localScale = Vector3.one * (isKill ? 1f : 0.85f);
+            if (isKill)
+            {
+                if (isSuicide)
+                    _killAcc = 0;
+                else
+                    _killAcc++;
+                plusOne.gameObject.SetActive(true);
+                plusOne.color = TeamData.Colors[killTeam];
+                plusOne.text = $"+{_killAcc}";
+                InvokeRepeating(nameof(DeactivateAll), allDuration, 99999f);
+            }
+
+            InvokeRepeating(nameof(DeactivateCrosshairHit), crosshairHitDuration * (isKill ? 1f : 0.35f), 99999f);
         }
 
         private void DeactivateCrosshairHit() =>

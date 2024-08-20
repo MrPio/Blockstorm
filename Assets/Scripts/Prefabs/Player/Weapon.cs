@@ -10,7 +10,6 @@ using Network;
 using Partials;
 using TMPro;
 using Unity.Mathematics;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -155,16 +154,43 @@ namespace Prefabs.Player
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {
-                // TODO: TACT
-                _sm.ServerManager.SpawnExplosiveServerRpc(
-                    missile.name,
-                    mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
-                    mainCamera.transform.rotation.eulerAngles,
-                    mainCamera.transform.forward,
-                    _weaponModel.Damage,
-                    _weaponModel.ExplosionTime!.Value,
-                    _weaponModel.ExplosionRange!.Value
-                );
+                if (_weaponModel.Name.ToUpper() == "TACT")
+                {
+                    StartCoroutine(SpawnTACTMissiles());
+
+                    IEnumerator SpawnTACTMissiles()
+                    {
+                        var centre = _sm.highlightArea.position;
+                        var model = _weaponModel!;
+                        for (var i = 0; i < 40; i++)
+                        {
+                            _sm.ServerManager.SpawnExplosiveServerRpc(
+                                missile.name,
+                                centre + new Vector3(Random.Range(-18, 18), 0, Random.Range(-18, 18)) + Vector3.up*60,
+                                new NetVector3(90, 0, 0),
+                                Vector3.down,
+                                model.Damage,
+                                model.ExplosionTime!.Value,
+                                model.ExplosionRange!.Value,
+                                model.GroundDamageFactor!.Value
+                            );
+                            yield return new WaitForSeconds(model.Delay);
+                        }
+                    }
+                }
+                else
+                {
+                    _sm.ServerManager.SpawnExplosiveServerRpc(
+                        missile.name,
+                        mainCamera.transform.position + mainCamera.transform.forward * 0.5f,
+                        mainCamera.transform.rotation.eulerAngles,
+                        mainCamera.transform.forward,
+                        _weaponModel.Damage,
+                        _weaponModel.ExplosionTime!.Value,
+                        _weaponModel.ExplosionRange!.Value,
+                        _weaponModel!.GroundDamageFactor!.Value
+                    );
+                }
 
                 // Switch to the previous weapon if ran out of ammo
                 if (LeftAmmo[_weaponModel.GetNetName] <= 0 && Magazine[_weaponModel.GetNetName] <= 0)
@@ -287,6 +313,7 @@ namespace Prefabs.Player
                     grenadeModel!.Damage,
                     grenadeModel!.ExplosionTime!.Value,
                     grenadeModel!.ExplosionRange!.Value,
+                    grenadeModel!.GroundDamageFactor!.Value,
                     force
                 );
             }
@@ -356,6 +383,9 @@ namespace Prefabs.Player
 
             // Show the bottom bar
             _sm.bottomBar.Initialize(null, weaponType);
+            
+            // Handle highlightArea visibility
+            _sm.highlightArea.gameObject.SetActive(newWeapon.Name.ToUpper() == "TACT");
         }
 
         /// <summary>

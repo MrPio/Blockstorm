@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 19736020
+  GlobalObjectIdHash: 1303238699
   InScenePlacedSourceGlobalObjectIdHash: 1663247929
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -186,6 +186,8 @@ MonoBehaviour:
   - {fileID: 6596028330307384508}
   isMissile: 0
   smoke: {fileID: 0}
+  rb: {fileID: 7801186516557851054}
+  maxVelocity: 100
 --- !u!82 &6374599167877546130
 AudioSource:
   m_ObjectHideFlags: 0

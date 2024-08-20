@@ -46,7 +46,7 @@ namespace Model
 
         public static readonly List<Weapon> Melees = new()
         {
-            new Weapon(name: "shovel", damage: 35, rof: 50, distance: 4, type: WeaponType.Melee,
+            new Weapon(name: "shovel", damage: 35, rof: 58, distance: 4, type: WeaponType.Melee,
                 fireAnimation: "shovel")
         };
 
@@ -119,8 +119,8 @@ namespace Model
             new Weapon(name: "shmel", damage: 300, rof: 35, zoom: 3.5f, explosionRange: 1.95f,
                 type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
                 reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD"),
-            new Weapon(name: "tact", damage: 80, rof: 80, explosionRange: 1.25f,
-                type: WeaponType.Tertiary, ammo: 0,
+            new Weapon(name: "tact", damage: 80, rof: 30, explosionRange: 1.65f,
+                type: WeaponType.Tertiary, ammo: 0, hasAim: false, groundDamageFactor: 0.5f,
                 reloadTime: 600, magazine: 1, fireAnimation: "gun"),
         };
 
@@ -143,8 +143,9 @@ namespace Model
         public string Name, Audio, FireAnimation;
         public uint Damage, Rof, Distance;
         public ushort? Magazine, Ammo, ReloadTime;
-        public float? ExplosionRange, ExplosionTime, FogDuration;
+        public float? ExplosionRange, ExplosionTime, FogDuration, GroundDamageFactor;
         public float Zoom; // ex: 1.5x
+        public bool HasAim;
         public WeaponType Type;
         [CanBeNull] public string Scope;
         [CanBeNull] public string Variant;
@@ -155,7 +156,7 @@ namespace Model
             WeaponType type = WeaponType.Primary,
             float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, float fogDuration = 0,
             string scope = null,
-            string variant = null)
+            string variant = null, bool hasAim = true, float groundDamageFactor = 1f)
         {
             Name = name;
             Audio = audio ?? (variant is null ? name : $"{name}_{variant}");
@@ -173,6 +174,8 @@ namespace Model
             FogDuration = fogDuration;
             Scope = scope;
             Variant = variant;
+            HasAim = hasAim;
+            GroundDamageFactor = groundDamageFactor;
         }
 
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec

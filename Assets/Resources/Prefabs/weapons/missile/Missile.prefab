@@ -5327,7 +5327,7 @@ MonoBehaviour:
   - {fileID: 1571455291051028, guid: f84738953b9a07840970a8b878d90590, type: 3}
   delayFactor: 1
   damageText: {fileID: 4646960138804390006, guid: f24e2d73143facd49a1c875c1f13ec2e, type: 3}
-  speed: 45
+  speed: 40
   meshes:
   - {fileID: 8846636174898665974}
   - {fileID: 8805217756557128309}
@@ -5336,6 +5336,8 @@ MonoBehaviour:
   - {fileID: 7439683369996833414}
   isMissile: 1
   smoke: {fileID: 1878270810173420312}
+  rb: {fileID: 815406910085701851}
+  maxVelocity: 40
 --- !u!54 &815406910085701851
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5344,7 +5346,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8027923701763292337}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 0.95
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -5362,7 +5364,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 2
+  m_CollisionDetection: 1
 --- !u!65 &1319798124165190578
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5382,8 +5384,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.23143207, y: 0.24781768, z: 0.62883663}
-  m_Center: {x: -0.001903005, y: -0.0044825897, z: -0.39742845}
+  m_Size: {x: 0.30970126, y: 0.32538795, z: 0.6930926}
+  m_Center: {x: -0.0011229217, y: -0.0090261325, z: -0.37574744}
 --- !u!82 &7963232635910796491
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5523,4 +5525,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b59630bc4f7f44a39035feb750f234ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifespan: 10
+  lifespan: 20

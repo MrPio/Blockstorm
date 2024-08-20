@@ -471,7 +471,7 @@ namespace Prefabs.Player
                     this.weapon.SwitchEquipped(weapon.Value);
 
                 if (Input.GetMouseButtonDown(1) && this.weapon.WeaponModel!.Type != WeaponType.Block &&
-                    this.weapon.WeaponModel!.Type != WeaponType.Melee)
+                    this.weapon.WeaponModel!.Type != WeaponType.Melee && this.weapon.WeaponModel!.HasAim)
                     this.weapon.ToggleAim();
             }
 
@@ -571,14 +571,18 @@ namespace Prefabs.Player
             // Stop adding points
             if (IsHost && newStatus.IsDead)
                 FindObjectOfType<ScoreCube>().insidePlayers.Remove(this);
-            if (_sm.networkManager.LocalClientId == attackerID && newStatus.IsDead)
-                _sm.killPlusOne.Activate(Team, OwnerClientId == attackerID);
-
-            if (!IsOwner) return;
-            // Owner only ========================================================================================
 
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
+
+            // Show kill HUD
+            if (_sm.networkManager.LocalClientId == attackerID &&
+                !((attackerID != OwnerClientId && attacker.Team == Team) || invincible.Value))
+                _sm.killPlusOne.Activate(Team, OwnerClientId == attackerID, isKill: newStatus.IsDead);
+
+
+            if (!IsOwner) return;
+            // Owner only ========================================================================================
 
             // Check if the enemy is allied or invincible
             if ((attackerID != OwnerClientId && attacker.Team == Team) || invincible.Value)
@@ -593,6 +597,10 @@ namespace Prefabs.Player
             // Ragdoll
             if (newStatus.IsDead)
             {
+                // Disable any aiming
+                if (Weapon.isAiming)
+                    weapon.ToggleAim();
+                
                 // If it's not a suicide, add the kill
                 if (attackerID != OwnerClientId /*AKA: attackedID*/)
                 {
@@ -672,7 +680,7 @@ namespace Prefabs.Player
             transform.SetPositionAndRotation(
                 position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                          // Vector3.forward * 4.5f,
+                // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 

@@ -25,8 +25,11 @@ namespace Prefabs
         [SerializeField] private bool isMissile;
         [SerializeField] private ParticleSystem smoke = null;
         [NonSerialized] public ulong AttackerId;
+        [SerializeField] private Rigidbody rb;
+        [SerializeField] private float maxVelocity = 100f;
 
-        [NonSerialized] public float Damage, ExplosionTime, ExplosionRange, Delay;
+
+        [NonSerialized] public float Damage, ExplosionTime, ExplosionRange, Delay, GroundDamageFactor;
         private Player.Player attackerPlayer;
         private bool _hasExploded;
 
@@ -66,7 +69,8 @@ namespace Prefabs
             if (!isSmokeOrGas)
             {
                 // Destroy blocks
-                var destroyedVoxels = _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange);
+                var destroyedVoxels =
+                    _sm.worldManager.GetNeighborVoxels(transform.position, ExplosionRange * GroundDamageFactor);
                 _sm.ClientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
                 // Check if any player was hit
@@ -102,11 +106,10 @@ namespace Prefabs
 
         [Rpc(SendTo.Everyone)]
         public void InitializeRpc(NetVector3 forward, uint damage, float explosionTime, float explosionRange,
-            ulong attackerId, float force = 0)
+            float groundDamageFactor, ulong attackerId, float force = 0)
         {
             if (!isMissile)
             {
-                var rb = GetComponent<Rigidbody>();
                 rb.AddForce(forward.ToVector3 * math.clamp(6.5f * force, 2.25f, 6.5f),
                     ForceMode.Impulse);
                 rb.angularVelocity = VectorExtensions.RandomVector3(-60f, 60f);
@@ -116,16 +119,23 @@ namespace Prefabs
             Damage = damage;
             ExplosionTime = explosionTime;
             ExplosionRange = explosionRange;
+            GroundDamageFactor = groundDamageFactor;
             AttackerId = attackerId;
 
             if (isMissile)
-                GetComponent<Rigidbody>().velocity = transform.forward * speed;
+                rb.velocity = transform.forward * speed;
 
             _sm = FindObjectOfType<SceneManager>();
             attackerPlayer = FindObjectsOfType<Player.Player>().First(it => it.OwnerClientId == attackerId);
 
             if (IsHost && !isMissile)
                 InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
+        }
+
+        private void Update()
+        {
+            if (rb.velocity.magnitude > maxVelocity)
+                rb.velocity = rb.velocity.normalized * maxVelocity;
         }
     }
 }
