@@ -53,39 +53,49 @@ namespace Model
         public static readonly List<Weapon> Primaries = new()
         {
             // AK47 =========================================================================================
-            // 2_000
-            new Weapon(name: "ak47", damage: 20, rof: 100, distance: 80, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 1.65f, ammo: 120, magazine: 20, reloadTime: 250),
+            // 2_200
+            new Weapon(name: "ak47", damage: 22, rof: 100, distance: 84, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 1.65f, ammo: 120, magazine: 24, reloadTime: 250),
 
-            // 2_400
-            new Weapon(name: "ak47", damage: 24, rof: 100, distance: 80, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 24, reloadTime: 300,
+            // 2,880
+            new Weapon(name: "ak47", damage: 24, rof: 120, distance: 88, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 26, reloadTime: 300,
                 variant: "DESERT_STORM"),
 
-            // 3_000
-            new Weapon(name: "ak47", damage: 20, rof: 150, distance: 80, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 2f, ammo: 120, magazine: 24, reloadTime: 250, variant: "NY22",
+            // 3_200
+            new Weapon(name: "ak47", damage: 20, rof: 160, distance: 90, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 2f, ammo: 120, magazine: 34, reloadTime: 250, variant: "NY22",
                 scope: "scope0"),
 
             // 3_360
-            new Weapon(name: "ak47", damage: 28, rof: 120, distance: 90, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 3.35f, ammo: 160, magazine: 32, reloadTime: 300, variant: "SNOW",
+            new Weapon(name: "ak47", damage: 28, rof: 120, distance: 98, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 3.35f, ammo: 160, magazine: 28, reloadTime: 300, variant: "SNOW",
                 scope: "scope3"),
 
             // 3_000
-            new Weapon(name: "ak47", damage: 50, rof: 60, distance: 100, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 24, reloadTime: 350, variant: "SURVIVAL",
+            new Weapon(name: "ak47", damage: 50, rof: 60, distance: 110, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 21, reloadTime: 350, variant: "SURVIVAL",
                 scope: "scope4"),
 
             // BARRETT =====================================================================================
             // 300
-            new Weapon(name: "barrett", damage: 140, rof: 3, distance: 200, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600,
+            new Weapon(name: "barrett", damage: 140, rof: 4, distance: 150, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600,
                 scope: "scope5"),
 
-            // 375
-            new Weapon(name: "barrett", damage: 200, rof: 3, distance: 150, type: WeaponType.Primary,
-                fireAnimation: "gun", zoom: 5f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
+            // 540
+            new Weapon(name: "barrett", damage: 180, rof: 3, distance: 150, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
+                scope: "scope5", audio: "BARRETT"),
+            
+            // 1_400
+            new Weapon(name: "barrett", damage: 140, rof: 11, distance: 170, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 5.25f, ammo: 20, magazine: 7, reloadTime: 475, variant: "ICE",
+                scope: "scope5", audio: "BARRETT"),
+            
+            // 1_200
+            new Weapon(name: "barrett", damage: 400, rof: 3, distance: 250, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 6.5f, ammo: 10, magazine: 3, reloadTime: 600, variant: "NUCLEAR",
                 scope: "scope5", audio: "BARRETT"),
         };
 
