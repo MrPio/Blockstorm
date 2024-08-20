@@ -239,7 +239,7 @@ namespace Prefabs.Player
                     if (newValue.Message.Value.Length > 0)
                         audioSource.PlayOneShot(
                             Resources.Load<AudioClip>(Model.Weapon.Name2Weapon(newValue)!.GetAudioClip),
-                            1f);
+                            0.8f);
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
@@ -678,9 +678,9 @@ namespace Prefabs.Player
         {
             // Spawn the player location
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
-                // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                // Vector3.forward * 4.5f,
+                // position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
+                position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
+                Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 

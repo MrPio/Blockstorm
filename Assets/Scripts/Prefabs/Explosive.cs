@@ -6,6 +6,7 @@ using Network;
 using Partials;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Prefabs
@@ -89,6 +90,20 @@ namespace Prefabs
                         new NetVector3((transform.position - player.transform.position).normalized +
                                        VectorExtensions.RandomVector3(-0.25f, 0.25f)),
                         attackerPlayer.OwnerClientId, ragdollScale: 1.15f);
+                }
+
+                // Checks if there was a hit on a prop
+                foreach (var prop in _sm.worldManager.SpawnedProps)
+                {
+                    if (prop.gameObject.IsDestroyed()) continue;
+
+                    var distanceFactor = 1 - Vector3.Distance(prop.transform.position, transform.position) /
+                        (ExplosionRange * GroundDamageFactor * 3);
+                    if (distanceFactor <= 0) continue;
+                    var damage = (uint)(Damage * distanceFactor) * 4;
+
+                    // Broadcast the damage action
+                    _sm.ClientManager.DamagePropRpc(prop.ID, damage, true);
                 }
             }
         }

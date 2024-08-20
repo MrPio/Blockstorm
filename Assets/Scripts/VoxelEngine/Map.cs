@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
 using JetBrains.Annotations;
+using Managers.Encoder;
 using Managers.Serializer;
 using Model;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 using Random = UnityEngine.Random;
 
@@ -29,6 +31,7 @@ namespace VoxelEngine
         [NonSerialized] public Dictionary<Vector3Int, byte> BlocksEdits;
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
+        [SerializeField] public List<Prop> props;
         [SerializeField] public List<CameraSpawn> cameraSpawns;
         [SerializeField] public SerializableVector3Int scoreCubePosition;
 
@@ -116,6 +119,22 @@ namespace VoxelEngine
             point.y > spawnLayers.Select(sp => sp.y).Min() - 2f && point.y < spawnLayers.Select(sp => sp.y).Max() + 2f);
     }
 
+    [Serializable]
+    public class Prop
+    {
+        [SerializeField] public SerializableVector3 position;
+        [SerializeField] public SerializableVector3 rotation;
+        [SerializeField] public string prefabName;
+
+        public Prop(SerializableVector3 position, SerializableVector3 rotation, string prefabName)
+        {
+            this.position = position;
+            this.rotation = rotation;
+            this.prefabName = prefabName;
+        }
+
+        public string GetPrefab => $"Prefabs/props/{prefabName}";
+    }
     /**
      * A spawn area. Each spawn area consists of a rectangle on the XZ plane,
      * drawn at the given Y position.

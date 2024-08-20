@@ -245,6 +245,17 @@ namespace Utils
             map.Save();
         }
 
+
+        [Button]
+        private void SetProps()
+        {
+            var map = _wm.Map;
+            map.props = new List<Prop>();
+            map.props.AddRange(GameObject.FindGameObjectsWithTag("Prop").Select(it =>
+                new Prop(it.transform.position, it.transform.rotation.eulerAngles, it.name.Replace("(Clone)","").Split(" ")[0])).ToList());
+            map.Save();
+        }
+
         // Change the type of some map blocks
         [Header("ChangeBlocks")] [SerializeField]
         private string[] oldIds;

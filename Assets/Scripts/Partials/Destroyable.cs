@@ -6,12 +6,7 @@ namespace Partials
 {
     public class Destroyable : MonoBehaviour
     {
-        public float lifespan = 100;
-
-        public Destroyable(float lifespan)
-        {
-            this.lifespan = lifespan;
-        }
+        public float lifespan = 30;
 
         private float _startTime;
 

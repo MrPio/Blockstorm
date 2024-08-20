@@ -39,6 +39,7 @@ namespace VoxelEngine
         [SerializeField] private GameObject scoreCube;
         [NonSerialized] public List<NetVector3> FreeCollectablesSpawnPoints = new();
         [NonSerialized] public readonly List<Collectable> SpawnedCollectables = new();
+        [NonSerialized] public readonly List<Prefabs.Prop> SpawnedProps = new();
 
         /// <summary>
         /// Set the render distance
@@ -104,6 +105,17 @@ namespace VoxelEngine
                 }
             }
 
+            // Spawn Prefabs
+            foreach (var prop in Map.props)
+            {
+                var prefab = Resources.Load<GameObject>(prop.GetPrefab);
+                var go = Instantiate(prefab, prop.position, Quaternion.Euler(prop.rotation),
+                        GameObject.FindGameObjectWithTag("PropsContainer").transform)
+                    .GetComponent<Prefabs.Prop>();
+                go.ID = (ushort)SpawnedProps.Count;
+                SpawnedProps.Add(go);
+            }
+
             HasRendered = true;
             _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
         }
@@ -130,6 +142,9 @@ namespace VoxelEngine
                 if (_nonSolidChunks[x, z] != null)
                     _nonSolidChunks[x, z].IsActive = _chunks[x, z].IsActive;
             }
+
+            foreach (var prop in SpawnedProps)
+                prop.gameObject.SetActive(Vector3.Distance(playerPos, prop.transform.position) < viewDistance * 0.75f);
         }
 
         [CanBeNull]
@@ -302,6 +317,7 @@ namespace VoxelEngine
                         voxels.Add(posNorm);
                 }
             }
+
             return voxels;
         }
 

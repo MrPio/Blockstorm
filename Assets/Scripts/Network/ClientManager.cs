@@ -17,11 +17,14 @@ namespace Network
     {
         private SceneManager _sm;
 
-        // Used to update the map status
+        // Used to load the map status
         private NetworkVariable<MapStatus> mapStatus = new(new MapStatus
         {
             Xs = Array.Empty<short>(), Ys = Array.Empty<short>(), Zs = Array.Empty<short>(), Ids = Array.Empty<byte>()
         });
+
+        // Used to update the props status
+        private NetworkVariable<List<ushort>> brokenProps = new(new List<ushort>());
 
         // Used to update the collectables
         public NetworkVariable<CollectablesStatus> collectableStatus =
@@ -52,6 +55,11 @@ namespace Network
                 Debug.Log($"There have been made {status.Ids.Length} voxel edits to the original map!");
                 for (var i = 0; i < status.Ids.Length; i++)
                     _sm.worldManager.Map.Blocks[status.Ys[i], status.Xs[i], status.Zs[i]] = status.Ids[i];
+
+                // Destroy destroyed props
+                var destroyedProps = brokenProps.Value;
+                foreach (var prop in brokenProps.Value)
+                    Destroy(_sm.worldManager.SpawnedProps[prop].gameObject);
 
                 // React on collectable changes
                 collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
@@ -111,7 +119,7 @@ namespace Network
         private void LoadCollectables(CollectablesStatus newStatus)
         {
             var newCollectables = newStatus.ToCollectables;
-            
+
             // Spawn the new collectibles. Only collectables with free ids will be spawned.
             foreach (var model in newCollectables)
                 _sm.worldManager.SpawnCollectableWithID(model.ID, model);
@@ -154,6 +162,13 @@ namespace Network
                 _sm.highlightBlock.gameObject.SetActive(false);
             if (IsHost)
                 mapStatus.Value = new MapStatus(_sm.worldManager.Map);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        public void DamagePropRpc(ushort id, uint damage, bool explode)
+        {
+            if (_sm.worldManager.SpawnedProps[id].Damage(damage,explode) && IsHost)
+                brokenProps.Value = brokenProps.Value.Concat(new[] { id }).ToList();
         }
     }
 }

@@ -108,6 +108,7 @@
     <Compile Include="Assets\Scripts\ExtensionFunctions\EnumExtensions.cs" />
     <Compile Include="Assets\Scripts\UI\ReloadBar.cs" />
     <Compile Include="Assets\Scripts\Prefabs\SpawnCamera.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Prop.cs" />
     <Compile Include="Assets\Scripts\UI\ScoresHUD.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />

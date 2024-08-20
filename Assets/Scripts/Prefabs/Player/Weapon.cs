@@ -10,6 +10,7 @@ using Network;
 using Partials;
 using TMPro;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -57,6 +58,7 @@ namespace Prefabs.Player
         [CanBeNull] private Coroutine _reloadingCoroutine;
         private WeaponType _lastWeapon = WeaponType.Primary;
         [CanBeNull] private Animator weaponAnimator;
+        private bool _waitForMouseUp;
 
         [CanBeNull]
         public Model.Weapon WeaponModel
@@ -94,6 +96,12 @@ namespace Prefabs.Player
             isAiming = false;
         }
 
+        private void Update()
+        {
+            if (Input.GetMouseButtonUp(0))
+                _waitForMouseUp = false;
+        }
+
         /// <summary>
         /// Fire the current weapon and check if any enemy or ground block has been hit.
         /// This is called from CameraMovement for Block, Melee and Guns
@@ -101,7 +109,8 @@ namespace Prefabs.Player
         /// <seealso cref="CameraMovement"/>
         public void Fire()
         {
-            if (_weaponModel == null || Time.time - _lastSwitch < 0.25f || _reloadingCoroutine is not null)
+            if (_weaponModel == null || Time.time - _lastSwitch < 0.25f || _reloadingCoroutine is not null ||
+                _waitForMouseUp)
                 return;
 
             // Play audio effect and crosshair/scope animation
@@ -111,7 +120,7 @@ namespace Prefabs.Player
                 // Propagate the sound across the net
                 player.LastShotWeapon.Value = "";
                 player.LastShotWeapon.Value = _weaponModel.GetNetName;
-                audioSource.PlayOneShot(_fireClip, 1f);
+                audioSource.PlayOneShot(_fireClip, 0.8f);
                 animator.SetTrigger(Animator.StringToHash($"fire_{_weaponModel.FireAnimation}"));
                 weaponAnimator?.SetTrigger(Animator.StringToHash("fire"));
 
@@ -166,7 +175,7 @@ namespace Prefabs.Player
                         {
                             _sm.ServerManager.SpawnExplosiveServerRpc(
                                 missile.name,
-                                centre + new Vector3(Random.Range(-18, 18), 0, Random.Range(-18, 18)) + Vector3.up*60,
+                                centre + new Vector3(Random.Range(-18, 18), 0, Random.Range(-18, 18)) + Vector3.up * 60,
                                 new NetVector3(90, 0, 0),
                                 Vector3.down,
                                 model.Damage,
@@ -204,78 +213,104 @@ namespace Prefabs.Player
             var cameraTransform = cameraMovement.transform;
             var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
 
+            // Checks if there was a hit on a prop
+            var hasHitEnemy =
+                Physics.Raycast(ray, out var enemyHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")) &&
+                enemyHit.collider is not null;
+            var hasHitGround =
+                Physics.Raycast(ray, out var groundHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")) &&
+                groundHit.collider is not null;
+            var hasHitProp =
+                Physics.Raycast(ray, out var propHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Prop")) &&
+                propHit.collider is not null;
+
             // Checks if there was a hit on an enemy
-            var hasHitEnemy = false;
-            if (Physics.Raycast(ray, out var hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")))
-                if (hit.collider is not null)
+            if (hasHitEnemy && enemyHit.distance < (hasHitGround ? groundHit.distance : 9999f) &&
+                enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
+            {
+                var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
+                var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
+                var distance = Vector3.Distance(player.transform.position, enemyHit.collider.transform.position);
+                var distanceFactor =
+                    math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                var helmetHit = enemyHit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
+
+                var damage = (uint)(_weaponModel.Damage * multiplier *
+                                    (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
+
+                // Spawn blood effect on the enemy
+                Instantiate(enemyHit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
+                    enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.1f,
+                    Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
+                    Quaternion.Euler(0, Random.Range(-180, 180), 0));
+
+                if (!attackedPlayer.Status.Value.IsDead)
                 {
-                    var attackedPlayer = hit.transform.GetComponentInParent<Player>();
-                    var multiplier = Model.Weapon.BodyPartMultipliers[hit.transform.gameObject.name];
-                    var distance = Vector3.Distance(player.transform.position, hit.collider.transform.position);
-                    var distanceFactor =
-                        math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
-                    var helmetHit = hit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
-
-                    var damage = (uint)(_weaponModel.Damage * multiplier *
-                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
-
-                    // Spawn blood effect on the enemy
-                    Instantiate(hit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
-                        hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.1f,
-                        Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
-                        Quaternion.Euler(0, Random.Range(-180, 180), 0));
-
-                    if (!attackedPlayer.Status.Value.IsDead)
+                    // Check if the enemy is not allied nor invincible
+                    if ((attackedPlayer.IsOwner ||
+                         attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
                     {
-                        // Check if the enemy is not allied nor invincible
-                        if ((attackedPlayer.IsOwner ||
-                             attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
+                        // Spawn the damage text
+                        var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
+                        damageTextGo.transform.position =
+                            enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                            cameraTransform.forward * 0.35f;
+                        damageTextGo.transform.rotation = player.transform.rotation;
+                        damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
+                        damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
                         {
-                            // Spawn the damage text
-                            var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                            damageTextGo.transform.position =
-                                hit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                                cameraTransform.forward * 0.35f;
-                            damageTextGo.transform.rotation = player.transform.rotation;
-                            damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
-                            damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
-                            {
-                                text.text = damage.ToString();
-                                text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
-                                text.fontSize += distance > 10f ? distance / 20f + 0.5f : 1f;
-                            });
-                            damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+                            text.text = damage.ToString();
+                            text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                            text.fontSize += distance > 10f ? distance / 20f + 0.5f : 1f;
+                        });
+                        damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
 
-                            // Send the damage to the enemy
-                            attackedPlayer.DamageClientRpc(damage, hit.transform.gameObject.name,
-                                new NetVector3(cameraTransform.forward),
-                                player.OwnerClientId);
-                        }
+                        // Send the damage to the enemy
+                        attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
+                            new NetVector3(cameraTransform.forward),
+                            player.OwnerClientId);
                     }
-
-                    // Prevents damaging the ground
-                    hasHitEnemy = true;
                 }
+            }
 
             // Checks if there was a hit on the ground
-            if (!hasHitEnemy &&
-                Physics.Raycast(ray, out hit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")))
-                if (hit.collider is not null)
-                {
-                    // Check if the hit block is solid
-                    var pos = Vector3Int.FloorToInt(hit.point + cameraTransform.forward * 0.05f);
-                    var block = _sm.worldManager.GetVoxel(pos);
-                    if (block is not { isSolid: true }) return;
+            if (hasHitGround && groundHit.distance < (hasHitEnemy ? enemyHit.distance : 9999f) &&
+                groundHit.distance < (hasHitProp ? propHit.distance : 9999f))
+            {
+                // Check if the hit block is solid
+                var pos = Vector3Int.FloorToInt(groundHit.point + cameraTransform.forward * 0.05f);
+                var block = _sm.worldManager.GetVoxel(pos);
+                if (block is not { isSolid: true }) return;
 
-                    // Spawn damage effect on the block
-                    _sm.blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
-                    _sm.blockDigEffect.GetComponent<Renderer>().material = Resources.Load<Material>(block.GetMaterial);
-                    _sm.blockDigEffect.Play();
-                    audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/blocks/{block.AudioClip}"));
+                // Spawn damage effect on the block
+                _sm.blockDigEffect.transform.position = pos + Vector3.one * 0.5f;
+                _sm.blockDigEffect.GetComponent<Renderer>().material = Resources.Load<Material>(block.GetMaterial);
+                _sm.blockDigEffect.Play();
+                audioSource.PlayOneShot(Resources.Load<AudioClip>($"Audio/blocks/{block.AudioClip}"));
 
-                    // Broadcast the damage action
-                    _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
-                }
+                // Broadcast the damage action
+                _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
+            }
+
+            // Checks if there was a hit on a prop
+            if (hasHitProp && propHit.distance < (hasHitGround ? groundHit.distance : 9999f) &&
+                propHit.distance < (hasHitEnemy ? enemyHit.distance : 9999f))
+            {
+                // Spawn damage effect on the prop
+                _sm.blockDigEffect.transform.position = propHit.point;
+                _sm.blockDigEffect.GetComponent<Renderer>().material =
+                    propHit.transform.GetComponentInChildren<MeshRenderer>().material;
+                _sm.blockDigEffect.Play();
+                audioSource.PlayOneShot(
+                    Resources.Load<AudioClip>($"Audio/blocks/prop_hit_{Random.Range(0, 3)}"));
+
+                // Broadcast the damage action
+                if (propHit.transform.TryGetComponent<Prop>(out var prop))
+                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false);
+
+                // Prevent damaging enemies and ground
+                hasHitProp = true;
+            }
         }
 
         /// <summary>
@@ -341,6 +376,8 @@ namespace Prefabs.Player
             // Disable any aiming
             if (isAiming)
                 ToggleAim();
+            if (Input.GetMouseButton(0))
+                _waitForMouseUp = true;
 
             // Find the new weapon in the player's inventory
             var status = player.Status.Value;
@@ -382,8 +419,8 @@ namespace Prefabs.Player
             player.EquippedWeapon.Value = $"{WeaponModel!.Name}:{WeaponModel!.Variant}";
 
             // Show the bottom bar
-            _sm.bottomBar.Initialize(null, weaponType);
-            
+            _sm.bottomBar.Initialize(player.Status.Value, weaponType);
+
             // Handle highlightArea visibility
             _sm.highlightArea.gameObject.SetActive(newWeapon.Name.ToUpper() == "TACT");
         }
