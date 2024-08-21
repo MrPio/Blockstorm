@@ -21,7 +21,7 @@ namespace Managers
         [Header("Ground")] public ParticleSystem blockDigEffect;
         public Transform highlightBlock;
         public Transform placeBlock;
-        public Transform highlightArea;
+        public HighlightArea highlightArea;
 
         [Header("Prefabs")] public GameObject playerPrefab;
         public GameObject clientServerManagersPrefab;

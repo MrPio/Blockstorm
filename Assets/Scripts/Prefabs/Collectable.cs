@@ -18,7 +18,7 @@ namespace Prefabs
     /// </summary>
     public class Collectable : MonoBehaviour
     {
-        private SceneManager _sm;
+        private static SceneManager _sm;
         [SerializeField] private GameObject ammoLight;
         [SerializeField] private GameObject hpLight;
         [SerializeField] private GameObject weaponLight;
@@ -91,72 +91,78 @@ namespace Prefabs
             var player = other.gameObject.GetComponentInParent<Player.Player>();
             if (player is not null && player.IsOwner)
             {
-                var newStatus = player.Status.Value;
                 player.audioSource.PlayOneShot(lootAudioClip);
-                if (Model.Type is CollectableType.Weapon)
-                {
-                    // Equip the weapon
-                    if (Model.WeaponItem!.Type is WeaponType.Primary)
-                        newStatus.Primary = Model.WeaponItem;
-                    if (Model.WeaponItem!.Type is WeaponType.Secondary)
-                        newStatus.Secondary = Model.WeaponItem;
-                    if (Model.WeaponItem!.Type is WeaponType.Tertiary)
-                        newStatus.Tertiary = Model.WeaponItem;
-                    if (Model.WeaponItem!.Type is WeaponType.Grenade)
-                        newStatus.Grenade = Model.WeaponItem;
-                    if (Model.WeaponItem!.Type is WeaponType.GrenadeSecondary)
-                        newStatus.GrenadeSecondary = Model.WeaponItem;
-
-
-                    // Add ammo
-                    if (Model.WeaponItem!.Type is WeaponType.Grenade)
-                        newStatus.LeftGrenades += (byte)Random.Range(1, 4);
-                    else if (Model.WeaponItem!.Type is WeaponType.GrenadeSecondary)
-                        newStatus.LeftSecondaryGrenades += (byte)Random.Range(1, 3);
-                    else if (player.weapon.LeftAmmo.ContainsKey(Model.WeaponItem!.GetNetName))
-                        player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] +=
-                            Model.WeaponItem!.Type is WeaponType.Tertiary
-                                ? Random.Range(1, Model.WeaponItem.Ammo!.Value + 1)
-                                : (int)(Model.WeaponItem.Ammo!.Value / Random.Range(2f, 4f));
-                    else
-                    {
-                        player.weapon.LeftAmmo[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Ammo!.Value;
-                        player.weapon.Magazine[Model.WeaponItem!.GetNetName] = Model.WeaponItem!.Magazine!.Value;
-                    }
-
-                    var lootedModel = Model.WeaponItem!;
-                    player.Status.Value = newStatus;
-
-                    // Refresh the equipped weapon and Ammo HUD
-                    if (lootedModel.Type is not WeaponType.Grenade and not WeaponType.GrenadeSecondary)
-                    {
-                        player.weapon.SwitchEquipped(lootedModel.Type, force: true);
-                        _sm.ammoHUD.SetAmmo(player.weapon.Magazine[lootedModel.GetNetName],
-                            player.weapon.LeftAmmo[lootedModel.GetNetName],
-                            isTertiary: lootedModel.Type is WeaponType.Tertiary);
-                    }
-                }
-                else if (Model.Type is CollectableType.Ammo)
-                {
-                    var refillFactor = Random.Range(2f, 4f);
-                    foreach (var leftAmmoKey in new List<string>(player.weapon.LeftAmmo.Keys))
-                        player.weapon.LeftAmmo[leftAmmoKey] +=
-                            (int)(Weapon.Name2Weapon(leftAmmoKey)!.Ammo!.Value / refillFactor);
-                    if (player.weapon.WeaponModel!.IsGun)
-                        _sm.ammoHUD.SetAmmo(player.weapon.Magazine[player.weapon.WeaponModel!.GetNetName],
-                            player.weapon.LeftAmmo[player.weapon.WeaponModel!.GetNetName],
-                            isTertiary: player.weapon.WeaponModel.Type is WeaponType.Tertiary);
-                    player.Status.Value = newStatus;
-                }
-                else if (Model.Type is CollectableType.Hp)
-                {
-                    newStatus.Hp = math.min(100,
-                        newStatus.Hp + global::Model.Collectable.MedkitHps[Model.MedkitType!.Value]);
-                    player.Status.Value = newStatus;
-                }
+                LootCollectable(player, Model);
 
                 _sm.ServerManager.LootCollectableServerRpc(Model.ID);
                 Destroy(gameObject);
+            }
+        }
+
+        public static void LootCollectable(Player.Player player, Model.Collectable model)
+        {
+            var newStatus = player.Status.Value;
+
+            if (model.Type is CollectableType.Weapon)
+            {
+                // Equip the weapon
+                if (model.WeaponItem!.Type is WeaponType.Primary)
+                    newStatus.Primary = model.WeaponItem;
+                if (model.WeaponItem!.Type is WeaponType.Secondary)
+                    newStatus.Secondary = model.WeaponItem;
+                if (model.WeaponItem!.Type is WeaponType.Tertiary)
+                    newStatus.Tertiary = model.WeaponItem;
+                if (model.WeaponItem!.Type is WeaponType.Grenade)
+                    newStatus.Grenade = model.WeaponItem;
+                if (model.WeaponItem!.Type is WeaponType.GrenadeSecondary)
+                    newStatus.GrenadeSecondary = model.WeaponItem;
+
+
+                // Add ammo
+                if (model.WeaponItem!.Type is WeaponType.Grenade)
+                    newStatus.LeftGrenades += (byte)Random.Range(1, 4);
+                else if (model.WeaponItem!.Type is WeaponType.GrenadeSecondary)
+                    newStatus.LeftSecondaryGrenades += (byte)Random.Range(1, 3);
+                else if (player.weapon.LeftAmmo.ContainsKey(model.WeaponItem!.GetNetName))
+                    player.weapon.LeftAmmo[model.WeaponItem!.GetNetName] +=
+                        model.WeaponItem!.Type is WeaponType.Tertiary
+                            ? Random.Range(1, model.WeaponItem.Ammo!.Value + 1)
+                            : (int)(model.WeaponItem.Ammo!.Value / Random.Range(2f, 4f));
+                else
+                {
+                    player.weapon.LeftAmmo[model.WeaponItem!.GetNetName] = model.WeaponItem!.Ammo!.Value;
+                    player.weapon.Magazine[model.WeaponItem!.GetNetName] = model.WeaponItem!.Magazine!.Value;
+                }
+
+                var lootedModel = model.WeaponItem!;
+                player.Status.Value = newStatus;
+
+                // Refresh the equipped weapon and Ammo HUD
+                if (lootedModel.Type is not WeaponType.Grenade and not WeaponType.GrenadeSecondary)
+                {
+                    player.weapon.SwitchEquipped(lootedModel.Type, force: true);
+                    _sm.ammoHUD.SetAmmo(player.weapon.Magazine[lootedModel.GetNetName],
+                        player.weapon.LeftAmmo[lootedModel.GetNetName],
+                        isTertiary: lootedModel.Type is WeaponType.Tertiary);
+                }
+            }
+            else if (model.Type is CollectableType.Ammo)
+            {
+                var refillFactor = Random.Range(2f, 4f);
+                foreach (var leftAmmoKey in new List<string>(player.weapon.LeftAmmo.Keys))
+                    player.weapon.LeftAmmo[leftAmmoKey] +=
+                        (int)(Weapon.Name2Weapon(leftAmmoKey)!.Ammo!.Value / refillFactor);
+                if (player.weapon.WeaponModel!.IsGun)
+                    _sm.ammoHUD.SetAmmo(player.weapon.Magazine[player.weapon.WeaponModel!.GetNetName],
+                        player.weapon.LeftAmmo[player.weapon.WeaponModel!.GetNetName],
+                        isTertiary: player.weapon.WeaponModel.Type is WeaponType.Tertiary);
+                player.Status.Value = newStatus;
+            }
+            else if (model.Type is CollectableType.Hp)
+            {
+                newStatus.Hp = math.min(100,
+                    newStatus.Hp + global::Model.Collectable.MedkitHps[model.MedkitType!.Value]);
+                player.Status.Value = newStatus;
             }
         }
     }

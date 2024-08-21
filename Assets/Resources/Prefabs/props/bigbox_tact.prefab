@@ -696,6 +696,30 @@ PrefabInstance:
       propertyPath: lootWeapon
       value: tact
       objectReference: {fileID: 0}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 46239095871ba6f47b7f75a2cfa04035, type: 3}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 8f0849ad6f3e00a4b9968d573422b0fe, type: 3}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: 101937e1df7038440be9c4a724f6f6d6, type: 3}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: 9b18512be197f74438603124692b32e1, type: 3}
+    - target: {fileID: 2938902421444936587, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}
+      propertyPath: hitAudioClips.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: c6365201dd11b174bac98ceb18eaae02, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 7164743159382335522, guid: 53c721610b281fb48b01d95d7be014f1, type: 3}

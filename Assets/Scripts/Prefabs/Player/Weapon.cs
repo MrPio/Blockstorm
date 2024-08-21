@@ -169,13 +169,15 @@ namespace Prefabs.Player
 
                     IEnumerator SpawnTACTMissiles()
                     {
-                        var centre = _sm.highlightArea.position;
+                        var centre = _sm.highlightArea.transform.position;
                         var model = _weaponModel!;
                         for (var i = 0; i < 40; i++)
                         {
+                            var range = _sm.highlightArea.Range / 2;
                             _sm.ServerManager.SpawnExplosiveServerRpc(
                                 missile.name,
-                                centre + new Vector3(Random.Range(-18, 18), 0, Random.Range(-18, 18)) + Vector3.up * 60,
+                                centre + new Vector3(Random.Range(-range, range), 0, Random.Range(-range, range)) +
+                                Vector3.up * 60,
                                 new NetVector3(90, 0, 0),
                                 Vector3.down,
                                 model.Damage,
@@ -301,15 +303,10 @@ namespace Prefabs.Player
                 _sm.blockDigEffect.GetComponent<Renderer>().material =
                     propHit.transform.GetComponentInChildren<MeshRenderer>().material;
                 _sm.blockDigEffect.Play();
-                audioSource.PlayOneShot(
-                    Resources.Load<AudioClip>($"Audio/blocks/prop_hit_{Random.Range(0, 3)}"));
 
                 // Broadcast the damage action
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
                     _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false);
-
-                // Prevent damaging enemies and ground
-                hasHitProp = true;
             }
         }
 

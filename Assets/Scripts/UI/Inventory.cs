@@ -28,7 +28,7 @@ namespace UI
         [SerializeField] private InventoryTab[] inventoryTabs;
 
         [NonSerialized] public WeaponType selectedWeaponType;
-        [NonSerialized] public Dictionary<WeaponType,Weapon> selectedWeapons=new();
+        [NonSerialized] public Dictionary<WeaponType, Weapon> selectedWeapons = new();
 
         private void OnEnable()
         {
@@ -54,7 +54,8 @@ namespace UI
             {
                 foreach (var inventoryTab in inventoryTabs)
                     inventoryTab.UpdateUI();
-                var weapons = Weapon.Weapons.Where(it => it.Type == selectedWeaponType && it.Variant == null).ToList();
+                var weapons = Weapon.Weapons.Where(it =>
+                    it.Type == selectedWeaponType && it.Variant == null && it.Name.ToLower() != "tact").ToList();
                 foreach (var weapon in weapons)
                 {
                     var weaponTile = Instantiate(weaponTilePrefab, bodyContent).transform;
@@ -65,9 +66,15 @@ namespace UI
             }
 
             footerImage.sprite = Resources.Load<Sprite>(selectedWeapons[selectedWeaponType].GetThumbnail);
-            footerDamageText.text = selectedWeapons[selectedWeaponType].Damage == 0 ? "-" : selectedWeapons[selectedWeaponType].Damage.ToString();
-            footerRofText.text = selectedWeapons[selectedWeaponType].Rof == 0 ? "-" : selectedWeapons[selectedWeaponType].Rof.ToString();
-            footerDistanceText.text = selectedWeapons[selectedWeaponType].Distance == 0 ? "-" : selectedWeapons[selectedWeaponType].Distance.ToString();
+            footerDamageText.text = selectedWeapons[selectedWeaponType].Damage == 0
+                ? "-"
+                : selectedWeapons[selectedWeaponType].Damage.ToString();
+            footerRofText.text = selectedWeapons[selectedWeaponType].Rof == 0
+                ? "-"
+                : selectedWeapons[selectedWeaponType].Rof.ToString();
+            footerDistanceText.text = selectedWeapons[selectedWeaponType].Distance == 0
+                ? "-"
+                : selectedWeapons[selectedWeaponType].Distance.ToString();
             footerMagazineText.text = selectedWeapons[selectedWeaponType].Magazine?.ToString() ?? "-";
             footerAmmoText.text = selectedWeapons[selectedWeaponType].Ammo?.ToString() ?? "-";
 

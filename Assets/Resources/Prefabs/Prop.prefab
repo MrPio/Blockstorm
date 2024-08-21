@@ -75,6 +75,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Hp: 200
   lootWeapon: 
+  hitAudioClips:
+  - {fileID: 8300000, guid: f2d667112adf9a640a938ce4fa164318, type: 3}
+  - {fileID: 8300000, guid: 5bce626050ad9c849a5a2a1668c5f04e, type: 3}
+  - {fileID: 8300000, guid: ce34b62d990316f489b89a51f53892e5, type: 3}
+  destructionAudioClip: {fileID: 8300000, guid: 5c74acef647cbef4189a0c332e6301e6, type: 3}
 --- !u!82 &-1715798031483068689
 AudioSource:
   m_ObjectHideFlags: 0
@@ -95,7 +100,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 7
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -131,7 +136,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

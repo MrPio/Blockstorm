@@ -208,8 +208,9 @@ namespace Prefabs.Player
                 if (Physics.Raycast(ray, out var hit, 80, 1 << LayerMask.NameToLayer("Ground")))
                     if (hit.collider is not null)
                         newHighlightAreaPos = new Vector3(hit.point.x, 0, hit.point.z);
-                _sm.highlightArea.position =
-                    new Vector3(newHighlightAreaPos.x, _sm.highlightArea.position.y, newHighlightAreaPos.z);
+                _sm.highlightArea.transform.position =
+                    new Vector3(newHighlightAreaPos.x, _sm.highlightArea.transform.position.y, newHighlightAreaPos.z);
+                _sm.highlightArea.SetRange(Input.GetMouseButton(1));
             }
         }
 

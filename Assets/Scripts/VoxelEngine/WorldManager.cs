@@ -143,7 +143,7 @@ namespace VoxelEngine
                     _nonSolidChunks[x, z].IsActive = _chunks[x, z].IsActive;
             }
 
-            foreach (var prop in SpawnedProps)
+            foreach (var prop in SpawnedProps.Where(it => !it.IsDestroyed()))
                 prop.gameObject.SetActive(Vector3.Distance(playerPos, prop.transform.position) < viewDistance * 0.75f);
         }
 

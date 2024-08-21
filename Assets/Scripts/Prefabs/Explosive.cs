@@ -100,7 +100,7 @@ namespace Prefabs
                     var distanceFactor = 1 - Vector3.Distance(prop.transform.position, transform.position) /
                         (ExplosionRange * GroundDamageFactor * 3);
                     if (distanceFactor <= 0) continue;
-                    var damage = (uint)(Damage * distanceFactor) * 4;
+                    var damage = (uint)(Damage * distanceFactor) * 100;
 
                     // Broadcast the damage action
                     _sm.ClientManager.DamagePropRpc(prop.ID, damage, true);

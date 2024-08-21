@@ -1330,8 +1330,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
       propertyPath: lootWeapon
-      value: tact
+      value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: f2d667112adf9a640a938ce4fa164318, type: 3}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 5bce626050ad9c849a5a2a1668c5f04e, type: 3}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: ce34b62d990316f489b89a51f53892e5, type: 3}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: f2d667112adf9a640a938ce4fa164318, type: 3}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: 5bce626050ad9c849a5a2a1668c5f04e, type: 3}
+    - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
+      propertyPath: hitAudioClips.Array.data[5]
+      value: 
+      objectReference: {fileID: 8300000, guid: ce34b62d990316f489b89a51f53892e5, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 4850181511970038507, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
