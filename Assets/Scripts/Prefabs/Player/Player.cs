@@ -122,7 +122,8 @@ namespace Prefabs.Player
             }
 
             // Add the player to the mipmap
-            if (Team is not Team.None)
+            var player = FindObjectsOfType<Player>().First(it => it.IsOwner);
+            if (Team is not Team.None && (IsOwner || player.Team is Team.None || Team == player.Team))
                 _sm.mipmap.AddPlayerMarker(Team, transform);
 
             // Load the body skin
@@ -339,10 +340,10 @@ namespace Prefabs.Player
                 return;
 
             // Debug: Kill everyone except myself when pressing the L key
-            if (Input.GetKeyDown(KeyCode.L))
-                foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
-                    enemy.DamageClientRpc(999, "chest",
-                        new NetVector3(Vector3.up), OwnerClientId);
+            // if (Input.GetKeyDown(KeyCode.L))
+            //     foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
+            //         enemy.DamageClientRpc(999, "chest",
+            //             new NetVector3(Vector3.up), OwnerClientId);
 
             // When the player has touched the ground, activate his jump.
             _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.25f, 0.4f), Quaternion.identity,
@@ -600,7 +601,7 @@ namespace Prefabs.Player
                 // Disable any aiming
                 if (Weapon.isAiming)
                     weapon.ToggleAim();
-                
+
                 // If it's not a suicide, add the kill
                 if (attackerID != OwnerClientId /*AKA: attackedID*/)
                 {
@@ -678,9 +679,9 @@ namespace Prefabs.Player
         {
             // Spawn the player location
             transform.SetPositionAndRotation(
-                // position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
-                position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                Vector3.forward * 4.5f,
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
+                // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
+                          // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 

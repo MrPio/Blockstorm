@@ -143,9 +143,25 @@ namespace Utils
                 blocksList.AddRange(newBlocks);
             }
 
-            var map = new Map(mapName, blocksList, mapSize);
+            var map = new Map(mapName, blocksList, mapSize)
+            {
+                props = new List<Prop>()
+            };
             map.Save();
             print($"Map [{map.name}] saved successfully!");
+
+            // Add props
+            var props = GameObject.FindGameObjectsWithTag("Prop").Select(it =>
+                new Prop(it.transform.position, it.transform.rotation.eulerAngles,
+                    it.name.Replace("(Clone)", "").Split(" ")[0])).ToList();
+            map.props.AddRange(props);
+            map.Save();
+            print($"{props.Count} props added successfully!");
+            
+            // Add spawn cube
+            var scoreCube = GameObject.FindWithTag("ScoreCube");
+            map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
+            map.Save();
         }
 
         /*
@@ -286,15 +302,13 @@ namespace Utils
             Debug.Log($"Updated {count} blocks!");
             map.Save();
         }
-
-        [Header("AddScoreCube")] [SerializeField]
-        private GameObject scoreCube;
-
+        
         // Save the position of the score cube.
         [Button]
         private void AddScoreCube()
         {
             var map = _wm.Map;
+            var scoreCube = GameObject.FindWithTag("ScoreCube");
             map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
             map.Save();
         }

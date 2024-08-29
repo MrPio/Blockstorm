@@ -42,7 +42,6 @@ namespace VoxelEngine
             new("stone", topID: (1, 8), blockHealth: BlockHealth.High),
             new("sand", topID: (0, 7), blockHealth: BlockHealth.Low),
             new("sand_stone", topID: (0, 8), blockHealth: BlockHealth.Medium),
-            new("sand_alt", topID: (9, 12), blockHealth: BlockHealth.Low),
             new("ardesia", topID: (4, 7), blockHealth: BlockHealth.Medium),
             new("clay", topID: (0, 9), blockHealth: BlockHealth.Medium),
             new("red_stone", topID: (0, 11), blockHealth: BlockHealth.Medium),
@@ -130,8 +129,6 @@ namespace VoxelEngine
             new("cactus", topID: (10, 1), sideID: (10, 0), blockHealth: BlockHealth.Medium),
             new("tnt", topID: (14, 15), sideID: (14, 14), bottomID: (10, 2), blockHealth: BlockHealth.OneHit),
             new("window", topID: (1, 13), isTransparent: true, blockHealth: BlockHealth.OneHit),
-            new("window_alt", topID: (1, 14), isTransparent: true, blockHealth: BlockHealth.OneHit),
-            new("glass", topID: (1, 15), isTransparent: true, blockHealth: BlockHealth.OneHit),
             new("crate", topID: (2, 13), blockHealth: BlockHealth.Low),
             new("crate_alt", topID: (2, 15), sideID: (2, 14), blockHealth: BlockHealth.Low),
             new("flame_box", topID: (2, 12), blockHealth: BlockHealth.OneHit),
@@ -141,6 +138,15 @@ namespace VoxelEngine
             new("clay_brown", topID: (8, 14), blockHealth: BlockHealth.Medium),
             new("clay_black", topID: (8, 15), blockHealth: BlockHealth.Medium),
 
+            new("tile_orange", topID: (8, 6), blockHealth: BlockHealth.Medium),
+            new("tile_green", topID: (8, 7), blockHealth: BlockHealth.Medium),
+            new("tile_blue", topID: (8, 8), blockHealth: BlockHealth.Medium),
+            new("tile_red", topID: (8, 9), blockHealth: BlockHealth.Medium),
+            new("tile_white", topID: (8, 10), blockHealth: BlockHealth.Medium),
+            new("tile_black", topID: (8, 11), blockHealth: BlockHealth.Medium),
+            new("sand_alt", topID: (9, 12), blockHealth: BlockHealth.Low),
+            new("window_alt", topID: (1, 14), isTransparent: true, blockHealth: BlockHealth.OneHit),
+            new("glass", topID: (1, 15), isTransparent: true, blockHealth: BlockHealth.OneHit),
 
             // With damage
             new("lava", topID: (15, 11), isSolid: false, isTransparent: false),

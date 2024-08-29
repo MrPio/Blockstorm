@@ -383,7 +383,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3967566760417111834, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7670799607742067249, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -3645,7 +3645,6 @@ MonoBehaviour:
   - {x: 150, y: 5, z: 0}
   maxs:
   - {x: 171, y: 6, z: 71}
-  scoreCube: {fileID: 0}
 --- !u!1 &966511847
 GameObject:
   m_ObjectHideFlags: 0
@@ -5672,7 +5671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1607405885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8455,7 +8454,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4448862840658705061, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_ProtocolType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
