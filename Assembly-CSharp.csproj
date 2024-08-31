@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Partials\NetworkDestroyable.cs" />
     <Compile Include="Assets\Scripts\Utils\ClientNetworkTransform.cs" />
     <Compile Include="Assets\Scripts\Partials\TabMenu.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\HighlightArea.cs" />
     <Compile Include="Assets\Scripts\UI\SliderSetting.cs" />
     <Compile Include="Assets\Scripts\Utils\Vector2XZ.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3Int.cs" />
@@ -87,7 +88,6 @@
     <Compile Include="Assets\Scripts\Prefabs\Gas.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\BoolExtensions.cs" />
-    <Compile Include="Assets\HighlightArea.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\ObjectExtensions.cs" />
     <Compile Include="Assets\Scripts\Model\Collectable.cs" />
     <Compile Include="Assets\Scripts\Partials\Notifier.cs" />

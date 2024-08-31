@@ -73,7 +73,6 @@ namespace Utils
         [Button]
         private void Map2Voxel()
         {
-            var blockTypesList = VoxelData.BlockTypes.ToList();
             var cubes = GameObject.FindWithTag("MapGenerator").GetComponentsInChildren<MeshRenderer>();
             var blockTypes = new List<byte>();
             var positionsX = new List<int>();
@@ -82,7 +81,10 @@ namespace Utils
             foreach (var cube in cubes)
             {
                 var id = int.Parse(cube.material.mainTexture.name.Split('_')[1]) - 1;
-                var blockType = blockTypesList.FindIndex(e => e.topID == id || e.bottomID == id || e.sideID == id);
+                var blockType = VoxelData.BlockTypes.ToList()
+                    .FindIndex(e => e.topID == id || e.bottomID == id || e.sideID == id);
+                if (blockType < 0)
+                    throw new Exception($"Material {id} not found in VoxelData!");
                 var posNorm = Vector3Int.FloorToInt(cube.transform.position + Vector3.one * 0.25f);
                 blockTypes.Add((byte)blockType);
                 positionsX.Add(posNorm.x);
@@ -105,8 +107,8 @@ namespace Utils
             // Apply remapping rules
             foreach (var block in blocksList)
             foreach (var remap in remappingRules)
-                if (block.type == _wm.BlockTypeIndex(remap.oldName))
-                    block.type = _wm.BlockTypeIndex(remap.newName);
+                if (block.type == VoxelData.Name2Id(remap.oldName))
+                    block.type = VoxelData.Name2Id(remap.newName);
             // Add bottom bedrock layer
             for (var x = 0; x < mapSize.x; x++)
             for (var z = 0; z < mapSize.z; z++)
@@ -138,8 +140,8 @@ namespace Utils
                 };
                 foreach (var block in newBlocks)
                 foreach (var remap in rule.remappingRules)
-                    if (block.type == _wm.BlockTypeIndex(remap.oldName))
-                        block.type = _wm.BlockTypeIndex(remap.newName);
+                    if (block.type == VoxelData.Name2Id(remap.oldName))
+                        block.type = VoxelData.Name2Id(remap.newName);
                 blocksList.AddRange(newBlocks);
             }
 
@@ -152,12 +154,13 @@ namespace Utils
 
             // Add props
             var props = GameObject.FindGameObjectsWithTag("Prop").Select(it =>
-                new Prop(it.transform.position, it.transform.rotation.eulerAngles,
+                new Prop(it.transform.position + new Vector3(-minX, -minY + 1, -minZ),
+                    it.transform.rotation.eulerAngles,
                     it.name.Replace("(Clone)", "").Split(" ")[0])).ToList();
             map.props.AddRange(props);
             map.Save();
             print($"{props.Count} props added successfully!");
-            
+
             // Add spawn cube
             var scoreCube = GameObject.FindWithTag("ScoreCube");
             map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
@@ -268,7 +271,8 @@ namespace Utils
             var map = _wm.Map;
             map.props = new List<Prop>();
             map.props.AddRange(GameObject.FindGameObjectsWithTag("Prop").Select(it =>
-                new Prop(it.transform.position, it.transform.rotation.eulerAngles, it.name.Replace("(Clone)","").Split(" ")[0])).ToList());
+                new Prop(it.transform.position, it.transform.rotation.eulerAngles,
+                    it.name.Replace("(Clone)", "").Split(" ")[0])).ToList());
             map.Save();
         }
 
@@ -302,7 +306,7 @@ namespace Utils
             Debug.Log($"Updated {count} blocks!");
             map.Save();
         }
-        
+
         // Save the position of the score cube.
         [Button]
         private void AddScoreCube()

@@ -26,7 +26,7 @@ namespace Model
         {
             { CollectableType.Hp, 2 },
             { CollectableType.Ammo, 2 },
-            { CollectableType.Weapon, 3 },
+            { CollectableType.Weapon, 4 },
         };
         private static readonly Dictionary<WeaponType, float> WeaponProbabilities = new()
         {

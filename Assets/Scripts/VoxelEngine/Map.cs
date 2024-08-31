@@ -18,7 +18,7 @@ namespace VoxelEngine
     public class Map
     {
         // The list of game maps. It is assumed that each map is stored, 2 times gzip compressed, inside the Firebase storage
-        public static readonly string[] AvailableMaps = { "Harbor" };
+        public static readonly string[] AvailableMaps = { "Harbor","City" };
         public static ISerializer Serializer => JsonSerializer.Instance;
         public const short MaxHeight = 128;
 
@@ -40,8 +40,7 @@ namespace VoxelEngine
             this.name = name;
             this.blocksList = blocksList;
             this.size = size;
-            BlocksHealth = new Dictionary<Vector3Int, uint>();
-            BlocksEdits = new Dictionary<Vector3Int, byte>();
+            DeserializeMap();
         }
 
         public Map DeserializeMap()

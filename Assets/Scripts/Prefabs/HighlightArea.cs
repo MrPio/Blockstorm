@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class HighlightArea : MonoBehaviour
 {
-    private const float smallRange = 36f;
-    private const float bigRange = 54f;
+    private const float SmallRange = 36f;
+    private const float BigRange = 54f;
     private bool _isAiming;
-    public float Range => _isAiming ? bigRange : smallRange;
+    public float Range => _isAiming ? BigRange : SmallRange;
 
     public void SetRange(bool isAiming)
     {

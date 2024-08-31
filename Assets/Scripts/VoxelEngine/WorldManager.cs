@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,8 +22,6 @@ namespace VoxelEngine
     {
         private SceneManager _sm;
 
-        public byte BlockTypeIndex(string blockName) =>
-            (byte)VoxelData.BlockTypes.ToList().FindIndex(it => it.name == blockName.ToLower());
 
         public Material material, transparentMaterial;
         [Range(1, 128)] public int chunkSize = 2;
@@ -116,13 +115,24 @@ namespace VoxelEngine
                 SpawnedProps.Add(go);
             }
 
+            StartCoroutine(ActivatePrefabs());
+
             HasRendered = true;
             _sm.logger.Log($"The map {_sm.worldManager.Map.name} was rendered!");
+            return;
+
+            IEnumerator ActivatePrefabs()
+            {
+                yield return new WaitForSeconds(5f);
+                foreach (var prop in SpawnedProps)
+                    prop.Initialize();
+            }
         }
 
         public bool IsVoxelInWorld(Vector3Int posNorm) =>
-            posNorm.x >= 0 && posNorm.x < Map.size.x && posNorm.y >= 0 && posNorm.y < Map.size.y && posNorm.z >= 0 &&
-            posNorm.z < Map.size.z;
+            posNorm.x >= 0 && posNorm.x < Map.size.x &&
+            posNorm.y >= 0 && posNorm.y < Map.size.y &&
+            posNorm.z >= 0 && posNorm.z < Map.size.z;
 
         [CanBeNull]
         public BlockType GetVoxel(Vector3Int posNorm) =>

@@ -144,9 +144,17 @@ namespace VoxelEngine
             new("tile_red", topID: (8, 9), blockHealth: BlockHealth.Medium),
             new("tile_white", topID: (8, 10), blockHealth: BlockHealth.Medium),
             new("tile_black", topID: (8, 11), blockHealth: BlockHealth.Medium),
+            new("tile_alt_red", topID: (9, 6), blockHealth: BlockHealth.Low),
+            new("tile_alt_green", topID: (9, 7), blockHealth: BlockHealth.Low),
+            new("tile_alt_blue", topID: (9, 8), blockHealth: BlockHealth.Low),
+            new("tile_alt_yellow", topID: (9, 9), blockHealth: BlockHealth.Low),
             new("sand_alt", topID: (9, 12), blockHealth: BlockHealth.Low),
             new("window_alt", topID: (1, 14), isTransparent: true, blockHealth: BlockHealth.OneHit),
             new("glass", topID: (1, 15), isTransparent: true, blockHealth: BlockHealth.OneHit),
+
+            new("plank_brick_red", topID: (7, 12), blockHealth: BlockHealth.Medium),
+            new("plank_brick", topID: (7, 13), blockHealth: BlockHealth.Medium),
+            new("plank_brick_gray", topID: (7, 14), blockHealth: BlockHealth.Medium),
 
             // With damage
             new("lava", topID: (15, 11), isSolid: false, isTransparent: false),

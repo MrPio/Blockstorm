@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Partials;
@@ -111,14 +112,14 @@ namespace VoxelEngine
         {
             if (_removedBlocks != null) return _removedBlocks.ContainsKey(posNorm);
             var worldPos = posNorm + Coord.WorldPos;
-            return _wm.IsVoxelInWorld(worldPos) &&
-                   (VoxelData.BlockTypes[_wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z]].isSolid ||
-                    _wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z] == currentBlockType);
+            if (!_wm.IsVoxelInWorld(worldPos)) return false;
+            var blockId = _wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z];
+            return VoxelData.BlockTypes[blockId].isSolid && blockId == currentBlockType;
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists
         // NOTE: Vertices cannot be shared across different faces, otherwise Unity will attempt to
-        // smoothen them and we won't obtain the desired cube crisp edges.
+        // smoothen them, and we won't get the desired cube crisp edges.
         // So each extern vertex is repeated 3 times, 1 for each of the three adjacent faces.
         // The used optimizations are:
         // - Faces are drawn only if visible thanks to _voxelMap[,,] (faces pruning)
@@ -135,7 +136,7 @@ namespace VoxelEngine
                 return;
             for (var p = 0; p < 6; p++)
             {
-                // Skip if current face is hidden
+                // Skip if the current face is hidden
                 if (CheckVoxel(Vector3Int.FloorToInt(pos) + VoxelData.FaceChecks[p], blockId)) continue;
                 for (var i = 0; i < 4; i++)
                     _vertices.Add(pos + VoxelData.VoxelVerts[VoxelData.VoxelTris[p, i]]);

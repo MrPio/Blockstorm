@@ -33,6 +33,12 @@ namespace Prefabs
             _sm = FindObjectOfType<SceneManager>();
             _rb = FindObjectOfType<Rigidbody>();
             _as = FindObjectOfType<AudioSource>();
+            _rb.isKinematic = true;
+        }
+        
+        public void Initialize()
+        {
+            _rb.isKinematic = false;
         }
 
         private void DestroyProp(bool explode = false)
