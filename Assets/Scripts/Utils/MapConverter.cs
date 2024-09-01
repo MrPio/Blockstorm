@@ -201,8 +201,6 @@ namespace Utils
             BinarySerializer
         }
 
-        [Header("SerializeMap")] [SerializeField]
-        private Spawn redSpawn;
 
         /*
          * Serialize the map currently loaded in the world manager using the provided serialization method.
@@ -213,26 +211,6 @@ namespace Utils
         private void SerializeMap(Serializers serializer)
         {
             var map = _wm.Map;
-            map.spawns = new List<Spawn>
-            {
-                redSpawn,
-                new(Team.Blue,
-                    redSpawn.spawnLayers.Select(it =>
-                            new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, it.bottomLeft.z),
-                                new Vector2XZ(map.size.x - it.bottomLeft.x, it.topRight.z), it.y))
-                        .ToList()),
-                new(Team.Green,
-                    redSpawn.spawnLayers.Select(it =>
-                            new SpawnArea(new Vector2XZ(it.bottomLeft.x, map.size.z - it.topRight.z),
-                                new Vector2XZ(it.topRight.x, map.size.z - it.bottomLeft.z), it.y))
-                        .ToList()),
-                new(Team.Yellow,
-                    redSpawn.spawnLayers.Select(it =>
-                            new SpawnArea(new Vector2XZ(map.size.x - it.topRight.x, map.size.z - it.topRight.z),
-                                new Vector2XZ(map.size.x - it.bottomLeft.x, map.size.z - it.bottomLeft.z), it.y))
-                        .ToList())
-            };
-
             if (serializer is Serializers.BinarySerializer)
                 map.Save(BinarySerializer.Instance);
             else if (serializer is Serializers.JsonSerializer)
@@ -263,7 +241,6 @@ namespace Utils
                 .ToList());
             map.Save();
         }
-
 
         [Button]
         private void SetProps()
@@ -315,6 +292,30 @@ namespace Utils
             var scoreCube = GameObject.FindWithTag("ScoreCube");
             map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
             map.Save();
+        }
+
+        [Header("AddSpawns")] [SerializeField] private Transform[] redSpawns, blueSpawns, greenSpawns, yellowSpawns;
+
+        [Button]
+        private void AddSpawns()
+        {
+            var map = _wm.Map;
+            map.spawns = new List<Spawn>
+            {
+                new(Team.Red, Transforms2SpawnAreas(redSpawns)),
+                new(Team.Blue, Transforms2SpawnAreas(blueSpawns)),
+                new(Team.Green, Transforms2SpawnAreas(greenSpawns)),
+                new(Team.Yellow, Transforms2SpawnAreas(yellowSpawns)),
+            };
+            map.Save();
+            return;
+
+            List<SpawnArea> Transforms2SpawnAreas(Transform[] transforms) => transforms.Select(it =>
+                new SpawnArea(
+                    new Vector2XZ(it.position.x - it.localScale.x / 0.2f, it.position.z - it.localScale.z / 0.2f),
+                    new Vector2XZ(it.position.x + it.localScale.x / 0.2f, it.position.z + it.localScale.z / 0.2f),
+                    (short)it.position.y
+                )).ToList();
         }
     }
 }

@@ -108,7 +108,7 @@ namespace VoxelEngine
             foreach (var prop in Map.props)
             {
                 var prefab = Resources.Load<GameObject>(prop.GetPrefab);
-                var go = Instantiate(prefab, prop.position, Quaternion.Euler(prop.rotation),
+                var go = Instantiate(prefab, prop.position + Vector3.up * 0.5f, Quaternion.Euler(prop.rotation),
                         GameObject.FindGameObjectWithTag("PropsContainer").transform)
                     .GetComponent<Prefabs.Prop>();
                 go.ID = (ushort)SpawnedProps.Count;

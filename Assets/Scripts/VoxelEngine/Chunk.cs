@@ -114,7 +114,7 @@ namespace VoxelEngine
             var worldPos = posNorm + Coord.WorldPos;
             if (!_wm.IsVoxelInWorld(worldPos)) return false;
             var blockId = _wm.Map.Blocks[worldPos.y, worldPos.x, worldPos.z];
-            return VoxelData.BlockTypes[blockId].isSolid && blockId == currentBlockType;
+            return (VoxelData.BlockTypes[blockId].isSolid && !VoxelData.BlockTypes[blockId].isTransparent) || blockId == currentBlockType;
         }
 
         // The following can be (a little) more efficiently rewritten using arrays instead of lists

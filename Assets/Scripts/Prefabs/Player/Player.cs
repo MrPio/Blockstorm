@@ -346,8 +346,9 @@ namespace Prefabs.Player
             //             new NetVector3(Vector3.up), OwnerClientId);
 
             // When the player has touched the ground, activate his jump.
-            _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.25f, 0.4f), Quaternion.identity,
-                groundLayerMask);
+            // _isGrounded = Physics.CheckBox(groundCheck.position, new Vector3(0.4f, 0.25f, 0.4f), Quaternion.identity,
+            //     groundLayerMask);
+            _isGrounded = characterController.isGrounded;
             if (_isGrounded && _velocity.y < 0)
             {
                 // When the player hits the ground after a hard enough fall, start the camera bounce animation.
@@ -438,13 +439,13 @@ namespace Prefabs.Player
             if (weapon.WeaponModel != null)
             {
                 WeaponType? weapon = null;
-                if (Input.GetKeyDown(KeyCode.Alpha3) && this.weapon.WeaponModel!.Type != WeaponType.Block)
+                if (Input.GetKeyDown(KeyCode.Alpha1) && this.weapon.WeaponModel!.Type != WeaponType.Block)
                     weapon = WeaponType.Block;
-                else if (Input.GetKeyDown(KeyCode.Alpha4) && this.weapon.WeaponModel!.Type != WeaponType.Melee)
+                else if (Input.GetKeyDown(KeyCode.Alpha2) && this.weapon.WeaponModel!.Type != WeaponType.Melee)
                     weapon = WeaponType.Melee;
-                else if (Input.GetKeyDown(KeyCode.Alpha1) && this.weapon.WeaponModel!.Type != WeaponType.Primary)
+                else if (Input.GetKeyDown(KeyCode.Alpha3) && this.weapon.WeaponModel!.Type != WeaponType.Primary)
                     weapon = WeaponType.Primary;
-                else if (Input.GetKeyDown(KeyCode.Alpha2) && this.weapon.WeaponModel!.Type != WeaponType.Secondary)
+                else if (Input.GetKeyDown(KeyCode.Alpha4) && this.weapon.WeaponModel!.Type != WeaponType.Secondary)
                     weapon = WeaponType.Secondary;
                 else if (Input.GetKeyDown(KeyCode.Q) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
                     weapon = WeaponType.Tertiary;
@@ -642,7 +643,8 @@ namespace Prefabs.Player
             if (IsOwner)
             {
                 walkAudioSource.Pause();
-                GetComponent<CharacterController>().enabled = !isDying;
+                if (isDying)
+                    GetComponent<CharacterController>().enabled = !isDying;
                 GetComponent<CapsuleCollider>().enabled = isDying;
                 GetComponentInChildren<CameraMovement>().enabled = !isDying;
                 GetComponentInChildren<Weapon>().enabled = !isDying;
@@ -677,11 +679,13 @@ namespace Prefabs.Player
         /// </summary>
         public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, bool onlyPosition = false)
         {
+            characterController.enabled = false;
+
             // Spawn the player location
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 2.1f,
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 1.5f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                          // Vector3.forward * 4.5f,
+                // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 
@@ -705,7 +709,14 @@ namespace Prefabs.Player
                 LoadStatus();
             StartCoroutine(EquipBlock());
             StartCoroutine(EndInvincibility());
+            StartCoroutine(EnableCc());
             return;
+
+            IEnumerator EnableCc()
+            {
+                yield return new WaitForSeconds(1f);
+                characterController.enabled = true;
+            }
 
             IEnumerator EquipBlock()
             {
