@@ -18,7 +18,7 @@ namespace VoxelEngine
             new("snow", topID: (0, 5), bottomID: (0, 0), sideID: (0, 6), blockHealth: BlockHealth.Medium),
 
             new("iron_dark", topID: (1, 1), blockHealth: BlockHealth.Indestructible),
-            new("iron_white", topID: (1, 2), blockHealth: BlockHealth.Medium),
+            new("iron_white", topID: (1, 2), blockHealth: BlockHealth.Indestructible),
             new("iron_red", topID: (1, 3), blockHealth: BlockHealth.Medium),
 
             new("bush", topID: (4, 8), blockHealth: BlockHealth.Low),

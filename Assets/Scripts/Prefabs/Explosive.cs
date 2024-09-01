@@ -103,7 +103,7 @@ namespace Prefabs
                     var damage = (uint)(Damage * distanceFactor) * 100;
 
                     // Broadcast the damage action
-                    _sm.ClientManager.DamagePropRpc(prop.ID, damage, true);
+                    _sm.ClientManager.DamagePropRpc(prop.ID, damage, true, AttackerId);
                 }
             }
         }

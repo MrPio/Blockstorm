@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Managers.Serializer;
 using TMPro;
@@ -176,7 +177,7 @@ namespace Managers
                         new(true, QueryOrder.FieldOptions.AvailableSlots)
                     }
                 });
-                return response.Results;
+                return response.Results.Where(it => it.LobbyCode is not null && it.LobbyCode != "").ToList();
             }
             catch (LobbyServiceException e)
             {
@@ -298,6 +299,7 @@ namespace Managers
                 _sm.logger.Log("Migration has occurred! You are now the host of this lobby!");
                 HostedLobby = _joinedLobby;
             }
+
             if (HostedLobby is not null)
             {
                 _sm.logger.Log("Sending Heartbeat...");

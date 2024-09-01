@@ -171,7 +171,7 @@ namespace Prefabs.Player
                     {
                         var centre = _sm.highlightArea.transform.position;
                         var model = _weaponModel!;
-                        for (var i = 0; i < 40; i++)
+                        for (var i = 0; i < 8f / model.Delay; i++)
                         {
                             var range = _sm.highlightArea.Range / 2;
                             _sm.ServerManager.SpawnExplosiveServerRpc(
@@ -306,7 +306,7 @@ namespace Prefabs.Player
 
                 // Broadcast the damage action
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
-                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false);
+                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, player.OwnerClientId);
             }
         }
 

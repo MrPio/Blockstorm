@@ -326,6 +326,7 @@ namespace Prefabs.Player
                 {
                     Cursor.lockState = CursorLockMode.None;
                     Cursor.visible = true;
+                    walkAudioSource.Pause();
                 }
                 else
                 {
@@ -378,11 +379,12 @@ namespace Prefabs.Player
             // If crunching prevent from falling
             var isAboutToFall =
                 !Physics.CheckSphere(groundCheck.position + move.normalized * 0.05f, 0.15f, groundLayerMask);
-            characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
-                                             (_isRunning.Value ? runMultiplier : 1f) *
-                                             (_isCrouching.Value ? crouchMultiplier : 1f) *
-                                             (_isCrouching.Value && isAboutToFall ? 0f : 1f))
-                                     + _velocity * Time.deltaTime);
+            if (characterController.enabled)
+                characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
+                                                 (_isRunning.Value ? runMultiplier : 1f) *
+                                                 (_isCrouching.Value ? crouchMultiplier : 1f) *
+                                                 (_isCrouching.Value && isAboutToFall ? 0f : 1f))
+                                         + _velocity * Time.deltaTime);
 
             // Broadcast the walking state
             var isWalking = math.abs(x) > 0.1f || math.abs(z) > 0.1f;
@@ -683,7 +685,7 @@ namespace Prefabs.Player
 
             // Spawn the player location
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 1.5f,
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 0.75f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
                 // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
@@ -714,7 +716,7 @@ namespace Prefabs.Player
 
             IEnumerator EnableCc()
             {
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(0.5f);
                 characterController.enabled = true;
             }
 

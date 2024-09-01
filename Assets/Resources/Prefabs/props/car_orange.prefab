@@ -1282,7 +1282,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1063915213084553710, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
       propertyPath: m_Name
-      value: taxi
+      value: car_orange
       objectReference: {fileID: 0}
     - target: {fileID: 2905539113035393459, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1326,7 +1326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
       propertyPath: Hp
-      value: 2000
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 2938902421444936587, guid: d9200116a00bcf3459b20e69c161f458, type: 3}
       propertyPath: lootWeapon

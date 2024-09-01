@@ -165,9 +165,9 @@ namespace Network
         }
 
         [Rpc(SendTo.Everyone)]
-        public void DamagePropRpc(ushort id, uint damage, bool explode)
+        public void DamagePropRpc(ushort id, uint damage, bool explode, ulong attackerID)
         {
-            if (_sm.worldManager.SpawnedProps[id].Hit(damage,explode) && IsHost)
+            if (_sm.worldManager.SpawnedProps[id].Hit(damage, explode, attackerID==NetworkManager.Singleton.LocalClientId) && IsHost)
                 brokenProps.Value = brokenProps.Value.Concat(new[] { id }).ToList();
         }
     }

@@ -57,15 +57,25 @@ namespace Model
         {
             get
             {
-                if (new List<string>
-                        { "crate", "crate", "window", "hay", "barrel", "log" }.Any(it => name.Contains(it)))
-                    return "block_damage_light";
+                var audioMap = new Dictionary<List<string>, string>()
+                {
+                    { new() { "plank", "log" }, "hit_wood" },
+                    { new() { "dirt", "grass", "snow" }, "wet_grass1" },
+                    { new() { "window", "glass" }, "destroy_glass" },
+                    { new() { "crate", "barrel", "hay" }, "block_damage_light" },
+                    { new() { "sand" }, "sand1" },
+                    { new() { "clay" }, "gravel1" },
+                    { new() { "bush", "foliage" }, "grass1" },
+                    { new() { "bars" }, "prop_hit_0" },
+                };
+                foreach (var key in audioMap.Keys.Where(key => key.Any(it => name.Contains(it))))
+                    return audioMap[key];
                 return blockHealth is BlockHealth.Indestructible
                     ? "block_damage_indestructible"
                     : "block_damage_medium";
             }
         }
 
-        public string GetMaterial => $"Textures/texturepacks/blockade/Materials/blockade_{topID + 1:D1}";
+        public string GetMaterial => $"Textures/texturepacks/blockade/Materials/blockade_{topID + 1:D2}";
     }
 }
