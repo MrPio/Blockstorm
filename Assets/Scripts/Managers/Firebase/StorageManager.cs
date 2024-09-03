@@ -24,6 +24,8 @@ namespace Managers.Firebase
         public async Task DownloadFileAsync(string path)
         {
             Debug.Log(path);
+            if (!Directory.Exists(Path.Combine(Application.persistentDataPath, string.Concat(path.Split('/')[..^1]))))
+                Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, string.Concat(path.Split('/')[..^1])));
             await storageRef.Child(path).GetFileAsync(Path.Combine(Application.persistentDataPath, path)).ContinueWith(task =>
             {
                 if (task.IsFaulted || task.IsCanceled)

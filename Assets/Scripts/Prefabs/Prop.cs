@@ -58,6 +58,7 @@ namespace Prefabs
                                      new Vector3(_animationCurves[0].Evaluate(t), _animationCurves[1].Evaluate(t),
                                          _animationCurves[2].Evaluate(t)) * AnimationHitScale;
             }
+            // End of the animation
             else if (_acc > AnimationHitDuration)
             {
                 // _rb.isKinematic = false;
@@ -118,8 +119,9 @@ namespace Prefabs
                 _as.PlayOneShot(hitAudioClips.RandomItem());
                 // _rb.isKinematic = true;
                 _animationCurves = animationCurves.ToList().RandomSublist(3);
+                if (_acc <= 0)
+                    _startPosition = transform.position;
                 _acc = 0;
-                _startPosition = transform.position;
             }
 
             return Hp <= 0;

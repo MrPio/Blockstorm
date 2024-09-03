@@ -4,6 +4,7 @@ using System.Linq;
 using Managers;
 using Managers.Serializer;
 using Model;
+using UI;
 using Unity.Mathematics;
 using UnityEngine;
 using VoxelEngine;
@@ -89,8 +90,14 @@ namespace Prefabs.Player
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _transform = transform;
-            SetSensitivity(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/sensitivity", 0.2f));
-            SetFOV(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/fov", 0.5f));
+            SetSensitivity(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/sensitivity",
+                               SliderSetting.defaultValues[SliderSettingType.MouseSensitivity] *
+                               SliderSetting.steps[SliderSettingType.MouseSensitivity]) /
+                           SliderSetting.steps[SliderSettingType.MouseSensitivity]);
+            SetFOV(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/fov",
+                       SliderSetting.defaultValues[SliderSettingType.Fov] *
+                       SliderSetting.steps[SliderSettingType.Fov]) /
+                   SliderSetting.steps[SliderSettingType.Fov]);
         }
 
         private void LateUpdate()

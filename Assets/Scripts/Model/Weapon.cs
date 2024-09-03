@@ -79,12 +79,12 @@ namespace Model
 
             // BARRETT =====================================================================================
             // 300
-            new Weapon(name: "barrett", damage: 140, rof: 4, distance: 150, type: WeaponType.Primary,
+            new Weapon(name: "barrett", damage: 140, rof: 5, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600,
                 scope: "scope5"),
 
             // 540
-            new Weapon(name: "barrett", damage: 180, rof: 3, distance: 150, type: WeaponType.Primary,
+            new Weapon(name: "barrett", damage: 180, rof: 4, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
                 scope: "scope5", audio: "BARRETT"),
             

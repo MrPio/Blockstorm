@@ -95,7 +95,7 @@ namespace Prefabs
                 // Checks if there was a hit on a prop
                 foreach (var prop in _sm.worldManager.SpawnedProps)
                 {
-                    if (prop.gameObject.IsDestroyed()) continue;
+                    if (prop.IsDestroyed()) continue;
 
                     var distanceFactor = 1 - Vector3.Distance(prop.transform.position, transform.position) /
                         (ExplosionRange * GroundDamageFactor * 3);

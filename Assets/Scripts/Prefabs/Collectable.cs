@@ -76,7 +76,7 @@ namespace Prefabs
 
             var upgradedWeaponPrefab = Resources.Load<GameObject>(Model.WeaponItem.GetPrefab(collectable: true));
             foreach (Transform child in collectableContainer.transform)
-                if (!child.gameObject.IsDestroyed())
+                if (!child.IsDestroyed())
                     Destroy(child.gameObject);
             var go = Instantiate(upgradedWeaponPrefab, collectableContainer.transform);
             // Load the weapon material and the scope

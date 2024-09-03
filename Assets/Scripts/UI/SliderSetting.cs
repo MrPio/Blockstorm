@@ -39,6 +39,13 @@ namespace UI
             { SliderSettingType.RenderDistance, 0.025f },
             { SliderSettingType.Fov, 0.025f }
         };
+        
+        public static readonly Dictionary<SliderSettingType, int> steps = new()
+        {
+            { SliderSettingType.MouseSensitivity, 16 },
+            { SliderSettingType.RenderDistance, 6 },
+            { SliderSettingType.Fov, 8 }
+        };
 
 
         [SerializeField] private Slider slider;
@@ -47,20 +54,22 @@ namespace UI
 
         private void Start()
         {
+            slider.maxValue = steps[sliderSettingType];
             slider.value =
                 BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{configFiles[sliderSettingType]}",
-                    defaultValues[sliderSettingType]);
+                    defaultValues[sliderSettingType]*steps[sliderSettingType]);
             slider.onValueChanged.AddListener(value =>
             {
-                if (Time.time - _lastChange < delays[sliderSettingType]) return;
+                if (!slider.wholeNumbers && Time.time - _lastChange < delays[sliderSettingType]) return;
                 _lastChange = Time.time;
-                UpdateSetting(value);
+                UpdateSetting(value / slider.maxValue);
             });
         }
 
         private void UpdateSetting(float value)
         {
-            BinarySerializer.Instance.Serialize(value, ISerializer.ConfigsDir, configFiles[sliderSettingType]);
+            BinarySerializer.Instance.Serialize(value * slider.maxValue, ISerializer.ConfigsDir,
+                configFiles[sliderSettingType]);
             if (sliderSettingType is SliderSettingType.MouseSensitivity)
                 FindObjectOfType<CameraMovement>().SetSensitivity(value);
             else if (sliderSettingType is SliderSettingType.RenderDistance)

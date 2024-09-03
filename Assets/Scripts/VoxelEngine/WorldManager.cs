@@ -10,6 +10,7 @@ using Managers.Encoder;
 using Managers.Serializer;
 using Model;
 using Network;
+using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
@@ -55,7 +56,10 @@ namespace VoxelEngine
         {
             _sm = FindObjectOfType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
-            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/render_distance", 0.5f));
+            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/render_distance",
+                                  SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
+                                  SliderSetting.steps[SliderSettingType.RenderDistance]) /
+                              SliderSetting.steps[SliderSettingType.RenderDistance]);
         }
 
         private async Task LoadMap(string mapName)
@@ -155,6 +159,8 @@ namespace VoxelEngine
 
             foreach (var prop in SpawnedProps.Where(it => !it.IsDestroyed()))
                 prop.gameObject.SetActive(Vector3.Distance(playerPos, prop.transform.position) < viewDistance * 0.75f);
+            foreach (var c in SpawnedCollectables.Where(it => !it.IsDestroyed()))
+                c.gameObject.SetActive(Vector3.Distance(playerPos, c.transform.position) < viewDistance * 0.75f);
         }
 
         [CanBeNull]

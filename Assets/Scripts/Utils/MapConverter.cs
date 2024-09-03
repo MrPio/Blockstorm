@@ -152,9 +152,10 @@ namespace Utils
             map.Save();
             print($"Map [{map.name}] saved successfully!");
 
+            print(new Vector3(-minX, -minY + 1, -minZ));
             // Add props
             var props = GameObject.FindGameObjectsWithTag("Prop").Select(it =>
-                new Prop(it.transform.position + new Vector3(-minX, -minY + 1, -minZ),
+                new Prop(it.transform.position + new Vector3(-minX, -minY + 1, -minZ) + Vector3.one / 2,
                     it.transform.rotation.eulerAngles,
                     it.name.Replace("(Clone)", "").Split(" ")[0])).ToList();
             map.props.AddRange(props);
@@ -163,7 +164,8 @@ namespace Utils
 
             // Add spawn cube
             var scoreCube = GameObject.FindWithTag("ScoreCube");
-            map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position);
+            map.scoreCubePosition = Vector3Int.RoundToInt(scoreCube.transform.position +
+                                                          new Vector3(-minX, -minY + 1, -minZ) + Vector3.one / 2);
             map.Save();
         }
 

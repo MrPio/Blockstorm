@@ -213,7 +213,7 @@ namespace Prefabs.Player
 
             // Cast a ray to check for collisions
             var cameraTransform = cameraMovement.transform;
-            var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.45f, cameraTransform.forward);
+            var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.25f, cameraTransform.forward);
 
             // Checks if there was a hit on a prop
             var hasHitEnemy =
