@@ -39,6 +39,8 @@ namespace Network
         // Used to update the collectables
         public NetworkVariable<Scores> scores = new();
 
+        public NetworkVariable<byte> skybox = new(0);
+
         [SerializeField] private GameObject collectable;
 
         private void Awake()
@@ -109,6 +111,16 @@ namespace Network
                     Quit();
                 }
             };
+            skybox.OnValueChanged += (_, newValue) => SetSkybox(newValue);
+            SetSkybox(skybox.Value);
+            return;
+
+            void SetSkybox(int value)
+            {
+                RenderSettings.skybox = _sm.skyboxes[value];
+                RenderSettings.fogColor = _sm.fogColors[value];
+                _sm.directionalLight.color = _sm.lightColors[value];
+            }
         }
 
         /// <summary>
@@ -167,7 +179,8 @@ namespace Network
         [Rpc(SendTo.Everyone)]
         public void DamagePropRpc(ushort id, uint damage, bool explode, ulong attackerID)
         {
-            if (_sm.worldManager.SpawnedProps[id].Hit(damage, explode, attackerID==NetworkManager.Singleton.LocalClientId) && IsHost)
+            if (_sm.worldManager.SpawnedProps[id]
+                    .Hit(damage, explode, attackerID == NetworkManager.Singleton.LocalClientId) && IsHost)
                 brokenProps.Value = brokenProps.Value.Concat(new[] { id }).ToList();
         }
     }

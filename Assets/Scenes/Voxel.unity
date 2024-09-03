@@ -6696,6 +6696,31 @@ MonoBehaviour:
   highlightArea: {fileID: 1484144878}
   playerPrefab: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
   clientServerManagersPrefab: {fileID: 3382692895550762362, guid: 553961391bf125e4ea866d369aa81cc0, type: 3}
+  skyboxes:
+  - {fileID: 2100000, guid: efd1c33efd2d58340b88804268e6833f, type: 2}
+  - {fileID: 2100000, guid: 85cf0b004bc4a654b9e501efcce47902, type: 2}
+  - {fileID: 2100000, guid: d9dca9ae1786c394f9e79c637aa9a7bf, type: 2}
+  - {fileID: 2100000, guid: 3e5399bd195de7649b874f58c1b9f8a3, type: 2}
+  - {fileID: 2100000, guid: 4e154bf235e41704bbd6bbc6fd6c63f6, type: 2}
+  - {fileID: 2100000, guid: 2039a0ad0a9d05549928b70362f54902, type: 2}
+  - {fileID: 2100000, guid: e391f00234292cc4f935308c11cf0e54, type: 2}
+  fogColors:
+  - {r: 0.6745098, g: 0.91764706, b: 0.9647059, a: 0}
+  - {r: 0.43529412, g: 0.65882355, b: 0.7882353, a: 0}
+  - {r: 0.5019608, g: 0.62352943, b: 0.7019608, a: 0}
+  - {r: 0.78431374, g: 0.79607844, b: 0.77254903, a: 0}
+  - {r: 0.7607843, g: 0.8156863, b: 0.88235295, a: 0}
+  - {r: 0.12156863, g: 0.13725491, b: 0.16078432, a: 0}
+  - {r: 0.33333334, g: 0.27058825, b: 0.21960784, a: 0}
+  lightColors:
+  - {r: 0.8901961, g: 0.9607843, b: 1, a: 0}
+  - {r: 0.9372549, g: 0.972549, b: 1, a: 0}
+  - {r: 0.69803923, g: 0.62352943, b: 0.7176471, a: 0}
+  - {r: 1, g: 1, b: 1, a: 0}
+  - {r: 0.7529412, g: 0.7764706, b: 0.68235296, a: 0}
+  - {r: 0.57254905, g: 0.44705883, b: 0.34509805, a: 0}
+  - {r: 0.827451, g: 0.7921569, b: 0.6156863, a: 0}
+  directionalLight: {fileID: 1611321447}
   worldCanvas: {fileID: 1658400691}
   uiCanvas: {fileID: 1611964765}
   crosshair: {fileID: 1410053973}

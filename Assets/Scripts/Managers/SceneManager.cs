@@ -12,6 +12,7 @@ using Unity.Netcode;
 using UnityEngine;
 using VoxelEngine;
 using Logger = UI.Logger;
+using Random = UnityEngine.Random;
 using Weapon = Model.Weapon;
 
 namespace Managers
@@ -25,6 +26,13 @@ namespace Managers
 
         [Header("Prefabs")] public GameObject playerPrefab;
         public GameObject clientServerManagersPrefab;
+
+        [Header("Skybox")] 
+        public Material[] skyboxes;
+
+        public Color[] fogColors;
+        public Color[] lightColors;
+        public Light directionalLight;
 
         [Header("UI")] public Canvas worldCanvas;
         public Canvas uiCanvas;
@@ -141,6 +149,8 @@ namespace Managers
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
             invincibilityHUD.SetActive(false);
+            if (isFirstSpawn && ClientManager.IsHost)
+                ClientManager.skybox.Value = (byte)Random.Range(0, skyboxes.Length);
         }
 
         /// <summary>
