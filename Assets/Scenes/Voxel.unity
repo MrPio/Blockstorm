@@ -3635,16 +3635,6 @@ MonoBehaviour:
   copyRules: []
   remappingRules: []
   cube: {fileID: 0}
-  redSpawn:
-    team: 0
-    spawnLayers:
-    - bottomLeft:
-        x: 5
-        z: 235
-      topRight:
-        x: 21
-        z: 244
-      y: 3
   spawnCameras: []
   oldIds:
   - iron
@@ -3653,6 +3643,10 @@ MonoBehaviour:
   - {x: 150, y: 5, z: 0}
   maxs:
   - {x: 171, y: 6, z: 71}
+  redSpawns: []
+  blueSpawns: []
+  greenSpawns: []
+  yellowSpawns: []
 --- !u!1 &966511847
 GameObject:
   m_ObjectHideFlags: 0

@@ -129,9 +129,9 @@ namespace Model
             new Weapon(name: "shmel", damage: 300, rof: 35, zoom: 3.5f, explosionRange: 1.95f,
                 type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
                 reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD"),
-            new Weapon(name: "tact", damage: 120, rof: 125, explosionRange: 2f,
-                type: WeaponType.Tertiary, ammo: 0, hasAim: false, groundDamageFactor: 0.35f,
-                reloadTime: 1200, magazine: 1, fireAnimation: "gun"),
+            new Weapon(name: "tact", damage: 120, rof: 160, explosionRange: 2f,
+                type: WeaponType.Tertiary, ammo: 1, hasAim: false, groundDamageFactor: 0.35f,
+                reloadTime: 1000, magazine: 1, fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()

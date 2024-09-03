@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7357896813498737331, guid: d9d72586ab9c37d49b3e1671a0f135a1, type: 3}
       propertyPath: Hp
-      value: 300
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 7357896813498737331, guid: d9d72586ab9c37d49b3e1671a0f135a1, type: 3}
       propertyPath: hitAudioClips.Array.size
