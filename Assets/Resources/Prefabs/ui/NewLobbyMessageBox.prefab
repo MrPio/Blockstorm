@@ -1360,6 +1360,8 @@ MonoBehaviour:
     m_Options:
     - m_Text: Harbor
       m_Image: {fileID: 0}
+    - m_Text: City
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
