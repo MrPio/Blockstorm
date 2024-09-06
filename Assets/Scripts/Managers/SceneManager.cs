@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using Managers.Firebase;
+using Managers.Serializer;
 using Model;
 using Network;
 using Prefabs;
@@ -10,6 +11,7 @@ using Prefabs.Player;
 using UI;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 using VoxelEngine;
 using Logger = UI.Logger;
 using Random = UnityEngine.Random;
@@ -27,8 +29,7 @@ namespace Managers
         [Header("Prefabs")] public GameObject playerPrefab;
         public GameObject clientServerManagersPrefab;
 
-        [Header("Skybox")] 
-        public Material[] skyboxes;
+        [Header("Skybox")] public Material[] skyboxes;
 
         public Color[] fogColors;
         public Color[] lightColors;
@@ -72,6 +73,9 @@ namespace Managers
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
         public StorageManager storageManager;
+
+        [Header("Misc")] public AudioMixer audioMixer;
+
         private Team? _newTeam = null;
         [CanBeNull] private Dictionary<WeaponType, Weapon> _lastSelectedWeapons = null;
 
@@ -81,6 +85,13 @@ namespace Managers
             ClientManager = clientServerManagers.GetComponentInChildren<ClientManager>();
             ServerManager = clientServerManagers.GetComponentInChildren<ServerManager>();
             InitializeMenu();
+
+            // Load the volume setting
+            var volume = BinarySerializer.Instance.Deserialize(
+                $"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}",
+                SliderSetting.defaultValues[SliderSettingType.Volume] *
+                SliderSetting.steps[SliderSettingType.Volume]);
+            audioMixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(volume, .0001f, 1f)) * 20);
         }
 
         /// <summary>

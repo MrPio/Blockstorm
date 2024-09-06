@@ -90,11 +90,11 @@ namespace Prefabs.Player
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             _transform = transform;
-            SetSensitivity(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/sensitivity",
+            SetSensitivity(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.MouseSensitivity]}",
                                SliderSetting.defaultValues[SliderSettingType.MouseSensitivity] *
                                SliderSetting.steps[SliderSettingType.MouseSensitivity]) /
                            SliderSetting.steps[SliderSettingType.MouseSensitivity]);
-            SetFOV(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/fov",
+            SetFOV(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.Fov]}",
                        SliderSetting.defaultValues[SliderSettingType.Fov] *
                        SliderSetting.steps[SliderSettingType.Fov]) /
                    SliderSetting.steps[SliderSettingType.Fov]);

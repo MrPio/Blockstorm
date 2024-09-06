@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Managers;
 using Managers.Serializer;
 using Prefabs.Player;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VoxelEngine;
@@ -15,55 +17,49 @@ namespace UI
         MouseSensitivity,
         RenderDistance,
         Fov,
+        Volume
     }
 
     public class SliderSetting : MonoBehaviour
     {
+        private SceneManager _sm;
+
         public static readonly Dictionary<SliderSettingType, string> configFiles = new()
         {
             { SliderSettingType.MouseSensitivity, "sensitivity" },
             { SliderSettingType.RenderDistance, "render_distance" },
-            { SliderSettingType.Fov, "fov" }
+            { SliderSettingType.Fov, "fov" },
+            { SliderSettingType.Volume, "volume" }
         };
 
         public static readonly Dictionary<SliderSettingType, float> defaultValues = new()
         {
             { SliderSettingType.MouseSensitivity, 0.2f },
             { SliderSettingType.RenderDistance, 0.75f },
-            { SliderSettingType.Fov, 0.5f }
+            { SliderSettingType.Fov, 0.5f },
+            { SliderSettingType.Volume, 1f }
         };
 
-        public static readonly Dictionary<SliderSettingType, float> delays = new()
-        {
-            { SliderSettingType.MouseSensitivity, 0.025f },
-            { SliderSettingType.RenderDistance, 0.025f },
-            { SliderSettingType.Fov, 0.025f }
-        };
-        
         public static readonly Dictionary<SliderSettingType, int> steps = new()
         {
             { SliderSettingType.MouseSensitivity, 16 },
             { SliderSettingType.RenderDistance, 6 },
-            { SliderSettingType.Fov, 8 }
+            { SliderSettingType.Fov, 8 },
+            { SliderSettingType.Volume, 20 }
         };
 
 
         [SerializeField] private Slider slider;
         [SerializeField] private SliderSettingType sliderSettingType;
-        private float _lastChange;
 
         private void Start()
         {
+            _sm = FindObjectOfType<SceneManager>();
             slider.maxValue = steps[sliderSettingType];
             slider.value =
                 BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{configFiles[sliderSettingType]}",
-                    defaultValues[sliderSettingType]*steps[sliderSettingType]);
-            slider.onValueChanged.AddListener(value =>
-            {
-                if (!slider.wholeNumbers && Time.time - _lastChange < delays[sliderSettingType]) return;
-                _lastChange = Time.time;
-                UpdateSetting(value / slider.maxValue);
-            });
+                    defaultValues[sliderSettingType] * steps[sliderSettingType]);
+            slider.onValueChanged.AddListener(value => UpdateSetting(value / slider.maxValue));
         }
 
         private void UpdateSetting(float value)
@@ -76,6 +72,8 @@ namespace UI
                 FindObjectOfType<WorldManager>().SetRenderDistance(value);
             else if (sliderSettingType is SliderSettingType.Fov)
                 FindObjectOfType<CameraMovement>().SetFOV(value);
+            else if (sliderSettingType is SliderSettingType.Volume)
+                _sm.audioMixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1.0f)) * 20);
         }
     }
 }

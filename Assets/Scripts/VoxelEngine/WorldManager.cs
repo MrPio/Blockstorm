@@ -56,7 +56,7 @@ namespace VoxelEngine
         {
             _sm = FindObjectOfType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
-            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/render_distance",
+            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
                                   SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
                                   SliderSetting.steps[SliderSettingType.RenderDistance]) /
                               SliderSetting.steps[SliderSettingType.RenderDistance]);
