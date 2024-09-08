@@ -3,11 +3,11 @@
 An FPS game in the style of Minecraft. This is my first attempt at writing a **voxel engine** and **multiplayer** system
 in Unity.
 
-<div>
-     <img src="https://github.com/user-attachments/assets/7628268a-8225-457e-aebf-7ae64729517a" width="23.5%"/>
-     <img src="https://github.com/user-attachments/assets/2e8074e3-2208-40bc-b29e-de46f0550b8a" width="23.5%"/>
-     <img src="https://github.com/user-attachments/assets/99a70a98-be7c-4ecb-a639-39c17c39f987" width="23.5%"/>
-     <img src="https://github.com/user-attachments/assets/4ccc262c-ec67-42af-af12-be87df5cf1d9" width="23.5%"/>
+<div>    
+     <img src="https://github.com/user-attachments/assets/8ccb789e-1b06-46de-9cff-e70d94923898" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/5a127610-b014-49ff-b222-7d3d095be44c" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/2e7b5210-39d5-4c19-b4e8-bee7c4441b09" width="23.5%"/>
+     <img src="https://github.com/user-attachments/assets/86425bf6-7405-4ffc-82f2-4e9ccc84e551" width="23.5%"/>
 </div>
 
 ## 🧊 What is a Voxel Engine?
@@ -85,6 +85,21 @@ In this project, to switch between localhost and remote modes you should:
 | Submeshes for transparent blocks |  ✅   |
 |       Inventory management       |  ✅   |
 |    Multiplayer implementation    |  ✅  |
+
+## 🖼️ In-Game Screenshots
+
+![vlcsnap-2024-09-08-14h37m25s975](https://github.com/user-attachments/assets/6e773bf0-e7f6-4977-895f-f0c4c2a02303)
+![vlcsnap-2024-09-08-14h37m23s070](https://github.com/user-attachments/assets/95e0ca90-fefa-4160-8668-bea6450d50b4)
+![vlcsnap-2024-09-08-14h37m08s955](https://github.com/user-attachments/assets/37200ac3-7a12-4037-ae95-052df54203a6)
+![vlcsnap-2024-09-08-14h36m59s045](https://github.com/user-attachments/assets/b2af876f-f75f-4b74-90d8-f5308801eb91)
+![vlcsnap-2024-09-08-14h36m45s626](https://github.com/user-attachments/assets/bf54fc4a-0273-49b3-b591-fc658eff5816)
+![vlcsnap-2024-09-08-14h36m28s344](https://github.com/user-attachments/assets/4e98c68d-87a9-4c83-b004-a9ef5411c85d)
+![vlcsnap-2024-09-08-14h36m09s382](https://github.com/user-attachments/assets/188ca242-5733-48fb-b506-abe65919ddb6)
+![vlcsnap-2024-09-08-14h35m24s158](https://github.com/user-attachments/assets/e64ba5c1-3041-43cf-bf11-8f1dedc8171e)
+![vlcsnap-2024-09-08-14h35m07s167](https://github.com/user-attachments/assets/7bde99ac-556f-45c4-b82b-a0b1a4dcab5f)
+![vlcsnap-2024-09-08-14h34m59s535](https://github.com/user-attachments/assets/fe733db0-9d56-4832-923c-e0e58d895620)
+
+
 
 ## 🖼️ Misc
 
