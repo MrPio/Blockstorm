@@ -90,6 +90,7 @@ In this project, to switch between localhost and remote modes you should:
 
 ![vlcsnap-2024-09-08-14h37m25s975](https://github.com/user-attachments/assets/6e773bf0-e7f6-4977-895f-f0c4c2a02303)
 ![vlcsnap-2024-09-08-14h37m23s070](https://github.com/user-attachments/assets/95e0ca90-fefa-4160-8668-bea6450d50b4)
+![vlcsnap-2024-09-08-14h44m27s061](https://github.com/user-attachments/assets/2dae2157-ea19-4524-9a41-401877e1571f)
 ![vlcsnap-2024-09-08-14h37m08s955](https://github.com/user-attachments/assets/37200ac3-7a12-4037-ae95-052df54203a6)
 ![vlcsnap-2024-09-08-14h36m59s045](https://github.com/user-attachments/assets/b2af876f-f75f-4b74-90d8-f5308801eb91)
 ![vlcsnap-2024-09-08-14h36m45s626](https://github.com/user-attachments/assets/bf54fc4a-0273-49b3-b591-fc658eff5816)
