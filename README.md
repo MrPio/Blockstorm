@@ -84,7 +84,7 @@ In this project, to switch between localhost and remote modes you should:
 |   Creating and deleting blocks   |  ✅   |
 | Submeshes for transparent blocks |  ✅   |
 |       Inventory management       |  ✅   |
-|    Multiplayer implementation    |  ✅  |
+|    Multiplayer implementation    |  🟨  |
 
 ## 🖼️ In-Game Screenshots
 
