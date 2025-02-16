@@ -26,6 +26,7 @@ Material:
   disabledShaderPasses:
   - DepthOnly
   - SHADOWCASTER
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -52,6 +53,7 @@ Material:
     - _EmissionColor: {r: 0.0012254902, g: 0.04681374, b: 0, a: 1}
     - _TintColor: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &8231218159152009894
 MonoBehaviour:
   m_ObjectHideFlags: 11
@@ -64,4 +66,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 7
+  version: 9

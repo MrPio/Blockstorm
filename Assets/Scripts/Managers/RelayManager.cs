@@ -9,11 +9,12 @@ namespace Managers
 {
     public class RelayManager : MonoBehaviour
     {
+        [SerializeField] private string connectionType = "dtls";
         private SceneManager _sm;
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
         }
 
         // For the host
@@ -26,7 +27,7 @@ namespace Managers
                 Debug.Log($"Relay Join Code = {joinCode}");
 
                 // Integrate Relay with Netcode for game objects
-                var relayServerData = new RelayServerData(allocation, "dtls");
+                var relayServerData = new RelayServerData(allocation, connectionType);
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartHost();
                 return joinCode;
@@ -46,7 +47,7 @@ namespace Managers
                 var allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
                 // Integrate Relay with Netcode for game objects
-                var relayServerData = new RelayServerData(allocation, "dtls");
+                var relayServerData = new RelayServerData(allocation, connectionType);
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                 NetworkManager.Singleton.StartClient();
             }

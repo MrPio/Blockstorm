@@ -69,7 +69,7 @@ namespace UI
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             if (image is not null)
                 startColor = image.color;
         }
@@ -153,7 +153,7 @@ namespace UI
 
             if (actionType is ActionType.InventorySpawn)
             {
-                var inventory = FindObjectOfType<Inventory>();
+                var inventory = FindFirstObjectByType<Inventory>();
                 _sm.InitializeSpawn(selectedWeapons:inventory.selectedWeapons);
             }
         }

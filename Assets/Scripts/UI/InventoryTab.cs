@@ -17,7 +17,7 @@ namespace UI
 
         private void Awake()
         {
-            _inventory = FindObjectOfType<Inventory>();
+            _inventory = FindFirstObjectByType<Inventory>();
         }
 
         private void Start()
@@ -37,7 +37,7 @@ namespace UI
 
         public void UpdateUI()
         {
-            _inventory ??= FindObjectOfType<Inventory>();
+            _inventory ??= FindFirstObjectByType<Inventory>();
             bg.color = _inventory.selectedWeaponType == weaponType ? selectedColor : unselectedColor;
         }
 

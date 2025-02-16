@@ -301,7 +301,7 @@ namespace Prefabs.Player
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _networkDestroyable = GetComponent<NetworkDestroyable>();
         }
 
@@ -574,7 +574,7 @@ namespace Prefabs.Player
 
             // Stop adding points
             if (IsHost && newStatus.IsDead)
-                FindObjectOfType<ScoreCube>().insidePlayers.Remove(this);
+                FindFirstObjectByType<ScoreCube>().insidePlayers.Remove(this);
 
             print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
             var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);

@@ -92,7 +92,7 @@ namespace Prefabs.Player
 
         public void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             isAiming = false;
         }
 

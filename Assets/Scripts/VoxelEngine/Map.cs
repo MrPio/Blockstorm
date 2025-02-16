@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ExtensionFunctions;
 using JetBrains.Annotations;
 using Managers.Encoder;
@@ -18,7 +20,7 @@ namespace VoxelEngine
     public class Map
     {
         // The list of game maps. It is assumed that each map is stored, 2 times gzip compressed, inside the Firebase storage
-        public static readonly string[] AvailableMaps = { "Harbor","City" };
+        public static readonly string[] AvailableMaps = { "Harbor", "City" };
         public static ISerializer Serializer => JsonSerializer.Instance;
         public const short MaxHeight = 128;
 
@@ -29,6 +31,7 @@ namespace VoxelEngine
         [NonSerialized] public byte[,,] Blocks; // y,x,z
         [NonSerialized] public Dictionary<Vector3Int, uint> BlocksHealth;
         [NonSerialized] public Dictionary<Vector3Int, byte> BlocksEdits;
+        [NonSerialized] public AStarPathfinder Pathfinder;
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
         [SerializeField] public List<Prop> props;
@@ -51,6 +54,7 @@ namespace VoxelEngine
                 Blocks[block.y, block.x, block.z] = block.type;
             BlocksHealth = new Dictionary<Vector3Int, uint>();
             BlocksEdits = new Dictionary<Vector3Int, byte>();
+            Pathfinder = new AStarPathfinder(NavMap);
             return this;
         }
 
@@ -80,6 +84,21 @@ namespace VoxelEngine
                 if (Blocks[y, x, z] != 0)
                     blocksList.Add(new BlockEncoding(x, y, z, Blocks[y, x, z]));
             (serializer ?? Serializer).Serialize(this, "maps", name);
+        }
+
+        public bool[,,] NavMap
+        {
+            get
+            {
+                var boolArray = new bool[Blocks.GetLength(0), Blocks.GetLength(1), Blocks.GetLength(2)];
+                Parallel.For(0, Blocks.GetLength(0), x =>
+                {
+                    for (var y = 0; y < Blocks.GetLength(1); y++)
+                        for (var z = 0; z < Blocks.GetLength(2); z++)
+                            boolArray[x, y, z] = Blocks[x, y, z] != 0;
+                });
+                return boolArray;
+            }
         }
     }
 
@@ -134,6 +153,7 @@ namespace VoxelEngine
 
         public string GetPrefab => $"Prefabs/props/{prefabName}";
     }
+
     /**
      * A spawn area. Each spawn area consists of a rectangle on the XZ plane,
      * drawn at the given Y position.

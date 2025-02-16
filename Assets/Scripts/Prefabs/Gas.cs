@@ -20,7 +20,7 @@ namespace Prefabs
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _gasWeapon = Weapon.Name2Weapon("gas");
         }
 

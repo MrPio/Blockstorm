@@ -13,7 +13,7 @@ namespace UI
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _rectTransform = GetComponent<RectTransform>();
             _scaleFactor = transform.parent.GetComponent<RectTransform>().rect.width / _sm.worldManager.Map.size.x;
             InvokeRepeating(nameof(UpdateTransform), 0f, 0.1f);

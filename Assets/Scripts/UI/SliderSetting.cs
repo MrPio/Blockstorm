@@ -54,7 +54,7 @@ namespace UI
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             slider.maxValue = steps[sliderSettingType];
             slider.value =
                 BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{configFiles[sliderSettingType]}",
@@ -67,11 +67,11 @@ namespace UI
             BinarySerializer.Instance.Serialize(value * slider.maxValue, ISerializer.ConfigsDir,
                 configFiles[sliderSettingType]);
             if (sliderSettingType is SliderSettingType.MouseSensitivity)
-                FindObjectOfType<CameraMovement>().SetSensitivity(value);
+                FindFirstObjectByType<CameraMovement>().SetSensitivity(value);
             else if (sliderSettingType is SliderSettingType.RenderDistance)
-                FindObjectOfType<WorldManager>().SetRenderDistance(value);
+                FindFirstObjectByType<WorldManager>().SetRenderDistance(value);
             else if (sliderSettingType is SliderSettingType.Fov)
-                FindObjectOfType<CameraMovement>().SetFOV(value);
+                FindFirstObjectByType<CameraMovement>().SetFOV(value);
             else if (sliderSettingType is SliderSettingType.Volume)
                 _sm.audioMixer.SetFloat("MasterVolume", Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1.0f)) * 20);
         }

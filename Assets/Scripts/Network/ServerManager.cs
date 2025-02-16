@@ -27,7 +27,7 @@ namespace Network
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
         }
 
         [ServerRpc(RequireOwnership = false)]

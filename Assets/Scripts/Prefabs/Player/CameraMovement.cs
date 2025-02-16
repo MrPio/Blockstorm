@@ -81,7 +81,7 @@ namespace Prefabs.Player
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _camera = GetComponent<Camera>();
         }
 

@@ -20,7 +20,7 @@ namespace Prefabs
 
         private void Awake()
         {
-            _logger = FindObjectOfType<Logger>();
+            _logger = FindFirstObjectByType<Logger>();
         }
 
 

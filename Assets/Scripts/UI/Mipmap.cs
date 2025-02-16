@@ -16,7 +16,7 @@ namespace UI
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             Debug.Log(_sm.worldManager.Map.name);
             Instantiate(Resources.Load<GameObject>($"Prefabs/mipmaps/maps/{_sm.worldManager.Map.name}"), transform);
         }

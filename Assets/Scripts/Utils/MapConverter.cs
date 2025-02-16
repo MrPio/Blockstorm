@@ -319,5 +319,15 @@ namespace Utils
                     (short)it.position.y
                 )).ToList();
         }
+        
+        [Button]
+        private void PathFind(SerializableVector3Int start, SerializableVector3Int goal)
+        {
+            var path = _wm.Map.Pathfinder.FindPath(start, goal);
+            foreach (var point in path)
+            {
+                print(point);
+            }
+        }
     }
 }

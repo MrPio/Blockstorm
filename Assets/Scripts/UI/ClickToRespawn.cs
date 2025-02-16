@@ -23,7 +23,7 @@ namespace UI
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _children = transform.GetComponentsInChildren<Transform>().Where(it => it != transform).ToList();
             HideChildren();
         }

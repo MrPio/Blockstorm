@@ -14,7 +14,7 @@ namespace UI
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             _serializer=BinarySerializer.Instance;
         }
 

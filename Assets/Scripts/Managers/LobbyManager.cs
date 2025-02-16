@@ -33,7 +33,7 @@ namespace Managers
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
         }
 
         private async void Start()
@@ -177,7 +177,7 @@ namespace Managers
                         new(true, QueryOrder.FieldOptions.AvailableSlots)
                     }
                 });
-                return response.Results.Where(it => it.LobbyCode is not null && it.LobbyCode != "").ToList();
+                return response.Results/*.Where(it => it.LobbyCode is not null && it.LobbyCode != "")*/.ToList();
             }
             catch (LobbyServiceException e)
             {

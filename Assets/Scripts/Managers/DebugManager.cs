@@ -1,4 +1,5 @@
 using System;
+using EasyButtons;
 using Managers.Serializer;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -7,6 +8,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using UnityEngine;
+using Utils;
 using Logger = UI.Logger;
 
 namespace Managers
@@ -21,14 +23,14 @@ namespace Managers
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
         }
 
         private async void Start()
         {
             _sm.lobbyManager.gameObject.SetActive(false);
             _sm.InitializeLoading();
-            _logger = FindObjectOfType<Logger>();
+            _logger = FindFirstObjectByType<Logger>();
             _isHost = _serializer.Deserialize($"{ISerializer.DebugDir}/isHost", true);
             _serializer.Serialize(!_isHost, $"{ISerializer.DebugDir}", "isHost");
 
@@ -60,7 +62,7 @@ namespace Managers
                 NetworkManager.Singleton.StartClient();
             }
 
-            FindObjectOfType<SceneManager>().InitializeTeamSelection();
+            FindFirstObjectByType<SceneManager>().InitializeTeamSelection();
 
             _logger.Log($"Connection established as {(_isHost ? "Host" : "Client")}");
         }

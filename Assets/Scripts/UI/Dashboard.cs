@@ -28,7 +28,7 @@ namespace UI
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             if (!isTeamSelector)
             {
                 transform.GetChild(0).gameObject.SetActive(false);

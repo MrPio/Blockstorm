@@ -138,9 +138,9 @@ namespace Prefabs
             AttackerId = attackerId;
 
             if (isMissile)
-                rb.velocity = transform.forward * speed;
+                rb.linearVelocity = transform.forward * speed;
 
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             attackerPlayer = FindObjectsOfType<Player.Player>().First(it => it.OwnerClientId == attackerId);
 
             if (IsHost && !isMissile)
@@ -149,8 +149,8 @@ namespace Prefabs
 
         private void Update()
         {
-            if (rb.velocity.magnitude > maxVelocity)
-                rb.velocity = rb.velocity.normalized * maxVelocity;
+            if (rb.linearVelocity.magnitude > maxVelocity)
+                rb.linearVelocity = rb.linearVelocity.normalized * maxVelocity;
         }
     }
 }

@@ -54,7 +54,7 @@ namespace VoxelEngine
 
         private void Start()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
             SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
                                   SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
@@ -127,7 +127,7 @@ namespace VoxelEngine
 
             IEnumerator ActivatePrefabs()
             {
-                yield return new WaitForSeconds(4f);
+                yield return new WaitForSeconds(5f);
                 foreach (var prop in SpawnedProps)
                     prop.Initialize();
             }

@@ -31,7 +31,7 @@ namespace Prefabs
 
         public void Initialize(Model.Collectable collectable)
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
             Model = collectable;
             ammoLight.SetActive(collectable.Type is CollectableType.Ammo);
             hpLight.SetActive(collectable.Type is CollectableType.Hp);

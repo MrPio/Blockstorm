@@ -37,9 +37,9 @@ namespace Prefabs
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
-            _rb = FindObjectOfType<Rigidbody>();
-            _as = FindObjectOfType<AudioSource>();
+            _sm = FindFirstObjectByType<SceneManager>();
+            _rb = FindFirstObjectByType<Rigidbody>();
+            _as = FindFirstObjectByType<AudioSource>();
             _rb.isKinematic = true;
         }
 

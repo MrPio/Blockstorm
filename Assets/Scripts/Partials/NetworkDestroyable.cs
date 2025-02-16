@@ -13,7 +13,7 @@ namespace Partials
 
         private void Awake()
         {
-            _sm = FindObjectOfType<SceneManager>();
+            _sm = FindFirstObjectByType<SceneManager>();
         }
 
         public override void OnNetworkSpawn()
