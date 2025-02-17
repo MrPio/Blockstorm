@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExtensionFunctions;
 using UnityEngine;
 
 namespace Utils
 {
+    
+    /// <summary>
+    /// Implementation of A* algorithm using a PriorityQueue,
+    /// where the priority of each node is given by the Euclidean distance heuristics.
+    /// </summary>
     public class AStarPathfinder
     {
         private readonly struct Point3D : IEquatable<Point3D>
@@ -29,14 +35,23 @@ namespace Utils
                 new((short)rValue.x, (short)rValue.y, (short)rValue.z);
         }
 
-        // 4 cardinal directions for horizontal moves.
-        private static readonly Point3D[] Directions =
-        {
-            new(1, 0, 0),
-            new(-1, 0, 0),
-            new(0, 0, 1),
-            new(0, 0, -1)
-        };
+        // 4 cardinal and 4 diagonal XZ moves.
+        private static readonly Point3D[] BaseDirections =
+            {
+                new(1, 0, 0),
+                new(-1, 0, 0),
+                new(0, 0, 1),
+                new(0, 0, -1)
+            },
+            BaseDiagonalDirections =
+            {
+                new(1, 0, 1),
+                new(1, 0, -1),
+                new(-1, 0, 1),
+                new(-1, 0, -1)
+            };
+
+        private static Point3D[] _directions, _diagonalDirections;
 
         private readonly bool[,,] _isBlock;
 
@@ -52,6 +67,10 @@ namespace Utils
         /// </summary>
         public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
         {
+            // Randomize the direction choice
+            _directions = BaseDirections.ToList().Shuffle().ToArray();
+            _diagonalDirections = BaseDiagonalDirections.ToList().Shuffle().ToArray();
+            
             Point3D startP = start;
             Point3D goalP = goal;
             var openSet = new PriorityQueue<Point3D, int>();
@@ -59,11 +78,16 @@ namespace Utils
             var cameFrom = new Dictionary<Point3D, Point3D>();
             var gScore = new Dictionary<Point3D, int> { [startP] = 0 };
 
+            var steps = 0;
             while (openSet.Count > 0)
             {
+                ++steps;
                 var current = openSet.Dequeue();
                 if (current == goalP)
+                {
+                    Debug.Log($"Got a path in {steps} steps!");
                     return ReconstructPath(cameFrom, current).Select(point3D => (Vector3Int)point3D).ToList();
+                }
 
                 foreach (var neighbor in GetNeighbors(current))
                 {
@@ -93,31 +117,57 @@ namespace Utils
             return path;
         }
 
-        // Manhattan distance heuristic.
+        // Distance heuristic.
         private static int Heuristic(Point3D a, Point3D b) =>
-            Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z);
+            // Manhattan distance
+            // Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z);
+            // Euclidean distance
+            (int)Math.Pow(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2) + Math.Pow(a.Z - b.Z, 2), 0.5);
 
         private IEnumerable<Point3D> GetNeighbors(Point3D p)
         {
-            // Horizontal moves (same level).
-            foreach (var d in Directions)
-            {
-                var np = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), (short)(p.Z + d.Z));
-                if (IsValid(np))
-                    yield return np;
-            }
+            var ground = new Point3D(p.X, (short)(p.Y - 1), p.Z);
 
-            // Jump up by 1 block.
-            var jump = new Point3D(p.X, (short)(p.Y + 1), p.Z);
-            if (IsValid(jump))
-                yield return jump;
-            // Fall down by 1 block.
-            var fall = new Point3D(p.X, (short)(p.Y + 1), p.Z);
-            if (IsValid(fall)) yield return fall;
+            // Check if I'm grounded, otherwise keep falling
+            if (!_isBlock[ground.Y, ground.X, ground.Z])
+                yield return ground;
+            else
+            {
+                // XZ cardinal moves
+                foreach (var d in _directions)
+                {
+                    var np = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), (short)(p.Z + d.Z));
+                    if (IsValid(np))
+                        yield return np;
+
+                    // Jump up by 1 block, but only if there's a step to jump on.
+                    var jump = new Point3D(np.X, (short)(np.Y + 1), np.Z);
+                    if (IsValid(jump) && _isBlock[jump.Y - 1, jump.X, jump.Z])
+                        yield return jump;
+                }
+                // XZ diagonal moves
+                foreach (var d in _diagonalDirections)
+                {
+                    // Is not valid:
+                    //  █ X     - X     █ X 
+                    //  • █     • █     • - 
+                    // Is valid:
+                    //  - X
+                    //  • -
+                    var np = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), (short)(p.Z + d.Z));
+                    var np1 = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), p.Z);
+                    var np2 = new Point3D(p.X, (short)(p.Y + d.Y), (short)(p.Z + d.Z));
+                    if (IsValid(np) && IsValid(np1) && IsValid(np2))
+                        yield return np;
+                }
+
+                // Fall down by 1 block.
+                var fall = new Point3D(p.X, (short)(p.Y + 1), p.Z);
+                if (IsValid(fall)) yield return fall;
+            }
         }
 
         // Checks if the player can occupy the given position.
-        // The player occupies cell 'pos' and the one above it.
         private bool IsValid(Point3D pos)
         {
             var above = new Point3D(pos.X, (short)(pos.Y + 1), pos.Z);

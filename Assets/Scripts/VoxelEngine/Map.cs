@@ -86,6 +86,9 @@ namespace VoxelEngine
             (serializer ?? Serializer).Serialize(this, "maps", name);
         }
 
+        /// <summary>
+        /// Convert the byte[,,] map into a bool[,,] map, where 1=solid block, 0=non-solid block
+        /// </summary>
         public bool[,,] NavMap
         {
             get
@@ -95,7 +98,7 @@ namespace VoxelEngine
                 {
                     for (var y = 0; y < Blocks.GetLength(1); y++)
                         for (var z = 0; z < Blocks.GetLength(2); z++)
-                            boolArray[x, y, z] = Blocks[x, y, z] != 0;
+                            boolArray[x, y, z] = VoxelData.BlockTypes[Blocks[x, y, z]].isSolid;
                 });
                 return boolArray;
             }

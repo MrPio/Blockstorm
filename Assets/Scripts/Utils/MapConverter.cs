@@ -59,6 +59,7 @@ namespace Utils
         public CopyRule.RemappingRule[] remappingRules;
         [Header("Voxel2Map")] public GameObject cube;
         private WorldManager _wm;
+        [SerializeField] private GameObject pathPointPrefab;
 
         private void Awake()
         {
@@ -319,14 +320,22 @@ namespace Utils
                     (short)it.position.y
                 )).ToList();
         }
-        
+
+        private readonly List<GameObject> _instantiatedPathPoints = new();
+
         [Button]
-        private void PathFind(SerializableVector3Int start, SerializableVector3Int goal)
+        private void PathFind(Transform from, Transform to)
         {
-            var path = _wm.Map.Pathfinder.FindPath(start, goal);
+            foreach (var point in _instantiatedPathPoints)
+                Destroy(point);
+            _instantiatedPathPoints.Clear();
+            var path = _wm.Map.Pathfinder.FindPath(Vector3Int.FloorToInt(from.position),
+                Vector3Int.FloorToInt(to.position));
             foreach (var point in path)
             {
                 print(point);
+                _instantiatedPathPoints.Add(Instantiate(pathPointPrefab, point + Vector3.one * 0.5f,
+                    Quaternion.identity));
             }
         }
     }

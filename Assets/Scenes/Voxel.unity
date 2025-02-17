@@ -380,7 +380,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3967566760417111834, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7670799607742067249, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -392,7 +392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: mapName
-      value: City
+      value: Harbor
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4005,6 +4005,7 @@ MonoBehaviour:
   copyRules: []
   remappingRules: []
   cube: {fileID: 0}
+  pathPointPrefab: {fileID: 3287888696289537785, guid: a12afdcfd6fe2354a82f1057d7287a27, type: 3}
   spawnCameras: []
   oldIds:
   - iron
@@ -9160,7 +9161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4448862840658705061, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_ProtocolType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4448862840658705061, guid: beacedcb08780c0488b61f8a29dbb34f, type: 3}
       propertyPath: m_UseWebSockets
