@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Utils
 {
+    /// <summary>
+    /// Useful when thinking the map as a list of grids, where each grid represents a XZ plane at a certain height Y.
+    /// </summary>
     [Serializable]
     public class Vector2XZ
     {

@@ -59,11 +59,10 @@ namespace Network
                     _sm.worldManager.Map.Blocks[status.Ys[i], status.Xs[i], status.Zs[i]] = status.Ids[i];
 
                 // Destroy destroyed props
-                var destroyedProps = brokenProps.Value;
                 foreach (var prop in brokenProps.Value)
                     Destroy(_sm.worldManager.SpawnedProps[prop].gameObject);
 
-                // React on collectable changes
+                // Listen on collectable changes
                 collectableStatus.OnValueChanged += (_, newValue) => LoadCollectables(newValue);
                 LoadCollectables(collectableStatus.Value);
 
@@ -80,7 +79,7 @@ namespace Network
                 };
             }
 
-            // Render the map and spawn the player
+            // Score cube and Collectables
             if (IsHost)
             {
                 // Spawn the score cube for all the players

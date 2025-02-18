@@ -97,6 +97,7 @@
     <Compile Include="Assets\Scripts\UI\HpHUD.cs" />
     <Compile Include="Assets\Scripts\UI\Dashboard.cs" />
     <Compile Include="Assets\Scripts\UI\SliderSetting.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Player\InputInterface.cs" />
     <Compile Include="Assets\Scripts\Managers\Serializer\ISerializer.cs" />
     <Compile Include="Assets\Scripts\Network\ServerManager.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Player\CameraMovement.cs" />

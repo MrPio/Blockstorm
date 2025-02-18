@@ -18,6 +18,13 @@ using Random = UnityEngine.Random;
 
 namespace Prefabs.Player
 {
+    /// <summary>
+    /// The player can be:
+    /// • A human player - takes inputs, the only one in first-person control.
+    /// • The body of another human player - read the behavior sent across the network
+    /// • A bot - The host makes it act like a human-player.
+    ///     Both host and clients read its behavior sent across the network 
+    /// </summary>
     public class Player : NetworkBehaviour
     {
         private SceneManager _sm;
@@ -37,10 +44,12 @@ namespace Prefabs.Player
         [SerializeField] private AnimationCurve cameraBounceCurve;
         [SerializeField] private LayerMask groundLayerMask;
         [SerializeField] private float spawnInvincibilityDuration = 5f;
+        [SerializeField] private bool isBot = false;
 
         [Header("Components")] [SerializeField]
-        private CharacterController characterController;
+        private CapsuleCollider capsuleCollider;
 
+        [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform groundCheck;
         [SerializeField] private Animator bodyAnimator;
         [SerializeField] private Transform enemyWeaponContainer;
@@ -84,15 +93,16 @@ namespace Prefabs.Player
         private bool isDying;
         private float _usedStamina;
         private NetworkDestroyable _networkDestroyable;
+        private InputInterface _inputInterface;
 
         private bool CanUseInventory => Team is not Team.None && active.Value &&
                                         _sm.worldManager.Map.spawns.First(it => it.team == Team)
                                             .IsInside(transform.position);
 
-        // Owner-only
+        // Owner-only, non bot
         private void UpdateChunks()
         {
-            if (!IsOwner) return;
+            if (!IsOwner || isBot) return;
             _sm.ammoHUD.SetInventoryIcon(CanUseInventory);
             if (active.Value)
                 _sm.worldManager.UpdatePlayerPos(_transform.position);
@@ -102,17 +112,17 @@ namespace Prefabs.Player
         private void LoadStatus()
         {
             if (!IsOwner)
-                _sm.logger.Log($"Receiving new status from {OwnerClientId}: team={Team}", Color.yellow);
+                _sm.logger.Log($"Receiving new status from {OwnerClientId}: team={Team}, isBot={isBot}", Color.yellow);
 
             // Load HUD values
-            if (IsOwner)
+            if (IsOwner && !isBot)
             {
                 _sm.hpHUD.SetHp(Status.Value.Hp, Status.Value.Armor, Status.Value.HasHelmet);
                 _sm.ammoHUD.SetGrenades(Status.Value.LeftGrenades, Status.Value.LeftSecondaryGrenades);
             }
 
             // Load the enemy helmet, if any
-            if (!IsOwner)
+            if (!IsOwner || isBot)
             {
                 helmet.SetActive(Status.Value.HasHelmet);
                 if (Status.Value.HasHelmet)
@@ -135,7 +145,7 @@ namespace Prefabs.Player
             }
 
             // Load collectables weapon prefabs
-            if (IsOwner)
+            if (IsOwner && !isBot)
                 foreach (var colletable in _sm.worldManager.SpawnedCollectables)
                     colletable.TryUpdateWeaponPrefab(Status.Value);
         }
@@ -206,7 +216,7 @@ namespace Prefabs.Player
         {
             // Listen to network variables based on ownership
             Status.OnValueChanged += (_, _) => LoadStatus();
-            if (!IsOwner)
+            if (!IsOwner || isBot)
             {
                 _isWalking.OnValueChanged += (_, newValue) =>
                 {
@@ -283,20 +293,18 @@ namespace Prefabs.Player
 
             invincible.OnValueChanged += (_, newValue) =>
             {
-                if (IsOwner)
+                if (IsOwner && !isBot)
                     _sm.invincibilityHUD.SetActive(newValue);
                 else
-                {
                     foreach (var bodyMesh in bodyMeshes)
                     {
                         if (bodyMesh.IsDestroyed()) continue;
                         var skinName = Status.Value.Skin.GetSkinForTeam(Team, invincible: newValue);
                         bodyMesh.material = Resources.Load<Material>($"Materials/skin/{skinName}");
                     }
-                }
             };
 
-            _sm.logger.Log($"[OnNetworkSpawn] Player {OwnerClientId} joined the session!");
+            _sm.logger.Log($"[OnNetworkSpawn] {(isBot ? "Bot" : "Player")} {OwnerClientId} joined the session!");
         }
 
         private void Awake()
@@ -310,9 +318,11 @@ namespace Prefabs.Player
             if (!IsOwner) return;
             _transform = transform;
             _cameraInitialLocalPosition = cameraTransform.localPosition;
+            _inputInterface = new InputInterface(isBot);
 
             // Update the view distance. Render new chunks if needed.
-            InvokeRepeating(nameof(UpdateChunks), 0, 1);
+            if (!isBot)
+                InvokeRepeating(nameof(UpdateChunks), 0, 1);
         }
 
         private void Update()
@@ -320,28 +330,31 @@ namespace Prefabs.Player
             if (!IsOwner || isDying || !active.Value) return;
 
             // Show the pause menu
-            if (Input.GetKeyUp(KeyCode.Escape))
+            if (!isBot)
             {
-                if (!_sm.pauseMenu.activeSelf)
+                if (_inputInterface.IsPauseDown)
                 {
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
-                    walkAudioSource.Pause();
-                }
-                else
-                {
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
+                    if (!_sm.pauseMenu.activeSelf)
+                    {
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                        walkAudioSource.Pause();
+                    }
+                    else
+                    {
+                        Cursor.lockState = CursorLockMode.Locked;
+                        Cursor.visible = false;
+                    }
+
+                    _sm.pauseMenu.SetActive(!_sm.pauseMenu.activeSelf);
                 }
 
-                _sm.pauseMenu.SetActive(!_sm.pauseMenu.activeSelf);
+                if (_sm.pauseMenu.activeSelf)
+                    return;
             }
 
-            if (_sm.pauseMenu.activeSelf)
-                return;
-
             // Debug: Kill everyone except myself when pressing the L key
-            // if (Input.GetKeyDown(KeyCode.L))
+            // if (_inputInterface.GetKeyDown(KeyCode.L))
             //     foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
             //         enemy.DamageClientRpc(999, "chest",
             //             new NetVector3(Vector3.up), OwnerClientId);
@@ -370,8 +383,9 @@ namespace Prefabs.Player
                  (_isCrouching.Value ? 0.4f : 0f));
 
             // Handle XZ movement
-            var x = Input.GetAxis("Horizontal");
-            var z = Input.GetAxis("Vertical");
+            var xz = _inputInterface.Axis;
+            var x = xz.x;
+            var z = xz.y;
             var move = _transform.right * x + _transform.forward * z;
             _velocity.y -= gravity * Time.deltaTime;
             _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
@@ -392,7 +406,7 @@ namespace Prefabs.Player
                 _isWalking.Value = isWalking;
 
             // Handle jump
-            if (Input.GetButtonDown("Jump") && _isGrounded /*&& !Weapon.isAiming*/)
+            if (_inputInterface.IsJumpDown && _isGrounded /*&& !Weapon.isAiming*/)
                 _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
 
             // Invisible walls on map edges
@@ -406,7 +420,7 @@ namespace Prefabs.Player
                     MathF.Max(0.5f, Mathf.Min(pos.z, mapSize.z - 0.5f)));
 
             if (pos.y < 0.85)
-                Spawn(onlyPosition: true);
+                Spawn(onlyReposition: true);
 
             // Play walk sound
             if (Time.time - _lastWalkCheck > 0.1f)
@@ -441,16 +455,10 @@ namespace Prefabs.Player
             if (weapon.WeaponModel != null)
             {
                 WeaponType? weapon = null;
-                if (Input.GetKeyDown(KeyCode.Alpha1) && this.weapon.WeaponModel!.Type != WeaponType.Block)
-                    weapon = WeaponType.Block;
-                else if (Input.GetKeyDown(KeyCode.Alpha2) && this.weapon.WeaponModel!.Type != WeaponType.Melee)
-                    weapon = WeaponType.Melee;
-                else if (Input.GetKeyDown(KeyCode.Alpha3) && this.weapon.WeaponModel!.Type != WeaponType.Primary)
-                    weapon = WeaponType.Primary;
-                else if (Input.GetKeyDown(KeyCode.Alpha4) && this.weapon.WeaponModel!.Type != WeaponType.Secondary)
-                    weapon = WeaponType.Secondary;
-                else if (Input.GetKeyDown(KeyCode.Q) && this.weapon.WeaponModel!.Type != WeaponType.Tertiary)
-                    weapon = WeaponType.Tertiary;
+                var weaponSelection = _inputInterface.WeaponSelection;
+
+                if (weaponSelection != null && weaponSelection != this.weapon.WeaponModel!.Type)
+                    weapon = _inputInterface.WeaponSelection;
                 else if (Input.GetAxis("Mouse ScrollWheel") > 0.05f)
                     weapon = this.weapon.WeaponModel.Type switch
                     {
@@ -474,19 +482,20 @@ namespace Prefabs.Player
                 if (weapon is not null)
                     this.weapon.SwitchEquipped(weapon.Value);
 
-                if (Input.GetMouseButtonDown(1) && this.weapon.WeaponModel!.Type != WeaponType.Block &&
+                if (_inputInterface.IsAimToggleDown && this.weapon.WeaponModel!.Type != WeaponType.Block &&
                     this.weapon.WeaponModel!.Type != WeaponType.Melee && this.weapon.WeaponModel!.HasAim)
                     this.weapon.ToggleAim();
             }
 
             // Handle weapon reloading
-            if (Input.GetKeyDown(KeyCode.R) && (weapon.WeaponModel?.IsGun ?? false))
+            if (_inputInterface.IsReloadDown && (weapon.WeaponModel?.IsGun ?? false))
                 if (weapon.Magazine[weapon.WeaponModel!.GetNetName] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
                 else audioSource.PlayOneShot(weapon.noAmmoClip);
 
             // Handle sprint
-            if (Input.GetKey(KeyCode.LeftShift) && isWalking && _usedStamina < stamina)
+            var isSprinting = _inputInterface.IsSprinting;
+            if (isSprinting && isWalking && _usedStamina < stamina)
             {
                 _usedStamina += Time.deltaTime;
                 _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
@@ -497,7 +506,7 @@ namespace Prefabs.Player
             {
                 if (_isRunning.Value)
                     _isRunning.Value = false;
-                if (!Input.GetKey(KeyCode.LeftShift) && _usedStamina > 0)
+                if (!isSprinting && _usedStamina > 0)
                 {
                     _usedStamina -= Time.deltaTime * staminaRecoverSpeed;
                     _sm.staminaBar.SetValue(1 - _usedStamina / stamina);
@@ -505,17 +514,17 @@ namespace Prefabs.Player
             }
 
             // Handle crouch
-            if (Input.GetKeyDown(KeyCode.LeftControl) && !_isCrouching.Value && !_isRunning.Value)
+            if (_inputInterface.IsCrouchingDown && !_isCrouching.Value && !_isRunning.Value)
             {
                 _isRunning.Value = false;
                 _isCrouching.Value = true;
             }
 
-            else if (Input.GetKeyUp(KeyCode.LeftControl) && _isCrouching.Value)
+            else if (_inputInterface.IsCrouchingUp && _isCrouching.Value)
                 _isCrouching.Value = false;
 
             // Handle Inventory
-            if (Input.GetKeyDown(KeyCode.I) && CanUseInventory)
+            if (_inputInterface.IsInventoryDown && CanUseInventory)
             {
                 active.Value = false;
                 _sm.InitializeInventory();
@@ -565,7 +574,7 @@ namespace Prefabs.Player
                         $"Textures/helmet/Materials/helmet_{Team.ToString().ToLower()}");
 
 
-                if (!IsOwner)
+                if (!IsOwner || isBot)
                     helmet.SetActive(false);
                 // damage /= 2; Already halved by Fire()
             }
@@ -624,16 +633,25 @@ namespace Prefabs.Player
                 {
                     yield return new WaitForSeconds(2f);
                     active.Value = false;
-                    _sm.InitializeTeamSelection(isFirstSpawn: false);
+                    if (isBot)
+                    {
+                        yield return new WaitForSeconds(4f);
+                        Spawn();
+                    }
+                    else
+                        _sm.InitializeTeamSelection(isFirstSpawn: false);
                 }
             }
 
             // Spawn damage circle
-            var directionToEnemy = attacker.transform.position - cameraTransform.position;
-            var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
-            var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
-            var circleDamageGo = Instantiate(circleDamage, _sm.circleDamageContainer.transform);
-            circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
+            if (!isBot)
+            {
+                var directionToEnemy = attacker.transform.position - cameraTransform.position;
+                var projectedDirection = Vector3.ProjectOnPlane(directionToEnemy, cameraTransform.up);
+                var angle = Vector3.SignedAngle(cameraTransform.forward, projectedDirection, Vector3.up);
+                var circleDamageGo = Instantiate(circleDamage, _sm.circleDamageContainer.transform);
+                circleDamageGo.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, -angle);
+            }
         }
 
         [Rpc(SendTo.Everyone)]
@@ -641,15 +659,15 @@ namespace Prefabs.Player
         {
             isDying = !reverse;
             if (isDying)
-                _sm.logger.Log($"[RagdollRpc] {OwnerClientId} is dead!", IsOwner ? Color.cyan : Color.yellow);
-            if (IsOwner)
+                _sm.logger.Log($"[RagdollRpc] {(isBot ? "Bot" : "Player")} {OwnerClientId} is dead!",
+                    IsOwner ? Color.cyan : Color.yellow);
+            if (IsOwner && !isBot)
             {
                 walkAudioSource.Pause();
-                if (isDying)
-                    GetComponent<CharacterController>().enabled = !isDying;
-                GetComponent<CapsuleCollider>().enabled = isDying;
+                characterController.enabled = !isDying;
+                capsuleCollider.enabled = isDying;
                 GetComponentInChildren<CameraMovement>().enabled = !isDying;
-                GetComponentInChildren<Weapon>().enabled = !isDying;
+                weapon.enabled = !isDying;
                 GetComponentInChildren<WeaponSway>().enabled = !isDying;
                 transform.Find("WeaponCamera").gameObject.SetActive(!isDying);
                 if (isDying)
@@ -659,7 +677,8 @@ namespace Prefabs.Player
                 else if (gameObject.TryGetComponent<Rigidbody>(out var rb))
                     Destroy(rb);
             }
-            else
+
+            if (!IsOwner || isBot)
             {
                 if (isDying)
                     ragdoll.ApplyForce(bodyPart, direction.ToVector3.normalized * math.clamp(damage * 5, 50f, 500f));
@@ -676,10 +695,10 @@ namespace Prefabs.Player
         #endregion
 
         /// <summary>
-        /// The owner spawns the player, adds it to the mipmap and loads the right arm skin texture.
+        /// The owner, non bot, spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
         /// </summary>
-        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, bool onlyPosition = false)
+        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, bool onlyReposition = false)
         {
             characterController.enabled = false;
 
@@ -691,14 +710,15 @@ namespace Prefabs.Player
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             GetComponent<ClientNetworkTransform>().Interpolate = true;
 
-            if (onlyPosition) return;
+            if (onlyReposition) return;
 
             if (newTeam is not null)
                 team.Value = newTeam.Value;
             if (playerStats is not null)
                 Stats.Value = playerStats.Value;
 
-            _sm.logger.Log($"[Spawn] Spawning {OwnerClientId}, team = {Team.ToString()}", Color.cyan);
+            _sm.logger.Log($"[Spawn] Spawning {(isBot ? "Bot" : "Player")} {OwnerClientId}, team = {Team.ToString()}",
+                Color.cyan);
             active.Value = true;
             invincible.Value = true;
             Status.Value = new PlayerStatus(null);
@@ -723,7 +743,7 @@ namespace Prefabs.Player
             IEnumerator EquipBlock()
             {
                 yield return new WaitForSeconds(0.15f);
-                weapon.SwitchEquipped(WeaponType.Block);
+                weapon.SwitchEquipped(isBot ? WeaponType.Primary : WeaponType.Block);
             }
 
             IEnumerator EndInvincibility()

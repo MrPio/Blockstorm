@@ -394,6 +394,10 @@ PrefabInstance:
       propertyPath: mapName
       value: Harbor
       objectReference: {fileID: 0}
+    - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+      propertyPath: isMultiplayer
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10713,10 +10717,10 @@ SceneRoots:
   - {fileID: 1607405886}
   - {fileID: 1236175147}
   - {fileID: 1145990820}
+  - {fileID: 958774637}
   - {fileID: 30371042}
   - {fileID: 1404352929}
   - {fileID: 1611321448}
-  - {fileID: 958774637}
   - {fileID: 1471391806}
   - {fileID: 1598240996}
   - {fileID: 6752008271387740772}

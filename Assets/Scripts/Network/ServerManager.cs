@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using ExtensionFunctions;
 using Managers;
-using Model;
 using Prefabs;
-using Prefabs.Player;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using Utils;
 
 namespace Network
 {
