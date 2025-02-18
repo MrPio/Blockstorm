@@ -120,6 +120,7 @@
     <Compile Include="Assets\Scripts\Prefabs\Prop.cs" />
     <Compile Include="Assets\Scripts\UI\ScoresHUD.cs" />
     <Compile Include="Assets\Scripts\Prefabs\Collectable.cs" />
+    <Compile Include="Assets\Scripts\Managers\BotManager.cs" />
     <Compile Include="Assets\Scripts\Managers\Encoder\IEncoder.cs" />
     <Compile Include="Assets\Scripts\Network\NetworkStructs.cs" />
     <Compile Include="Assets\Scripts\Partials\Destroyable.cs" />

@@ -92,7 +92,7 @@ namespace Prefabs
                 yield return new WaitForSeconds(0.2f);
                 _as.Play();
                 var weapon = Weapon.Name2Weapon(lootWeapon);
-                var player = FindObjectsOfType<Player.Player>().First(it => it.IsOwner);
+                var player = FindObjectsOfType<Player.Player>().First(it => it.IsOwner&& !it.IsBot.Value);
                 Collectable.LootCollectable(player,
                     new Model.Collectable(CollectableType.Weapon, Vector3.zero, weaponType: weapon.Type)
                         { WeaponItem = weapon });

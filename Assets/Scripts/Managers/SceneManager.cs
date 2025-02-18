@@ -73,6 +73,7 @@ namespace Managers
         public LobbyManager lobbyManager;
         public RelayManager relayManager;
         public StorageManager storageManager;
+        public BotManager botManager;
 
         [Header("Misc")] public AudioMixer audioMixer;
 
@@ -206,7 +207,7 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            var player = FindObjectsOfType<Player>().First(it => it.IsOwner);
+            var player = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value);
             player.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
             if (selectedWeapons is not null || _lastSelectedWeapons is not null)
             {
@@ -229,6 +230,9 @@ namespace Managers
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
             inventory.SetActive(false);
+
+            // TODO remove
+            botManager.SpawnBot(_newTeam!.Value);
         }
     }
 }

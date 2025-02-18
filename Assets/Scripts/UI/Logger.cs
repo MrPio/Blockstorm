@@ -36,7 +36,7 @@ namespace UI
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.KeypadMinus))
+            if (Input.GetKeyDown(KeyCode.Tilde) || Input.GetKeyDown(KeyCode.KeypadMinus))
             {
                 _isVisible = !_isVisible;
                 GetComponent<CanvasGroup>().alpha = _isVisible ? 1 : 0;

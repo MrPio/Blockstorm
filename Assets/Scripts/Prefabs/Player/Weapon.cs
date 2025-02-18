@@ -249,6 +249,10 @@ namespace Prefabs.Player
                 if (!attackedPlayer.Status.Value.IsDead)
                 {
                     // Check if the enemy is not allied nor invincible
+                    
+                    // TODO Uncomment
+                    // if (((attackedPlayer.IsOwner && !attackedPlayer.IsBot.Value) ||
+                    //      attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
                     if ((attackedPlayer.IsOwner ||
                          attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
                     {
