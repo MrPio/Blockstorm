@@ -109,6 +109,7 @@
     <Compile Include="Assets\Scripts\Prefabs\Gas.cs" />
     <Compile Include="Assets\Scripts\VoxelEngine\WorldManager.cs" />
     <Compile Include="Assets\Scripts\Utils\PathFinding.cs" />
+    <Compile Include="Assets\Scripts\Prefabs\Player\AI\BotAI.cs" />
     <Compile Include="Assets\Scripts\UI\Mipmap.cs" />
     <Compile Include="Assets\Scripts\Utils\SerializableVector3.cs" />
     <Compile Include="Assets\Scripts\ExtensionFunctions\VectorExtensions.cs" />

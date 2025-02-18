@@ -27,7 +27,7 @@ namespace Managers
         public HighlightArea highlightArea;
 
         [Header("Prefabs")] public GameObject playerPrefab;
-        public GameObject clientServerManagersPrefab;
+        public GameObject clientServerManagersPrefab, pathPointPrefab;
 
         [Header("Skybox")] public Material[] skyboxes;
 

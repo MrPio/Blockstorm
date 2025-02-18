@@ -27,8 +27,6 @@ namespace Prefabs.Player
     /// </summary>
     public class Player : NetworkBehaviour
     {
-        private SceneManager _sm;
-
         #region Serializable
 
         [Header("Params")] [SerializeField] public float speed = 8f;
@@ -85,6 +83,8 @@ namespace Prefabs.Player
 
         #region Private
 
+        [NonSerialized] public InputInterface InputInterface;
+        private SceneManager _sm;
         private Transform _transform;
         private bool _isGrounded;
         private Vector3 _velocity;
@@ -94,7 +94,6 @@ namespace Prefabs.Player
         [NonSerialized] public GameObject WeaponPrefab;
         private bool isDying;
         private float _usedStamina;
-        private InputInterface _inputInterface;
         private Rigidbody _rigidbody;
 
         private bool CanUseInventory => Team is not Team.None && active.Value &&
@@ -158,7 +157,6 @@ namespace Prefabs.Player
                 IsOwner ? Color.cyan : Color.yellow);
             if (IsOwner && !IsBot.Value)
             {
-                groundCheck.gameObject.SetActive(value);
                 weaponCamera.SetActive(value);
                 cameraTransform.gameObject.SetActive(value);
             }
@@ -326,7 +324,6 @@ namespace Prefabs.Player
                 Destroy(playerBody);
             else
             {
-                groundCheck.gameObject.SetActive(false);
                 weaponCamera.SetActive(false);
                 cameraTransform.gameObject.SetActive(false);
                 Destroy(weaponCamera);
@@ -346,6 +343,11 @@ namespace Prefabs.Player
                     }
             };
 
+            // Add AI movement if it's a bot
+            InputInterface = new InputInterface(IsBot.Value);
+            if (IsOwner && IsBot.Value && !TryGetComponent(out BotAI _))
+                transform.AddComponent<BotAI>();
+
             _sm.logger.Log($"[OnNetworkSpawn] {(IsBot.Value ? "Bot" : "Player")} {OwnerClientId} joined the session!");
         }
 
@@ -360,17 +362,16 @@ namespace Prefabs.Player
             if (!IsOwner) return;
             _transform = transform;
             _cameraInitialLocalPosition = cameraTransform.localPosition;
-            _inputInterface = new InputInterface(IsBot.Value);
         }
 
         private void Update()
         {
-            if (!IsOwner || isDying || !active.Value) return;
+            if (!IsOwner || isDying || !active.Value || InputInterface == null) return;
 
             // Show the pause menu
             if (!IsBot.Value)
             {
-                if (_inputInterface.IsPauseDown)
+                if (InputInterface.IsPauseDown)
                 {
                     if (!_sm.pauseMenu.activeSelf)
                     {
@@ -424,7 +425,7 @@ namespace Prefabs.Player
             }
 
             // Handle XZ movement
-            var xz = _inputInterface.Axis;
+            var xz = InputInterface.Axis;
             var x = xz.x;
             var z = xz.y;
             var move = _transform.right * x + _transform.forward * z;
@@ -432,17 +433,14 @@ namespace Prefabs.Player
             _velocity.y = Mathf.Clamp(_velocity.y, -maxVelocityY, 100);
 
             // If crunching prevent from falling
-            if (!IsBot.Value)
-            {
-                var isAboutToFall =
-                    !Physics.CheckSphere(groundCheck.position + move.normalized * 0.05f, 0.15f, groundLayerMask);
-                if (characterController.enabled)
-                    characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
-                                                     (_isRunning.Value ? runMultiplier : 1f) *
-                                                     (_isCrouching.Value ? crouchMultiplier : 1f) *
-                                                     (_isCrouching.Value && isAboutToFall ? 0f : 1f))
-                                             + _velocity * Time.deltaTime);
-            }
+            var isAboutToFall =
+                !Physics.CheckSphere(groundCheck.position + move.normalized * 0.05f, 0.15f, groundLayerMask);
+            if (characterController.enabled)
+                characterController.Move(move * (speed * Time.deltaTime * (Weapon.isAiming ? 0.66f : 1f) *
+                                                 (_isRunning.Value ? runMultiplier : 1f) *
+                                                 (_isCrouching.Value ? crouchMultiplier : 1f) *
+                                                 (_isCrouching.Value && isAboutToFall ? 0f : 1f))
+                                         + _velocity * Time.deltaTime);
 
             // Broadcast the walking state
             var isWalking = math.abs(x) > 0.1f || math.abs(z) > 0.1f;
@@ -450,7 +448,7 @@ namespace Prefabs.Player
                 _isWalking.Value = isWalking;
 
             // Handle jump
-            if (_inputInterface.IsJumpDown && _isGrounded /*&& !Weapon.isAiming*/)
+            if (InputInterface.IsJumpDown && _isGrounded /*&& !Weapon.isAiming*/)
                 _velocity.y = Mathf.Sqrt(jumpHeight * 2f * gravity);
 
             // Invisible walls on map edges
@@ -474,9 +472,9 @@ namespace Prefabs.Player
                 if (_isGrounded && move.magnitude > 0.1f)
                 {
                     var terrainType =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position + Vector3.down * 2));
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position + Vector3.down * 2));
                     var hasWater =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(cameraTransform.position + Vector3.down * 1))!
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position + Vector3.down * 1))!
                             .name.Contains("water");
 
                     if (terrainType == null)
@@ -499,10 +497,10 @@ namespace Prefabs.Player
             if (weapon.WeaponModel != null)
             {
                 WeaponType? weapon = null;
-                var weaponSelection = _inputInterface.WeaponSelection;
+                var weaponSelection = InputInterface.WeaponSelection;
 
                 if (weaponSelection != null && weaponSelection != this.weapon.WeaponModel!.Type)
-                    weapon = _inputInterface.WeaponSelection;
+                    weapon = InputInterface.WeaponSelection;
                 else if (Input.GetAxis("Mouse ScrollWheel") > 0.05f)
                     weapon = this.weapon.WeaponModel.Type switch
                     {
@@ -526,19 +524,19 @@ namespace Prefabs.Player
                 if (weapon is not null)
                     this.weapon.SwitchEquipped(weapon.Value);
 
-                if (_inputInterface.IsAimToggleDown && this.weapon.WeaponModel!.Type != WeaponType.Block &&
+                if (InputInterface.IsAimToggleDown && this.weapon.WeaponModel!.Type != WeaponType.Block &&
                     this.weapon.WeaponModel!.Type != WeaponType.Melee && this.weapon.WeaponModel!.HasAim)
                     this.weapon.ToggleAim();
             }
 
             // Handle weapon reloading
-            if (_inputInterface.IsReloadDown && (weapon.WeaponModel?.IsGun ?? false))
+            if (InputInterface.IsReloadDown && (weapon.WeaponModel?.IsGun ?? false))
                 if (weapon.Magazine[weapon.WeaponModel!.GetNetName] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
                 else audioSource.PlayOneShot(weapon.noAmmoClip);
 
             // Handle sprint
-            var isSprinting = _inputInterface.IsSprinting;
+            var isSprinting = InputInterface.IsSprinting;
             if (isSprinting && isWalking && _usedStamina < stamina)
             {
                 _usedStamina += Time.deltaTime;
@@ -558,17 +556,17 @@ namespace Prefabs.Player
             }
 
             // Handle crouch
-            if (_inputInterface.IsCrouchingDown && !_isCrouching.Value && !_isRunning.Value)
+            if (InputInterface.IsCrouchingDown && !_isCrouching.Value && !_isRunning.Value)
             {
                 _isRunning.Value = false;
                 _isCrouching.Value = true;
             }
 
-            else if (_inputInterface.IsCrouchingUp && _isCrouching.Value)
+            else if (InputInterface.IsCrouchingUp && _isCrouching.Value)
                 _isCrouching.Value = false;
 
             // Handle Inventory
-            if (_inputInterface.IsInventoryDown && CanUseInventory)
+            if (InputInterface.IsInventoryDown && CanUseInventory)
             {
                 active.Value = false;
                 _sm.InitializeInventory();

@@ -7240,6 +7240,7 @@ MonoBehaviour:
   highlightArea: {fileID: 1920299065}
   playerPrefab: {fileID: 4172920852534759685, guid: 071894b9f37a7eb42810d59e6868c5eb, type: 3}
   clientServerManagersPrefab: {fileID: 3382692895550762362, guid: 553961391bf125e4ea866d369aa81cc0, type: 3}
+  pathPointPrefab: {fileID: 3287888696289537785, guid: a12afdcfd6fe2354a82f1057d7287a27, type: 3}
   skyboxes:
   - {fileID: 2100000, guid: efd1c33efd2d58340b88804268e6833f, type: 2}
   - {fileID: 2100000, guid: 85cf0b004bc4a654b9e501efcce47902, type: 2}

@@ -1,36 +1,76 @@
-﻿using Model;
+﻿using ExtensionFunctions;
+using Model;
 using UnityEngine;
+using Utils;
 
 namespace Prefabs.Player
 {
     public class InputInterface
     {
-        private bool _isBot;
+        private readonly bool _isBot;
 
         public InputInterface(bool isBot)
         {
             _isBot = isBot;
         }
 
-        public Vector2 Axis =>
-            _isBot ? Vector2.zero : new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        private bool _isJumpDown, _isReloadDown, _isCrouchingDown, _isCrouchingUp, _isSprinting;
+        private WeaponType? _weaponSelection;
+        private Vector2 _axis;
+
+        public Vector2 Axis
+        {
+            get => _isBot ? _axis : new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            set => _axis = value;
+        }
+
 
         public bool IsPauseDown => !_isBot && Input.GetKeyDown(KeyCode.Escape);
         public bool IsInventoryDown => !_isBot && Input.GetKeyDown(KeyCode.I);
-        public bool IsJumpDown => _isBot ? false : Input.GetButtonDown("Jump");
-        public bool IsReloadDown => _isBot ? false : Input.GetKeyDown(KeyCode.R);
-        public bool IsAimToggleDown => _isBot ? false : Input.GetMouseButtonDown(1);
-        public bool IsSprinting => _isBot ? false : Input.GetKey(KeyCode.LeftShift); //non usare as trigger qui
-        public bool IsCrouchingDown => _isBot ? false : Input.GetKeyDown(KeyCode.LeftControl);
-        public bool IsCrouchingUp => _isBot ? false : Input.GetKeyUp(KeyCode.LeftControl); 
 
-        public WeaponType? WeaponSelection =>
-            _isBot
-                ? null
-                : (Input.GetKeyDown(KeyCode.Alpha1) ? WeaponType.Block :
-                    Input.GetKeyDown(KeyCode.Alpha2) ? WeaponType.Melee :
-                    Input.GetKeyDown(KeyCode.Alpha3) ? WeaponType.Primary :
-                    Input.GetKeyDown(KeyCode.Alpha4) ? WeaponType.Secondary :
-                    Input.GetKeyDown(KeyCode.Q) ? WeaponType.Tertiary : null);
+        public bool IsJumpDown
+        {
+            get => _isBot ? _isJumpDown.GetAsTrigger() : Input.GetButtonDown("Jump");
+            set => _isJumpDown = value;
+        }
+
+        public bool IsReloadDown
+        {
+            get => _isBot ? _isReloadDown.GetAsTrigger() : Input.GetKeyDown(KeyCode.R);
+            set => _isReloadDown = value;
+        }
+
+        public bool IsAimToggleDown => !_isBot && Input.GetMouseButtonDown(1);
+
+        public bool IsSprinting
+        {
+            get => _isBot ? _isSprinting : Input.GetKey(KeyCode.LeftShift);
+            set => _isSprinting = value;
+        }
+
+        public bool IsCrouchingDown
+        {
+            get => _isBot ? _isCrouchingDown.GetAsTrigger() : Input.GetKeyDown(KeyCode.LeftControl);
+            set => _isCrouchingDown = value;
+        }
+
+        public bool IsCrouchingUp
+        {
+            get => _isBot ? _isCrouchingUp.GetAsTrigger() : Input.GetKeyUp(KeyCode.LeftControl);
+            set => _isCrouchingUp = value;
+        }
+
+        public WeaponType? WeaponSelection
+        {
+            get =>
+                _isBot
+                    ? _weaponSelection.GetAsTrigger()
+                    : (Input.GetKeyDown(KeyCode.Alpha1) ? WeaponType.Block :
+                        Input.GetKeyDown(KeyCode.Alpha2) ? WeaponType.Melee :
+                        Input.GetKeyDown(KeyCode.Alpha3) ? WeaponType.Primary :
+                        Input.GetKeyDown(KeyCode.Alpha4) ? WeaponType.Secondary :
+                        Input.GetKeyDown(KeyCode.Q) ? WeaponType.Tertiary : null);
+            set => _weaponSelection = value;
+        }
     }
 }
