@@ -7,6 +7,7 @@ using Managers;
 using Model;
 using Network;
 using Partials;
+using Prefabs.Player.AI;
 using UI;
 using Unity.Mathematics;
 using Unity.Netcode;
@@ -653,7 +654,7 @@ namespace Prefabs.Player
             if (newStatus.IsDead)
             {
                 // Disable any aiming
-                if (Weapon.isAiming)
+                if (Weapon.isAiming && !IsBot.Value)
                     weapon.ToggleAim();
 
                 // If it's not a suicide, add the kill

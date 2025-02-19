@@ -19,7 +19,7 @@ namespace ExtensionFunctions
 
         public static Vector3 RandomVector3(float min, float max) =>
             new(Random.Range(min, max), Random.Range(min, max), Random.Range(min, max));
-        
+
         public static Vector2 RotateByAngle(this Vector2 v, float angleInDegrees)
         {
             var angleInRadians = angleInDegrees * Mathf.Deg2Rad;

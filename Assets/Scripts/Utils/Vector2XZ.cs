@@ -18,6 +18,16 @@ namespace Utils
             this.z = z;
         }
 
+        public Vector2XZ(Vector3 v)
+        {
+            x = v.x;
+            z = v.z;
+        }
+
         public Vector3 ToVector3(float y = 0) => new(x, y, z);
+
+        public static implicit operator Vector2(Vector2XZ rValue) => new(rValue.x, rValue.z);
+
+        public static implicit operator Vector2XZ(Vector2 rValue) => new(rValue.x, rValue.y);
     }
 }

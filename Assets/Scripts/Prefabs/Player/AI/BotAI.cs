@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ExtensionFunctions;
 using Managers;
 using UnityEngine;
+using Utils;
 using VoxelEngine;
 using Random = UnityEngine.Random;
 
-namespace Prefabs.Player
+namespace Prefabs.Player.AI
 {
     public enum AIState
     {
-        Roaming,
+        Patrolling,
         Attacking
     }
 
@@ -20,13 +20,15 @@ namespace Prefabs.Player
         private Player _player;
 
         private readonly Vector2 _moveRange = new(25, 100);
+        private const float LogicStep = 1f / 15; // 15 FPS
+        private const bool DebugMode = false;
 
-        private AIState _state = AIState.Roaming;
+        private AIState _state = AIState.Patrolling;
         private Vector3 _lastKnownEnemyPosition;
         private Transform _target = null;
         private List<Vector3Int> _currentPath;
-        private List<Vector3> _currentPathDirs;
-        private int _currentPathDirIndex;
+        private int _currentPathIndex;
+        private float _acc;
 
         private void Awake()
         {
@@ -61,9 +63,18 @@ namespace Prefabs.Player
                 Vector3Int.RoundToInt(transform.position + Vector3.down * 0.5f), dest);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            if (_state is AIState.Roaming)
+            if (Time.time < 3)
+                return;
+            // Ensure the algorithm is run every _logicStep
+            _acc += Time.deltaTime;
+            if (_acc < LogicStep)
+                return;
+            _acc = 0;
+
+            // AI Finite State Machine
+            if (_state is AIState.Patrolling)
             {
                 // I've got no path to follow
                 if (_currentPath == null)
@@ -71,64 +82,55 @@ namespace Prefabs.Player
                     _currentPath = ChoosePath();
                     if (_currentPath != null)
                     {
-                        _currentPathDirs = new List<Vector3>();
-                        for (var i = 1; i < _currentPath.Count; i++)
-                            _currentPathDirs.Add((Vector3)_currentPath[i] - _currentPath[i - 1]);
-                        _currentPathDirIndex = 1;
+                        _currentPathIndex = 1;
 
-                        // Debug
-                        foreach (var point in _currentPath)
-                            Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
-                                Quaternion.identity);
+                        // Debug -- spawn path
+                        if (DebugMode)
+                            foreach (var point in _currentPath)
+                                Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
+                                    Quaternion.identity);
                     }
                 }
                 // I'm currently following a path
                 else
                 {
-                    var currentDir = new Vector2(_currentPathDirs[_currentPathDirIndex].x,
-                        _currentPathDirs[_currentPathDirIndex].z).normalized;
-                    var currentDistVector3 = _currentPath[_currentPathDirIndex + 1] - transform.position;
-                    var currentDist = new Vector2(currentDistVector3.x, currentDistVector3.z).normalized;
-                    var currentAlignment = Vector2.Dot(currentDist, currentDir);
-                    print($"previousPoint= {_currentPath[_currentPathDirIndex]}");
-                    print($"currentPoint= {_currentPath[_currentPathDirIndex + 1]}");
-                    print($"currentDir= {currentDir}");
-                    print($"currentDist= {currentDist}");
-                    print($"currentAlignment= {currentAlignment}");
-                    print($"currentPathDirIndex= {_currentPathDirIndex}");
-
+                    var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
+                    var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
+                    var dir = (Vector2)new Vector2XZ(transform.position - to);
+                    var dist = dir.magnitude;
+                    print($"dir = {dir}, dist = {dist}");
+                    
                     // Set rotation along the direction
-                    Debug.LogWarning(Mathf.Atan2(currentDir.x, currentDir.y) * Mathf.Rad2Deg);
-                    if (currentDir != Vector2.zero)
-                        _player.transform.rotation =
-                            Quaternion.AngleAxis(Mathf.Atan2(currentDir.x, currentDir.y) * Mathf.Rad2Deg, Vector3.up);
+                    _player.transform.rotation =
+                        Quaternion.AngleAxis(Mathf.Atan2(-dir.x, -dir.y) * Mathf.Rad2Deg, Vector3.up);
 
                     // End of the current dir
-                    if (currentAlignment < 0)
+                    if (dist < 0.65)
                     {
-                        _currentPathDirIndex++;
-                        print($"Next point = {_currentPath[_currentPathDirIndex + 1]}");
+                        _currentPathIndex++;
 
                         // End of the current path
-                        if (_currentPathDirIndex >= _currentPathDirs.Count)
+                        if (_currentPathIndex >= _currentPath.Count)
                             _currentPath = null;
                         // Jump if there's a stair
-                        else if (_currentPathDirs[_currentPathDirIndex].y >
-                                 _currentPathDirs[_currentPathDirIndex - 1].y)
+                        else if (_currentPath[_currentPathIndex].y > _currentPath[_currentPathIndex - 1].y)
                         {
                             _player.InputInterface.IsJumpDown = true;
-                            _currentPathDirIndex++;
+                            _currentPathIndex++;
                         }
                     }
                     // Still pursuing the current dir
                     else
                     {
                         // Move if not falling
-                        if (Mathf.Abs(_currentPathDirs[_currentPathDirIndex].y) < 0.2f)
+                        if (Mathf.Abs(from.y - to.y) < 0.2f)
                         {
-                            _player.InputInterface.Axis = currentDist;
+                            // Go forward
+                            _player.InputInterface.Axis = new Vector2(0, 1);
                             print($"InputInterface.Axis= {_player.InputInterface.Axis}");
                         }
+                        else
+                            _player.InputInterface.Axis = Vector2.zero;
                     }
                 }
             }
