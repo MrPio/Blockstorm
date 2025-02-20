@@ -100,6 +100,7 @@ namespace Prefabs.Player.AI
                     // I block the moving avoid setting _choosePathCoroutine = null;
                     yield break;
                 }
+
                 do
                 {
                     if (_state is AIState.Patrolling)
@@ -177,10 +178,9 @@ namespace Prefabs.Player.AI
                     if (_state is AIState.Attacking)
                     {
                         var fullLookDir = _target.position - transform.position;
-                        var deltaAngleY = Mathf.Atan2(fullLookDir.y, fullLookDir.z) * Mathf.Rad2Deg;
-                        if (deltaAngleY > 90f) deltaAngleY = 180 - deltaAngleY;
-                        else if (deltaAngleY < -90) deltaAngleY = -180 - deltaAngleY;
-                        _player.CameraRotationX.Value = (byte)(-(int)deltaAngleY + 128);
+                        var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
+                        deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
+                        _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
                     }
 
                     // End of the current dir
@@ -213,7 +213,7 @@ namespace Prefabs.Player.AI
 
                             // Too much time on current point, retry...
                             _indexAcc += LogicStep;
-                            if (_indexAcc > 4 && _currentPathIndex > 1)
+                            if (_indexAcc > 3 && _currentPathIndex > 1)
                             {
                                 _currentPathIndex--;
                                 _indexAcc = 0;
