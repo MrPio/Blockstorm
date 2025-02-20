@@ -29,5 +29,7 @@ namespace ExtensionFunctions
             var newY = sinTheta * v.x + cosTheta * v.y;
             return new Vector2(newX, newY);
         }
+
+        public static float RandomRange(this Vector2 v) => (float)new System.Random().NextDouble() * (v.y - v.x) + v.x;
     }
 }

@@ -85,6 +85,7 @@ namespace Prefabs.Player
         #region Private
 
         [NonSerialized] public InputInterface InputInterface;
+        [NonSerialized] public GameObject WeaponPrefab;
         private SceneManager _sm;
         private Transform _transform;
         private bool _isGrounded;
@@ -92,7 +93,6 @@ namespace Prefabs.Player
         private float _cameraBounceStart, _cameraBounceIntensity;
         private Vector3 _cameraInitialLocalPosition;
         private float _lastWalkCheck;
-        [NonSerialized] public GameObject WeaponPrefab;
         private bool isDying;
         private float _usedStamina;
         private Rigidbody _rigidbody;
@@ -300,7 +300,7 @@ namespace Prefabs.Player
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {
                     var rotation = (float)(newValue - 128);
-                    var headRotation = Mathf.Clamp(rotation + 20f, -38, 20f) - 20f;
+                    var headRotation = Mathf.Clamp(rotation + 20f, -50, 50f) - 20f;
                     var bellyRotation = Mathf.Clamp(rotation - 15f, -30f, 30f);
                     head.localRotation = Quaternion.Euler(headRotation, 0f, 0f);
                     belly.localRotation = Quaternion.Euler(bellyRotation, 0f, 0f);

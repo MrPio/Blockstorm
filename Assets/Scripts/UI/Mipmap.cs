@@ -30,7 +30,7 @@ namespace UI
         public void AddPlayerMarker(Team team, Transform player)
         {
             var go = Instantiate(playerMarker, transform);
-            var playerId = player.GetComponent<Player>().OwnerClientId;
+            var playerId = player.GetComponent<Player>().OwnerClientId; // TODO channge to some other ID due to bots
             if (spawnedMarkers.TryGetValue(playerId, out var marker))
                 Destroy(marker.gameObject);
             spawnedMarkers[playerId] = go.GetComponent<PlayerMarker>();
