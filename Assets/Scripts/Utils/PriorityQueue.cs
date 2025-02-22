@@ -824,7 +824,7 @@ public class PriorityQueue<TElement, TPriority> {
         } else {
             // Currently the JIT doesn't optimize direct Comparer<T>.Default.Compare
             // calls for reference types, so we want to cache the comparer instance instead.
-            // TODO https://github.com/dotnet/runtime/issues/10050: Update if this changes in the future.
+            // https://github.com/dotnet/runtime/issues/10050: Update if this changes in the future.
             return comparer ?? Comparer<TPriority>.Default;
         }
     }

@@ -232,7 +232,7 @@ namespace Managers
             inventory.SetActive(false);
 
             // TODO remove
-            botManager.SpawnBot(_newTeam!.Value);
+            botManager.SpawnBot(Team.Blue);
         }
     }
 }

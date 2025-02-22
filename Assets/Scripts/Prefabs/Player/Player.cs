@@ -64,12 +64,11 @@ namespace Prefabs.Player
         [SerializeField] private CameraMovement cameraMovement;
         [SerializeField] private WeaponSway weaponSway;
         [SerializeField] private GameObject weaponCamera, playerBody;
+        [SerializeField] private GameObject[] bodyColliders;
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
-        [SerializeField] public List<GameObject> smokes;
         [SerializeField] public GameObject circleDamage;
         [SerializeField] private GameObject helmetPrefab;
-        [SerializeField] private GameObject playerBodyPrefab;
 
         [Header("AudioClips")] [SerializeField]
         public AudioClip walkGeneric;
@@ -88,6 +87,7 @@ namespace Prefabs.Player
         [NonSerialized] public InputInterface InputInterface;
         [NonSerialized] public GameObject WeaponPrefab;
         private List<AudioClip> WalkClips => new() { null, walkGeneric, walkMetal, walkWater };
+        private List<AudioClip> MiscClips => new() { null, hit, helmetHit, deadHit, weapon.noAmmoClip };
         private SceneManager _sm;
         private Transform _transform;
         private bool _isGrounded;
@@ -98,6 +98,7 @@ namespace Prefabs.Player
         private bool isDying;
         private float _usedStamina;
         private Rigidbody _rigidbody;
+        private BotAI _botAI;
 
         private bool CanUseInventory => Team is not Team.None && active.Value &&
                                         _sm.worldManager.Map.spawns.First(it => it.team == Team)
@@ -164,7 +165,10 @@ namespace Prefabs.Player
                 cameraTransform.gameObject.SetActive(value);
             }
             else
+            {
                 playerBody.SetActive(value);
+                helmet.SetActive(value);
+            }
         }
 
         #endregion
@@ -189,6 +193,10 @@ namespace Prefabs.Player
 
         // Used to play the weapon sound
         public readonly NetworkVariable<NetString> LastShotWeapon = new(new(),
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+        // Used to play misc sounds, like hit, deadHit and helmet hit
+        public readonly NetworkVariable<byte> _miscSound = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to play the walk sound
@@ -323,6 +331,11 @@ namespace Prefabs.Player
                     InvokeRepeating(nameof(UpdateChunks), 0, 1);
             }
 
+            _miscSound.OnValueChanged += (_, newValue) =>
+            {
+                if (newValue != 0)
+                    audioSource.PlayOneShot(MiscClips[newValue]);
+            };
             _walkSound.OnValueChanged += (_, newValue) =>
             {
                 var clip = walkAudioSource.clip = WalkClips[newValue];
@@ -341,7 +354,12 @@ namespace Prefabs.Player
 
             // Destroy unnecessary children based on the ownerships. An enemy or a bot shouldn't have a camera. 
             if (IsOwner && !IsBot.Value)
+            {
                 Destroy(playerBody);
+                Destroy(helmet);
+                foreach (var bodyCollider in bodyColliders)
+                    bodyCollider.layer = LayerMask.NameToLayer("Self");
+            }
             else
             {
                 weaponCamera.SetActive(false);
@@ -366,7 +384,7 @@ namespace Prefabs.Player
             // Add AI movement if it's a bot
             InputInterface = new InputInterface(IsBot.Value);
             if (IsOwner && IsBot.Value && !TryGetComponent(out BotAI _))
-                transform.AddComponent<BotAI>();
+                _botAI = transform.AddComponent<BotAI>();
 
             _sm.logger.Log($"[OnNetworkSpawn] {(IsBot.Value ? "Bot" : "Player")} {OwnerClientId} joined the session!");
         }
@@ -552,7 +570,11 @@ namespace Prefabs.Player
             if (InputInterface.IsReloadDown && (weapon.WeaponModel?.IsGun ?? false))
                 if (weapon.Magazine[weapon.WeaponModel!.GetNetName] < weapon.WeaponModel.Magazine)
                     weapon.Reload();
-                else audioSource.PlayOneShot(weapon.noAmmoClip);
+                else
+                {
+                    _miscSound.Value = 0;
+                    _miscSound.Value = (byte)MiscClips.IndexOf(weapon.noAmmoClip);
+                }
 
             // Handle sprint
             var isSprinting = InputInterface.IsSprinting;
@@ -603,7 +625,7 @@ namespace Prefabs.Player
             var mouth = WeaponPrefab.transform.Find("mouth");
             if (mouth)
                 Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation)
-                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner ? "WeaponCamera" : "Default"));
+                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default"));
         }
 
         [Rpc(SendTo.Everyone)]
@@ -618,7 +640,8 @@ namespace Prefabs.Player
             // Both owner and non-owner hear the hit sound effect
             if (bodyPart == "Head" && Status.Value.HasHelmet)
             {
-                audioSource.PlayOneShot(helmetHit);
+                _miscSound.Value = 0;
+                _miscSound.Value = (byte)MiscClips.IndexOf(helmetHit);
 
                 // Handle helmet removal
                 var rb = Instantiate(helmetPrefab,
@@ -640,13 +663,20 @@ namespace Prefabs.Player
                 // damage /= 2; Already halved by Fire()
             }
             else
-                audioSource.PlayOneShot(newStatus.IsDead ? deadHit : hit);
+            {
+                _miscSound.Value = 0;
+                _miscSound.Value = (byte)MiscClips.IndexOf(newStatus.IsDead ? deadHit : hit);
+            }
 
             // Stop adding points
             if (IsHost && newStatus.IsDead)
                 FindFirstObjectByType<ScoreCube>().insidePlayers.Remove(this);
 
             var attacker = FindObjectsOfType<Player>().First(it => it.NetworkObjectId == attackerID);
+
+            // If the attacker is a bot and this is a kill, set its state to patrolling
+            if (IsHost && newStatus.IsDead && attacker.IsBot.Value)
+                attacker._botAI.SwitchState(AIState.Patrolling);
 
             // Show kill HUD
             if (_sm.networkManager.LocalClientId == attackerID &&
@@ -667,6 +697,13 @@ namespace Prefabs.Player
             // Update player's HP
             Status.Value = newStatus;
 
+            // If it's a bot, alert it
+            if (IsBot.Value && attackerID != NetworkObjectId)
+            {
+                _botAI.Target = attacker.transform;
+                _botAI.SwitchState(AIState.Attacking);
+            }
+
             // Ragdoll
             if (newStatus.IsDead)
             {
@@ -681,6 +718,9 @@ namespace Prefabs.Player
                     newAttackerStats.Kills += 1;
                     attacker.UpdateStatServerRpc(newAttackerStats);
                 }
+
+                // If it's the bot that's dead, set its state
+                if (IsBot.Value) _botAI.SwitchState(AIState.Dead);
 
                 var newAttackedStats = Stats.Value;
                 newAttackedStats.Deaths += 1;
@@ -761,8 +801,10 @@ namespace Prefabs.Player
             characterController.enabled = false;
 
             // Spawn the player location
+            // TODO
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) + Vector3.up * 0.75f,
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(IsBot.Value ? Team.Yellow : newTeam ?? Team) +
+                          Vector3.up * 0.75f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
                 // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
@@ -786,6 +828,8 @@ namespace Prefabs.Player
             weapon.Magazine.Clear();
             weapon.LeftAmmo.Clear();
             weapon.WeaponModel = null;
+            
+            if(IsBot.Value) _botAI.SwitchState(AIState.Patrolling);
 
             if (newTeam is not null || playerStats is not null)
                 LoadStatus();
@@ -797,10 +841,7 @@ namespace Prefabs.Player
             {
                 yield return new WaitForSeconds(0.15f);
                 if (IsBot.Value)
-                {
-                    var weapon = Status.Value.Primary;
-                    EquippedWeapon.Value = $"{weapon!.Name}:{weapon!.Variant}";
-                }
+                    _botAI.SwitchEquipped(Random.value < 0.5 ? WeaponType.Primary : WeaponType.Secondary);
                 else
                     weapon.SwitchEquipped(WeaponType.Block);
             }

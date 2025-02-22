@@ -183,7 +183,8 @@ namespace Prefabs.Player
                                 model.Damage,
                                 model.ExplosionTime!.Value,
                                 model.ExplosionRange!.Value,
-                                model.GroundDamageFactor!.Value
+                                model.GroundDamageFactor!.Value,
+                                player.NetworkObjectId
                             );
                             yield return new WaitForSeconds(model.Delay);
                         }
@@ -199,7 +200,8 @@ namespace Prefabs.Player
                         _weaponModel.Damage,
                         _weaponModel.ExplosionTime!.Value,
                         _weaponModel.ExplosionRange!.Value,
-                        _weaponModel!.GroundDamageFactor!.Value
+                        _weaponModel!.GroundDamageFactor!.Value,
+                        player.NetworkObjectId
                     );
                 }
 
@@ -231,50 +233,50 @@ namespace Prefabs.Player
                 enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
             {
                 var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
-                var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
-                var distance = Vector3.Distance(player.transform.position, enemyHit.collider.transform.position);
-                var distanceFactor =
-                    math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
-                var helmetHit = enemyHit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
-
-                var damage = (uint)(_weaponModel.Damage * multiplier *
-                                    (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
-
-                // Spawn blood effect on the enemy
-                Instantiate(enemyHit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
-                    enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.1f,
-                    Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
-                    Quaternion.Euler(0, Random.Range(-180, 180), 0));
-
-                if (!attackedPlayer.Status.Value.IsDead)
+                if (attackedPlayer.NetworkObjectId != player.NetworkObjectId)
                 {
-                    // Check if the enemy is not allied nor invincible
-                    
-                    // TODO Uncomment
-                    // if (((attackedPlayer.IsOwner && !attackedPlayer.IsBot.Value) ||
-                    //      attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
-                    if ((attackedPlayer.IsOwner ||
-                         attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
-                    {
-                        // Spawn the damage text
-                        var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
-                        damageTextGo.transform.position =
-                            enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
-                            cameraTransform.forward * 0.35f;
-                        damageTextGo.transform.rotation = player.transform.rotation;
-                        damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
-                        damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
-                        {
-                            text.text = damage.ToString();
-                            text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
-                            text.fontSize += distance > 10f ? distance / 20f + 0.5f : 1f;
-                        });
-                        damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+                    var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
+                    var distance = Vector3.Distance(player.transform.position, enemyHit.collider.transform.position);
+                    var distanceFactor =
+                        math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                    var helmetHit = enemyHit.transform.gameObject.name == "Head" &&
+                                    attackedPlayer.Status.Value.HasHelmet;
 
-                        // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
-                            new NetVector3(cameraTransform.forward),
-                            player.NetworkObjectId);
+                    var damage = (uint)(_weaponModel.Damage * multiplier *
+                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
+
+                    // Spawn blood effect on the enemy
+                    Instantiate(enemyHit.transform.gameObject.name.ToLower() == "head" ? headBlood : bodyBlood,
+                        enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) - cameraTransform.forward * 0.1f,
+                        Quaternion.FromToRotation(Vector3.up, -cameraTransform.forward) *
+                        Quaternion.Euler(0, Random.Range(-180, 180), 0));
+
+                    if (!attackedPlayer.Status.Value.IsDead)
+                    {
+                        // Check if the enemy is not allied nor invincible
+                        if (((attackedPlayer.IsOwner && !attackedPlayer.IsBot.Value) ||
+                             attackedPlayer.Team != player.Team) && !attackedPlayer.invincible.Value)
+                        {
+                            // Spawn the damage text
+                            var damageTextGo = Instantiate(damageText, _sm.worldCanvas.transform);
+                            damageTextGo.transform.position =
+                                enemyHit.point + VectorExtensions.RandomVector3(-0.15f, 0.15f) -
+                                cameraTransform.forward * 0.35f;
+                            damageTextGo.transform.rotation = player.transform.rotation;
+                            damageTextGo.GetComponent<FollowRotation>().follow = player.transform;
+                            damageTextGo.GetComponentInChildren<TextMeshProUGUI>().Apply(text =>
+                            {
+                                text.text = damage.ToString();
+                                text.color = Color.Lerp(Color.white, Color.red, multiplier - 0.5f);
+                                text.fontSize += distance > 10f ? distance / 20f + 0.5f : 1f;
+                            });
+                            damageTextGo.transform.localScale = Vector3.one * math.sqrt(multiplier);
+
+                            // Send the damage to the enemy
+                            attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
+                                new NetVector3(cameraTransform.forward),
+                                player.NetworkObjectId);
+                        }
                     }
                 }
             }
@@ -310,7 +312,7 @@ namespace Prefabs.Player
 
                 // Broadcast the damage action
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
-                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, player.OwnerClientId);
+                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, player.NetworkObjectId);
             }
         }
 
@@ -350,6 +352,7 @@ namespace Prefabs.Player
                     grenadeModel!.ExplosionTime!.Value,
                     grenadeModel!.ExplosionRange!.Value,
                     grenadeModel!.GroundDamageFactor!.Value,
+                    player.NetworkObjectId,
                     force
                 );
             }

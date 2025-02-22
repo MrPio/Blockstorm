@@ -2,8 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ExtensionFunctions;
 using Managers;
+using Model;
+using Network;
+using Partials;
+using TMPro;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using Utils;
@@ -14,6 +20,7 @@ namespace Prefabs.Player.AI
 {
     public enum AIState
     {
+        Dead,
         Patrolling,
         Attacking
     }
@@ -22,51 +29,54 @@ namespace Prefabs.Player.AI
     {
         #region constants
 
-        private const bool DebugMode = true;
+        private const bool DebugMode = false;
         private const float LogicStep = 1f / 15; // 15 FPS
 
         // Patrolling
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
-            {
-                { AIState.Patrolling, new Vector2(15, 65) },
-                { AIState.Attacking, new Vector2(5, 40) },
-            },
-            _speedFactorRange = new()
-            {
-                { AIState.Patrolling, new Vector2(0.5f, 1f) },
-                { AIState.Attacking, new Vector2(0.9f, 1.3f) },
-            };
+        {
+            { AIState.Patrolling, new Vector2(15, 65) },
+            { AIState.Attacking, new Vector2(5, 40) },
+        };
+
+        private readonly Dictionary<AIState, Vector2> _speedFactorRange = new()
+        {
+            { AIState.Patrolling, new Vector2(0.5f, 1f) },
+            { AIState.Attacking, new Vector2(0.9f, 1.3f) },
+        };
 
         private readonly Dictionary<AIState, float> _speedChangeStep = new()
-            {
-                { AIState.Patrolling, 5 },
-                { AIState.Attacking, 4 },
-            },
-            _propCheckStep = new()
-            {
-                { AIState.Patrolling, 15 },
-                { AIState.Attacking, 7 },
-            },
-            _jumpProbability = new()
-            {
-                { AIState.Patrolling, 0.05f },
-                { AIState.Attacking, 0.085f },
-            };
+        {
+            { AIState.Patrolling, 5 },
+            { AIState.Attacking, 4 },
+        };
+
+        private readonly Dictionary<AIState, float> _propCheckStep = new()
+        {
+            { AIState.Patrolling, 15 },
+            { AIState.Attacking, 7 },
+        };
+
+        private readonly Dictionary<AIState, float> _jumpProbability = new()
+        {
+            { AIState.Patrolling, 0.05f },
+            { AIState.Attacking, 0.25f },
+        };
 
         #endregion
 
         #region private
 
+        [NonSerialized] public Transform Target = null;
         private SceneManager _sm;
         private Player _player;
-        private AIState _state = AIState.Patrolling;
+        private AIState _state = AIState.Dead;
         private Vector3 _lastKnownEnemyPosition;
-        private Transform _target = null;
         private List<Vector3Int> _currentPath;
-        private int _currentPathIndex;
-        private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc;
-        private float _baseSpeed;
-        private Coroutine _choosePathCoroutine;
+        private int _currentPathIndex, _fireCount;
+        private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc, _fireAcc;
+        private float _baseSpeed,_magazine;
+        private Model.Weapon _weaponModel;
 
         #endregion
 
@@ -79,13 +89,12 @@ namespace Prefabs.Player.AI
         private void Start()
         {
             _baseSpeed = _player.speed;
-            _target = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value).transform;
         }
 
         /// <summary>
         /// Choose a random path to follow
         /// </summary>
-        private IEnumerator ChoosePath()
+        private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
         {
             // Select a random point in the map, in the circle around the player
             var validDestFound = false;
@@ -94,21 +103,21 @@ namespace Prefabs.Player.AI
             while (!validDestFound)
             {
                 iterations++;
-                if (iterations > 25)
+                if (iterations > 20)
                 {
-                    Debug.LogError("Bot ChoosePath() disabled due to more than 25 iterations.");
+                    Debug.LogError("Bot ChoosePath() disabled due to more than 20 iterations.");
                     // I block the moving avoid setting _choosePathCoroutine = null;
-                    yield break;
+                    return;
                 }
 
                 do
                 {
                     if (_state is AIState.Patrolling)
-                        dest = Vector3Int.FloorToInt(transform.position + Vector3.down * 0.75f +
+                        dest = Vector3Int.FloorToInt(currentPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
                                                      _movingRange[AIState.Patrolling].RandomRange());
                     else if (_state is AIState.Attacking)
-                        dest = Vector3Int.FloorToInt(_target.position + Vector3.down * 0.75f +
+                        dest = Vector3Int.FloorToInt(targetPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
                                                      _movingRange[AIState.Patrolling].RandomRange());
 
@@ -126,7 +135,7 @@ namespace Prefabs.Player.AI
             }
 
             var path = _sm.worldManager.Map.Pathfinder.FindPath(
-                Vector3Int.FloorToInt(transform.position + Vector3.down * 0.75f), dest);
+                Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
             if (path != null)
             {
                 _currentPathIndex = 1;
@@ -141,9 +150,28 @@ namespace Prefabs.Player.AI
             _currentPath = path;
         }
 
-        private void FixedUpdate()
+        private async void FixedUpdate()
         {
-            // Ensure the algorithm is run every _logicStep
+            // Shoot
+            if (_state is AIState.Attacking)
+            {
+                _fireAcc += Time.deltaTime;
+                if (_fireAcc > _weaponModel.Delay)
+                {
+                    Fire();
+                    _fireAcc = 0;
+                }
+
+                // Reload
+                if (_fireCount > math.max(1f, _magazine))
+                {
+                    _fireCount = 0;
+                    _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
+                    _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
+                }
+            }
+            
+            // Ensure the walking algorithm is run every _logicStep
             _acc += Time.deltaTime;
             if (_acc < LogicStep)
                 return;
@@ -153,24 +181,22 @@ namespace Prefabs.Player.AI
             if (_state is AIState.Patrolling or AIState.Attacking)
             {
                 // I've got no path to follow
-                if (_currentPath == null)
+                if (_currentPath == null || _currentPath.Count < 3)
                 {
-                    if (_choosePathCoroutine == null)
-                    {
-                        print("===================");
-                        _choosePathCoroutine = StartCoroutine(ChoosePath());
-                    }
+                    print("===================");
+                    var currentPos = transform.position;
+                    var targetPos = Target?.position ?? Vector3.zero;
+                    await Task.Run(() => ChoosePath(currentPos, targetPos));
                 }
                 // I'm currently following a path
                 else
                 {
-                    _choosePathCoroutine = null;
                     var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                     var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
                     var dir = (Vector2)new Vector2XZ(transform.position - to);
                     var lookDir = _state is AIState.Patrolling
                         ? dir // look forward
-                        : (Vector2)new Vector2XZ(transform.position - _target.position); // look at the target
+                        : (Vector2)new Vector2XZ(transform.position - Target.position); // look at the target
                     var dist = dir.magnitude;
 
                     // Set y rotation along the direction
@@ -180,7 +206,7 @@ namespace Prefabs.Player.AI
                     // Set x head rotation
                     if (_state is AIState.Attacking)
                     {
-                        var fullLookDir = _target.position - transform.position;
+                        var fullLookDir = Target.position - transform.position;
                         var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
                         deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
                         _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
@@ -263,9 +289,135 @@ namespace Prefabs.Player.AI
             }
         }
 
-        private void ChangeState(AIState newState)
+        private void Fire()
         {
-            if (_state is AIState.Patrolling && newState is AIState.Attacking)
+            _fireCount++;
+
+            // Propagate the sound across the net
+            _player.LastShotWeapon.Value = "";
+            _player.LastShotWeapon.Value = _weaponModel.GetNetName;
+
+            // Spawn the weapon effect
+            if (_weaponModel.IsGun && !_weaponModel.HasScope)
+                _player.SpawnWeaponEffectRpc();
+
+            // Cast a ray to check for collisions
+            var cameraTransform = transform;
+            var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.5f, cameraTransform.forward);
+
+            // Checks if there was a hit on a prop
+            var hasHitHostPlayer =
+                Physics.Raycast(ray, out var hostPlayerHit, _weaponModel.Distance,
+                    1 << LayerMask.NameToLayer("Self")) &&
+                hostPlayerHit.collider is not null;
+            var hasHitEnemy =
+                Physics.Raycast(ray, out var enemyHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Enemy")) &&
+                enemyHit.collider is not null;
+            var hasHitGround =
+                Physics.Raycast(ray, out var groundHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Ground")) &&
+                groundHit.collider is not null;
+            var hasHitProp =
+                Physics.Raycast(ray, out var propHit, _weaponModel.Distance, 1 << LayerMask.NameToLayer("Prop")) &&
+                propHit.collider is not null;
+
+            // Checks if there was a hit on the host player
+            if (hasHitHostPlayer && hostPlayerHit.distance < (hasHitGround ? groundHit.distance : 9999f) &&
+                hostPlayerHit.distance < (hasHitProp ? propHit.distance : 9999f))
+            {
+                var attackedPlayer = hostPlayerHit.transform.GetComponentInParent<Player>();
+                var multiplier = Model.Weapon.BodyPartMultipliers[hostPlayerHit.transform.gameObject.name];
+                var distance = Vector3.Distance(transform.position, hostPlayerHit.collider.transform.position);
+                var distanceFactor =
+                    math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                var helmetHit = hostPlayerHit.transform.gameObject.name == "Head" &&
+                                attackedPlayer.Status.Value.HasHelmet;
+
+                var damage = (uint)(_weaponModel.Damage * multiplier *
+                                    (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
+
+                if (!attackedPlayer.Status.Value.IsDead)
+                {
+                    // Check if the enemy is not allied nor invincible
+                    if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
+                         attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
+                    {
+                        // Send the damage to the enemy
+                        attackedPlayer.DamageClientRpc(damage, hostPlayerHit.transform.gameObject.name,
+                            new NetVector3(cameraTransform.forward),
+                            _player.NetworkObjectId);
+                    }
+                }
+            }
+
+            // Checks if there was a hit on an enemy
+            if (hasHitEnemy && enemyHit.distance < (hasHitGround ? groundHit.distance : 9999f) &&
+                enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
+            {
+                var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
+                var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
+                var distance = Vector3.Distance(transform.position, enemyHit.collider.transform.position);
+                var distanceFactor =
+                    math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                var helmetHit = enemyHit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
+
+                var damage = (uint)(_weaponModel.Damage * multiplier *
+                                    (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
+
+                if (!attackedPlayer.Status.Value.IsDead)
+                {
+                    // Check if the enemy is not allied nor invincible
+                    if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
+                         attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
+                    {
+                        // Send the damage to the enemy
+                        attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
+                            new NetVector3(cameraTransform.forward),
+                            _player.NetworkObjectId);
+                    }
+                }
+            }
+
+            // Checks if there was a hit on the ground
+            if (hasHitGround && groundHit.distance < (hasHitEnemy ? enemyHit.distance : 9999f) &&
+                groundHit.distance < (hasHitProp ? propHit.distance : 9999f))
+            {
+                // Check if the hit block is solid
+                var pos = Vector3Int.FloorToInt(groundHit.point + cameraTransform.forward * 0.05f);
+                var block = _sm.worldManager.GetVoxel(pos);
+                if (block is not { isSolid: true }) return;
+
+                // Broadcast the damage action
+                _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
+            }
+
+            // Checks if there was a hit on a prop
+            if (hasHitProp && propHit.distance < (hasHitGround ? groundHit.distance : 9999f) &&
+                propHit.distance < (hasHitEnemy ? enemyHit.distance : 9999f))
+            {
+                // Broadcast the damage action
+                if (propHit.transform.TryGetComponent<Prop>(out var prop))
+                    _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, _player.NetworkObjectId);
+            }
+        }
+
+        public void SwitchEquipped(WeaponType weaponType)
+        {
+            _fireCount = 0;
+            var weapon = _player.Status.Value.WeaponType2Weapon(weaponType);
+            _player.EquippedWeapon.Value = $"{weapon!.Name}:{weapon!.Variant}";
+            _weaponModel = weapon;
+            _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
+        }
+
+        public void SwitchState(AIState newState)
+        {
+            if (_state == newState) return;
+            if (newState is AIState.Dead)
+            {
+                // Reinitialize AI state
+                _currentPath = null;
+            }
+            else if (_state is AIState.Patrolling && newState is AIState.Attacking)
             {
                 _currentPath = null;
             }

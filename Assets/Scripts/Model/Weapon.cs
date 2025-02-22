@@ -102,19 +102,19 @@ namespace Model
         public static readonly List<Weapon> Secondaries = new()
         {
             // 1_104
-            new Weapon(name: "m1911", damage: 24, rof: 46, distance: 50, type: WeaponType.Secondary,
+            new Weapon(name: "m1911", damage: 24, rof: 46, distance: 55, type: WeaponType.Secondary,
                 fireAnimation: "gun", zoom: 1.4f, ammo: 56, magazine: 9, reloadTime: 140),
 
             // 1_472
-            new Weapon(name: "m1911", damage: 32, rof: 46, distance: 50, type: WeaponType.Secondary,
+            new Weapon(name: "m1911", damage: 32, rof: 46, distance: 60, type: WeaponType.Secondary,
                 fireAnimation: "gun", zoom: 1.55f, ammo: 56, magazine: 11, reloadTime: 160, variant: "MILITARY"),
 
             // 1_600
-            new Weapon(name: "m1911", damage: 40, rof: 40, distance: 50, type: WeaponType.Secondary,
+            new Weapon(name: "m1911", damage: 40, rof: 40, distance: 65, type: WeaponType.Secondary,
                 fireAnimation: "gun", zoom: 1.55f, ammo: 77, magazine: 11, reloadTime: 200, variant: "ICE"),
 
             // 2_250
-            new Weapon(name: "m1911", damage: 75, rof: 30, distance: 50, type: WeaponType.Secondary,
+            new Weapon(name: "m1911", damage: 75, rof: 30, distance: 85, type: WeaponType.Secondary,
                 fireAnimation: "gun", zoom: 1.55f, ammo: 60, magazine: 5, reloadTime: 80, variant: "GOLD"),
         };
 

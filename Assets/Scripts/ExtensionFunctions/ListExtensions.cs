@@ -13,10 +13,11 @@ namespace ExtensionFunctions
 
         public static List<T> Shuffle<T>(this List<T> list)
         {
+            var random = new System.Random();
             var n = list.Count;
             while (n > 1)
             {
-                var randomIndex = Random.Range(0, --n + 1);
+                var randomIndex = random.Next(0, --n + 1);
                 (list[randomIndex], list[n]) = (list[n], list[randomIndex]);
             }
 

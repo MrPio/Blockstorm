@@ -56,7 +56,8 @@ namespace VoxelEngine
         {
             _sm = FindFirstObjectByType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
-            SetRenderDistance(BinarySerializer.Instance.Deserialize($"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
+            SetRenderDistance(BinarySerializer.Instance.Deserialize(
+                                  $"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
                                   SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
                                   SliderSetting.steps[SliderSettingType.RenderDistance]) /
                               SliderSetting.steps[SliderSettingType.RenderDistance]);
@@ -360,7 +361,7 @@ namespace VoxelEngine
         /// <param name="model"> The collectable model. If not provided, a random collectable will be spawned. </param>
         public void SpawnCollectableWithID(NetVector3 id, Model.Collectable model = null)
         {
-            if (SpawnedCollectables.Any(it => it.Model.ID == id)) return;
+            if (SpawnedCollectables.Any(it => Vector3.Distance(it.Model.ID, id) < 0.5f)) return;
             var newCollectable = Instantiate(collectable, id, Quaternion.identity,
                 GameObject.FindGameObjectWithTag("CollectablesContainer").transform).GetComponent<Collectable>();
             newCollectable.Initialize(model ?? Model.Collectable.GetRandomCollectable(id));

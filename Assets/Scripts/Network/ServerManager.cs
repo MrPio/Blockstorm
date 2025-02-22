@@ -37,7 +37,7 @@ namespace Network
         [ServerRpc(RequireOwnership = false)]
         public void SpawnExplosiveServerRpc(string prefabName, NetVector3 position, NetVector3 rotation,
             NetVector3 direction, uint damage, float explosionTime, float explosionRange, float groundDamageFactor,
-            float force = 0, ServerRpcParams rpcParams = default)
+            ulong attackerId, float force = 0)
         {
             var go = Instantiate(networkPrefabsList.PrefabList.First(it => it.Prefab.name == prefabName).Prefab,
                 position.ToVector3,
@@ -45,15 +45,17 @@ namespace Network
             );
             go.GetComponent<NetworkObject>().SpawnWithOwnership(0);
             go.GetComponent<Explosive>().InitializeRpc(direction, damage, explosionTime, explosionRange,
-                groundDamageFactor, rpcParams.Receive.SenderClientId, force);
+                groundDamageFactor, attackerId, force);
         }
 
         [ServerRpc(RequireOwnership = false)]
         public void LootCollectableServerRpc(NetVector3 id)
         {
+            print(id);
+            _sm.worldManager.SpawnedCollectables.Print();
             var newId = _sm.worldManager.FreeCollectablesSpawnPoints.RandomItem();
             _sm.worldManager.FreeCollectablesSpawnPoints.Add(id);
-            var looted = _sm.worldManager.SpawnedCollectables.First(it => it.Model.ID == id);
+            var looted = _sm.worldManager.SpawnedCollectables.First(it => Vector3.Distance(it.Model.ID ,id)<0.5f);
             _sm.worldManager.SpawnedCollectables.Remove(looted);
             Destroy(looted.gameObject);
 

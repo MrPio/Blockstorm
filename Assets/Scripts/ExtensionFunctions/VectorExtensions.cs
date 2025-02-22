@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ExtensionFunctions
 {
@@ -17,8 +16,12 @@ namespace ExtensionFunctions
                 Random.Range(bounds.min.y, bounds.max.y)
             );
 
-        public static Vector3 RandomVector3(float min, float max) =>
-            new(Random.Range(min, max), Random.Range(min, max), Random.Range(min, max));
+        public static Vector3 RandomVector3(float min, float max)
+        {
+            var random = new System.Random();
+            return new Vector3((float)random.NextDouble() * (max - min) + min, (float)random.NextDouble() * (max - min) + min,
+                (float)random.NextDouble() * (max - min) + min);
+        }
 
         public static Vector2 RotateByAngle(this Vector2 v, float angleInDegrees)
         {
