@@ -59,7 +59,7 @@ namespace Prefabs.Player.AI
 
         private SceneManager _sm;
         private Player _player;
-        private AIState _state = AIState.Attacking;
+        private AIState _state = AIState.Patrolling;
         private Vector3 _lastKnownEnemyPosition;
         private Transform _target = null;
         private List<Vector3Int> _currentPath;
@@ -139,7 +139,6 @@ namespace Prefabs.Player.AI
             }
 
             _currentPath = path;
-            _choosePathCoroutine = null;
         }
 
         private void FixedUpdate()
@@ -157,11 +156,15 @@ namespace Prefabs.Player.AI
                 if (_currentPath == null)
                 {
                     if (_choosePathCoroutine == null)
+                    {
+                        print("===================");
                         _choosePathCoroutine = StartCoroutine(ChoosePath());
+                    }
                 }
                 // I'm currently following a path
                 else
                 {
+                    _choosePathCoroutine = null;
                     var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                     var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
                     var dir = (Vector2)new Vector2XZ(transform.position - to);
@@ -250,7 +253,7 @@ namespace Prefabs.Player.AI
                                 if (Vector3.Distance(prop.transform.position, transform.position) <= 2.5)
                                 {
                                     // Broadcast the damage action
-                                    _sm.ClientManager.DamagePropRpc(prop.ID, 9999, true, _player.OwnerClientId);
+                                    _sm.ClientManager.DamagePropRpc(prop.ID, 9999, true, _player.NetworkObjectId);
                                     break;
                                 }
                             }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
+using JetBrains.Annotations;
 using Managers;
 using Model;
 using Network;
@@ -86,6 +87,7 @@ namespace Prefabs.Player
 
         [NonSerialized] public InputInterface InputInterface;
         [NonSerialized] public GameObject WeaponPrefab;
+        private List<AudioClip> WalkClips => new() { null, walkGeneric, walkMetal, walkWater };
         private SceneManager _sm;
         private Transform _transform;
         private bool _isGrounded;
@@ -189,6 +191,10 @@ namespace Prefabs.Player
         public readonly NetworkVariable<NetString> LastShotWeapon = new(new(),
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        // Used to play the walk sound
+        public readonly NetworkVariable<byte> _walkSound = new(0,
+            NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         // Used to animate the enemy's body tilt
         public readonly NetworkVariable<byte> CameraRotationX = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -250,6 +256,7 @@ namespace Prefabs.Player
                 };
                 _isRunning.OnValueChanged += (_, newValue) =>
                 {
+                    walkAudioSource.pitch = newValue ? runMultiplier : 1f;
                     var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastShot.Value < 400;
                     bodyAnimator.speed = (newValue && _isWalking.Value && !isShooting
                         ? runMultiplier
@@ -277,7 +284,6 @@ namespace Prefabs.Player
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
-                    print($"[EquippedWeapon.OnValueChanged] Player {OwnerClientId} has equipped {newValue.Message}");
                     var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
                     if (weaponModel is null)
                         return;
@@ -316,6 +322,19 @@ namespace Prefabs.Player
                 if (!IsBot.Value)
                     InvokeRepeating(nameof(UpdateChunks), 0, 1);
             }
+
+            _walkSound.OnValueChanged += (_, newValue) =>
+            {
+                var clip = walkAudioSource.clip = WalkClips[newValue];
+                if (clip is null)
+                    walkAudioSource.Pause();
+                else
+                {
+                    walkAudioSource.clip = clip;
+                    if (!walkAudioSource.isPlaying)
+                        walkAudioSource.Play();
+                }
+            };
 
             active.OnValueChanged += (_, newValue) => SetEnabled(newValue);
             SetEnabled(active.Value);
@@ -378,7 +397,7 @@ namespace Prefabs.Player
                     {
                         Cursor.lockState = CursorLockMode.None;
                         Cursor.visible = true;
-                        walkAudioSource.Pause();
+                        _walkSound.Value = 0;
                     }
                     else
                     {
@@ -473,25 +492,24 @@ namespace Prefabs.Player
                 if (_isGrounded && move.magnitude > 0.1f)
                 {
                     var terrainType =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position + Vector3.down * 2));
-                    var hasWater =
-                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position + Vector3.down * 1))!
-                            .name.Contains("water");
+                        _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position + Vector3.down * 1));
 
                     if (terrainType == null)
-                        return;
-                    var clip = walkGeneric;
-                    if (new List<string> { "iron", "steel" }.Any(it => terrainType.name.Contains(it)))
-                        clip = walkMetal;
-                    if (hasWater)
-                        clip = walkWater;
-                    if (walkAudioSource.clip != clip)
-                        walkAudioSource.clip = clip;
-                    if (!walkAudioSource.isPlaying)
-                        walkAudioSource.Play();
+                        _walkSound.Value = 0;
+                    else
+                    {
+                        var hasWater =
+                            _sm.worldManager.GetVoxel(Vector3Int.FloorToInt(transform.position))!
+                                .name.Contains("water");
+                        var clip = walkGeneric;
+                        if (new List<string> { "iron", "steel" }.Any(it => terrainType.name.Contains(it)))
+                            clip = walkMetal;
+                        if (hasWater)
+                            clip = walkWater;
+                        _walkSound.Value = (byte)WalkClips.IndexOf(clip);
+                    }
                 }
-                else if (walkAudioSource.isPlaying)
-                    walkAudioSource.Pause();
+                else _walkSound.Value = 0;
             }
 
             // Handle inventory weapon switch
@@ -628,20 +646,19 @@ namespace Prefabs.Player
             if (IsHost && newStatus.IsDead)
                 FindFirstObjectByType<ScoreCube>().insidePlayers.Remove(this);
 
-            print($"{OwnerClientId} - {attackerID} has attacked {OwnerClientId} dealing {damage} damage!");
-            var attacker = FindObjectsOfType<Player>().First(it => it.OwnerClientId == attackerID);
+            var attacker = FindObjectsOfType<Player>().First(it => it.NetworkObjectId == attackerID);
 
             // Show kill HUD
             if (_sm.networkManager.LocalClientId == attackerID &&
-                !((attackerID != OwnerClientId && attacker.Team == Team) || invincible.Value))
-                _sm.killPlusOne.Activate(Team, OwnerClientId == attackerID, isKill: newStatus.IsDead);
+                !((attackerID != NetworkObjectId && attacker.Team == Team) || invincible.Value))
+                _sm.killPlusOne.Activate(Team, NetworkObjectId == attackerID, isKill: newStatus.IsDead);
 
 
             if (!IsOwner) return;
             // Owner only ========================================================================================
 
             // Check if the enemy is allied or invincible
-            if ((attackerID != OwnerClientId && attacker.Team == Team) || invincible.Value)
+            if ((attackerID != NetworkObjectId && attacker.Team == Team) || invincible.Value)
                 return;
 
             if (bodyPart == "Head" && Status.Value.HasHelmet)
@@ -658,7 +675,7 @@ namespace Prefabs.Player
                     weapon.ToggleAim();
 
                 // If it's not a suicide, add the kill
-                if (attackerID != OwnerClientId /*AKA: attackedID*/)
+                if (attackerID != NetworkObjectId /*AKA: attackedID*/)
                 {
                     var newAttackerStats = attacker.Stats.Value;
                     newAttackerStats.Kills += 1;
@@ -706,7 +723,7 @@ namespace Prefabs.Player
                     IsOwner ? Color.cyan : Color.yellow);
             if (IsOwner && !IsBot.Value)
             {
-                walkAudioSource.Pause();
+                _walkSound.Value = 0;
                 characterController.enabled = !isDying;
                 capsuleCollider.enabled = isDying;
                 cameraMovement.enabled = !isDying;

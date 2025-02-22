@@ -110,7 +110,7 @@ namespace UI
                             Team.Green => greenStats,
                             _ => yellowStats
                         });
-                    stat.name = $"{player.Stats.Value.Username.Value} ({player.OwnerClientId})";
+                    stat.name = $"{player.Stats.Value.Username.Value} ({player.NetworkObjectId})";
                     stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().text = stat.name;
                     if (!player.active.Value)
                         stat.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>().color = Color.grey;

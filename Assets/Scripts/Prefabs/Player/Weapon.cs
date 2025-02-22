@@ -274,7 +274,7 @@ namespace Prefabs.Player
                         // Send the damage to the enemy
                         attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
                             new NetVector3(cameraTransform.forward),
-                            player.OwnerClientId);
+                            player.NetworkObjectId);
                     }
                 }
             }
