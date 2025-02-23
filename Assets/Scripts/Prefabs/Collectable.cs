@@ -94,6 +94,7 @@ namespace Prefabs
                 player.audioSource.PlayOneShot(lootAudioClip);
                 LootCollectable(player, Model);
 
+                print("call LootCollectableServerRpc()");
                 _sm.ServerManager.LootCollectableServerRpc(Model.ID);
                 Destroy(gameObject);
             }

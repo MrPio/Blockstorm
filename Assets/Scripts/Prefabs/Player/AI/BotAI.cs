@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using ExtensionFunctions;
 using Managers;
@@ -12,6 +14,7 @@ using TMPro;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Utils;
 using VoxelEngine;
 using Random = UnityEngine.Random;
@@ -79,6 +82,9 @@ namespace Prefabs.Player.AI
         private AIState _state = AIState.Dead;
         private Vector3 _lastKnownEnemyPosition;
         private List<Vector3Int> _currentPath;
+        private bool _isSearchingPath;
+        private Thread _pathThread;
+        private float _lastPathThreadDuration;
         private int _currentPathIndex, _fireCount;
         private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc, _fireAcc;
         private float _baseSpeed, _magazine;
@@ -102,6 +108,7 @@ namespace Prefabs.Player.AI
         /// </summary>
         private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
         {
+            var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             // Select a random point in the map, in the circle around the player
             var validDestFound = false;
             var dest = Vector3Int.zero;
@@ -111,8 +118,7 @@ namespace Prefabs.Player.AI
                 iterations++;
                 if (iterations > 20)
                 {
-                    Debug.LogError("Bot ChoosePath() disabled due to more than 20 iterations.");
-                    // I block the moving avoid setting _choosePathCoroutine = null;
+                    Thread.Sleep(10000);
                     return;
                 }
 
@@ -129,6 +135,9 @@ namespace Prefabs.Player.AI
 
                     dest.y = 0;
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
+                
+                // TODO this
+                // dest = new(_sm.worldManager.Map.size.x / 2, 0, _sm.worldManager.Map.size.x / 2);
 
                 // Find a valid y
                 for (dest.y = 0; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
@@ -140,26 +149,30 @@ namespace Prefabs.Player.AI
                 validDestFound = dest.y < _sm.worldManager.Map.size.y - 2;
             }
 
-            var path = _sm.worldManager.Map.Pathfinder.FindPath(
+            List<Vector3Int> path = null;
+            path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
                 Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
             if (path != null)
             {
                 _currentPathIndex = 1;
 
                 // Debug -- spawn path
-                if (DebugMode)
-                    foreach (var point in path)
-                        Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
-                            Quaternion.identity);
+                // if (DebugMode)
+                //     foreach (var point in path)
+                //         Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
+                //             Quaternion.identity);
             }
 
             _currentPath = path;
+            _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
         }
 
-        private async void FixedUpdate()
+        private void FixedUpdate()
         {
+            if ((Time.frameCount + 1) % 150 == 0)
+                _currentPath = null;
             // Shoot
-            if (_state is AIState.Attacking)
+            /*if (_state is AIState.Attacking)
             {
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
@@ -175,7 +188,7 @@ namespace Prefabs.Player.AI
                     _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
                     _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
                 }
-            }
+            }*/
 
             // Ensure the walking algorithm is run every _logicStep
             _acc += Time.deltaTime;
@@ -189,14 +202,20 @@ namespace Prefabs.Player.AI
                 // I've got no path to follow
                 if (_currentPath == null || _currentPath.Count < 3)
                 {
-                    print("===================");
-                    var currentPos = transform.position;
-                    var targetPos = Target?.position ?? Vector3.zero;
-                    await Task.Run(() => ChoosePath(currentPos, targetPos));
+                    if (_pathThread is not { IsAlive: true })
+                    {
+                        print("===================");
+                        var currentPos = transform.position;
+                        var targetPos = Target?.position ?? Vector3.zero;
+                        _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
+                        // await Task.Run(() => ChoosePath(currentPos, targetPos));
+                        _pathThread.Start();
+                    }
                 }
                 // I'm currently following a path
                 else
                 {
+                    // print($"Find Path took {_lastPathThreadDuration}s");
                     var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                     var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
                     var dir = (Vector2)new Vector2XZ(transform.position - to);
@@ -225,7 +244,7 @@ namespace Prefabs.Player.AI
                         _indexAcc = 0;
 
                         // End of the current path
-                        if (_currentPathIndex >= _currentPath.Count)
+                        if (_currentPathIndex >= _currentPath.Count - 1)
                             _currentPath = null;
                         // Jump if there's a stair
                         else if (_currentPath[_currentPathIndex].y > _currentPath[_currentPathIndex - 1].y)
@@ -248,7 +267,7 @@ namespace Prefabs.Player.AI
 
                             // Too much time on current point, retry...
                             _indexAcc += LogicStep;
-                            if (_indexAcc > 3 && _currentPathIndex > 1)
+                            if (_indexAcc > 2 && _currentPathIndex > 1)
                             {
                                 _currentPathIndex--;
                                 _indexAcc = 0;

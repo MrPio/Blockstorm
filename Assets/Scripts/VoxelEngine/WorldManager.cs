@@ -47,6 +47,9 @@ namespace VoxelEngine
         /// <param name="value"> A value normalized in [0, 1]. </param>
         public void SetRenderDistance(float value)
         {
+            // Due to bots moves, the host needs to render the full map
+            if (NetworkManager.Singleton.IsHost)
+                value = 1;
             viewDistance = (int)math.lerp(32f, 256f, value);
             if (HasRendered)
                 UpdatePlayerPos(_playerLastPos, force: true);

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
+using NUnit.Framework;
 using UnityEngine;
 using VoxelEngine;
 
 namespace Utils
 {
-    
     /// <summary>
     /// Implementation of A* algorithm using a PriorityQueue,
     /// where the priority of each node is given by the Euclidean distance heuristics.
@@ -54,7 +54,7 @@ namespace Utils
 
         private static Point3D[] _directions, _diagonalDirections;
 
-        private bool[,,] _isBlock;
+        private byte[,,] _blocks;
         private readonly Map _map;
 
         public AStarPathfinder(Map map)
@@ -69,11 +69,12 @@ namespace Utils
         /// </summary>
         public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
         {
-            _isBlock = _map.NavMap;
+            _blocks = (byte[,,])_map.Blocks.Clone();
+
             // Randomize the direction choice
             _directions = BaseDirections.ToList().Shuffle().ToArray();
             _diagonalDirections = BaseDiagonalDirections.ToList().Shuffle().ToArray();
-            
+
             Point3D startP = start;
             Point3D goalP = goal;
             var openSet = new PriorityQueue<Point3D, int>();
@@ -88,7 +89,12 @@ namespace Utils
                 var current = openSet.Dequeue();
                 if (current == goalP)
                 {
-                    Debug.Log($"Got a path in {steps} steps!");
+                    var path = ReconstructPath(cameFrom, current);
+                    List<Vector3Int> pathBuffer = new();
+                    foreach (var point in path)
+                        pathBuffer.Add(point);
+                    return new List<Vector3Int>(pathBuffer); // Allocate only once
+                    // ERA QUESTO IL FOTTUTO COLPEVOLE DEL LAG SUL MAIN THREAD!! LINQ CAUSAVA PESANTE LAVORO DI GARBAGE COLLECTOR!
                     return ReconstructPath(cameFrom, current).Select(point3D => (Vector3Int)point3D).ToList();
                 }
 
@@ -132,7 +138,7 @@ namespace Utils
             var ground = new Point3D(p.X, (short)(p.Y - 1), p.Z);
 
             // Check if I'm grounded, otherwise keep falling
-            if (!_isBlock[ground.Y, ground.X, ground.Z])
+            if (InBounds(ground) && !VoxelData.BlockTypes[_blocks[ground.Y, ground.X, ground.Z]].isSolid)
                 yield return ground;
             else
             {
@@ -140,14 +146,15 @@ namespace Utils
                 foreach (var d in _directions)
                 {
                     var np = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), (short)(p.Z + d.Z));
-                    if (IsValid(np))
+                    if (IsValidPos(np))
                         yield return np;
 
                     // Jump up by 1 block, but only if there's a step to jump on.
                     var jump = new Point3D(np.X, (short)(np.Y + 1), np.Z);
-                    if (IsValid(jump) && _isBlock[jump.Y - 1, jump.X, jump.Z])
+                    if (IsValidPos(jump) && VoxelData.BlockTypes[_blocks[jump.Y - 1, jump.X, jump.Z]].isSolid)
                         yield return jump;
                 }
+
                 // XZ diagonal moves
                 foreach (var d in _diagonalDirections)
                 {
@@ -160,27 +167,28 @@ namespace Utils
                     var np = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), (short)(p.Z + d.Z));
                     var np1 = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), p.Z);
                     var np2 = new Point3D(p.X, (short)(p.Y + d.Y), (short)(p.Z + d.Z));
-                    if (IsValid(np) && IsValid(np1) && IsValid(np2))
+                    if (IsValidPos(np) && IsValidPos(np1) && IsValidPos(np2))
                         yield return np;
                 }
 
                 // Fall down by 1 block.
                 var fall = new Point3D(p.X, (short)(p.Y + 1), p.Z);
-                if (IsValid(fall)) yield return fall;
+                if (IsValidPos(fall)) yield return fall;
             }
         }
 
         // Checks if the player can occupy the given position.
-        private bool IsValid(Point3D pos)
+        private bool IsValidPos(Point3D pos)
         {
             var above = new Point3D(pos.X, (short)(pos.Y + 1), pos.Z);
             return InBounds(pos) && InBounds(above) &&
-                   !_isBlock[pos.Y, pos.X, pos.Z] && !_isBlock[above.Y, above.X, above.Z];
+                   !VoxelData.BlockTypes[_blocks[pos.Y, pos.X, pos.Z]].isSolid &&
+                   !VoxelData.BlockTypes[_blocks[above.Y, above.X, above.Z]].isSolid;
         }
 
         private bool InBounds(Point3D pos) =>
-            pos.Y >= 0 && pos.Y < _isBlock.GetLength(0) &&
-            pos.X >= 0 && pos.X < _isBlock.GetLength(1) &&
-            pos.Z >= 0 && pos.Z < _isBlock.GetLength(2);
+            pos.Y >= 0 && pos.Y < _blocks.GetLength(0) &&
+            pos.X >= 0 && pos.X < _blocks.GetLength(1) &&
+            pos.Z >= 0 && pos.Z < _blocks.GetLength(2);
     }
 }

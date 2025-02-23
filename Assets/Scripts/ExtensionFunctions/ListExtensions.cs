@@ -2,27 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace ExtensionFunctions
 {
     public static class ListExtensions
     {
+        private static readonly System.Random _random = new();
         public static T RandomItem<T>(this List<T> list) =>
             list[new System.Random().Next(0, list.Count)];
 
         public static List<T> Shuffle<T>(this List<T> list)
         {
-            var random = new System.Random();
             var n = list.Count;
             while (n > 1)
             {
-                var randomIndex = random.Next(0, --n + 1);
-                (list[randomIndex], list[n]) = (list[n], list[randomIndex]);
+                var k = _random.Next(n--);
+                (list[n], list[k]) = (list[k], list[n]);
             }
-
-            return list;
-        }
+            return list;        }
 
         public static void ForEach<T>(this List<T> list, Action<T, int> action)
         {

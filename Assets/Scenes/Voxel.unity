@@ -7303,6 +7303,7 @@ MonoBehaviour:
   storageManager: {fileID: 1145990819}
   botManager: {fileID: 1887548119}
   audioMixer: {fileID: 24100000, guid: d82e523b67e0b9b45ac2ac5b5739b55e, type: 2}
+  myPlayer: {fileID: 0}
 --- !u!4 &1804926417
 Transform:
   m_ObjectHideFlags: 0
@@ -10560,6 +10561,18 @@ PrefabInstance:
     - target: {fileID: 2413519995432767538, guid: d8ca82aaedbd6cd46814335a79682d27, type: 3}
       propertyPath: m_Name
       value: +1Container
+      objectReference: {fileID: 0}
+    - target: {fileID: 2523857317996705503, guid: d8ca82aaedbd6cd46814335a79682d27, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5783737662074142455, guid: d8ca82aaedbd6cd46814335a79682d27, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 33
+      objectReference: {fileID: 0}
+    - target: {fileID: 5783737662074142455, guid: d8ca82aaedbd6cd46814335a79682d27, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 33
       objectReference: {fileID: 0}
     - target: {fileID: 8646411739057399427, guid: d8ca82aaedbd6cd46814335a79682d27, type: 3}
       propertyPath: m_text

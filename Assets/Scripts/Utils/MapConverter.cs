@@ -329,7 +329,7 @@ namespace Utils
             foreach (var point in _instantiatedPathPoints)
                 Destroy(point);
             _instantiatedPathPoints.Clear();
-            var path = _wm.Map.Pathfinder.FindPath(Vector3Int.FloorToInt(from.position),
+            var path = new AStarPathfinder(_wm.Map).FindPath(Vector3Int.FloorToInt(from.position),
                 Vector3Int.FloorToInt(to.position));
             foreach (var point in path)
             {
