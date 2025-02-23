@@ -827,8 +827,8 @@ namespace Prefabs.Player
             weapon.Magazine.Clear();
             weapon.LeftAmmo.Clear();
             weapon.WeaponModel = null;
-            
-            if(IsBot.Value) _botAI.SwitchState(AIState.Patrolling);
+
+            if (IsBot.Value) _botAI.SwitchState(AIState.Patrolling);
 
             if (newTeam is not null || playerStats is not null)
                 LoadStatus();

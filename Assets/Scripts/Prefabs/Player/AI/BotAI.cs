@@ -135,7 +135,7 @@ namespace Prefabs.Player.AI
 
                     dest.y = 0;
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
-                
+
                 // TODO this
                 // dest = new(_sm.worldManager.Map.size.x / 2, 0, _sm.worldManager.Map.size.x / 2);
 
@@ -172,7 +172,7 @@ namespace Prefabs.Player.AI
             if ((Time.frameCount + 1) % 150 == 0)
                 _currentPath = null;
             // Shoot
-            /*if (_state is AIState.Attacking)
+            if (_state is AIState.Attacking)
             {
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
@@ -188,7 +188,7 @@ namespace Prefabs.Player.AI
                     _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
                     _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
                 }
-            }*/
+            }
 
             // Ensure the walking algorithm is run every _logicStep
             _acc += Time.deltaTime;
@@ -464,21 +464,31 @@ namespace Prefabs.Player.AI
         public void SwitchState(AIState newState)
         {
             if (_state == newState) return;
-            if (newState is AIState.Dead)
-            {
-                // Reinitialize AI state
-                _currentPath = null;
-            }
-            else if (_state is AIState.Patrolling && newState is AIState.Attacking)
-            {
-                _currentPath = null;
-            }
-            else if (_state is AIState.Attacking && newState is AIState.Patrolling)
-            {
-                _currentPath = null;
-            }
+            var delay = 0f;
+            if (newState is AIState.Attacking)
+                delay = Random.Range(0.05f, 0.45f);
+            StartCoroutine(SwitchStateCoroutine());
+            return;
 
-            _state = newState;
+            IEnumerator SwitchStateCoroutine()
+            {
+                yield return new WaitForSeconds(delay);
+                if (newState is AIState.Dead)
+                {
+                    // Reinitialize AI state
+                    _currentPath = null;
+                }
+                else if (_state is AIState.Patrolling && newState is AIState.Attacking)
+                {
+                    _currentPath = null;
+                }
+                else if (_state is AIState.Attacking && newState is AIState.Patrolling)
+                {
+                    _currentPath = null;
+                }
+
+                _state = newState;
+            }
         }
 
         #endregion
