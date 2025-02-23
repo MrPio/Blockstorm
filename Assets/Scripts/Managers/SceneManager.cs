@@ -76,6 +76,7 @@ namespace Managers
         public BotManager botManager;
 
         [Header("Misc")] public AudioMixer audioMixer;
+        public Player myPlayer;
 
         private Team? _newTeam = null;
         [CanBeNull] private Dictionary<WeaponType, Weapon> _lastSelectedWeapons = null;
@@ -207,20 +208,20 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            var player = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value);
-            player.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
+            myPlayer = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value);
+            myPlayer.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
             if (selectedWeapons is not null || _lastSelectedWeapons is not null)
             {
                 selectedWeapons ??= _lastSelectedWeapons;
                 _lastSelectedWeapons = selectedWeapons;
-                var newStatus = player.Status.Value;
+                var newStatus = myPlayer.Status.Value;
                 newStatus.Melee = selectedWeapons[WeaponType.Melee];
                 newStatus.Primary = selectedWeapons[WeaponType.Primary];
                 newStatus.Secondary = selectedWeapons[WeaponType.Secondary];
                 newStatus.Tertiary = selectedWeapons[WeaponType.Tertiary];
                 newStatus.Grenade = selectedWeapons[WeaponType.Grenade];
                 newStatus.GrenadeSecondary = selectedWeapons[WeaponType.GrenadeSecondary];
-                player.Status.Value = newStatus;
+                myPlayer.Status.Value = newStatus;
 
                 // Initialize the BottomBar
                 bottomBar.Initialize(newStatus, WeaponType.Block);

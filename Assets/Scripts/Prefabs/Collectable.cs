@@ -89,7 +89,7 @@ namespace Prefabs
         private void OnTriggerEnter(Collider other)
         {
             var player = other.gameObject.GetComponentInParent<Player.Player>();
-            if (player is not null && player.IsOwner)
+            if (player is not null && player.IsOwner && !player.IsBot.Value)
             {
                 player.audioSource.PlayOneShot(lootAudioClip);
                 LootCollectable(player, Model);

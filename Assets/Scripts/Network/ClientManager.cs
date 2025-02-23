@@ -179,7 +179,7 @@ namespace Network
         public void DamagePropRpc(ushort id, uint damage, bool explode, ulong attackerID)
         {
             if (_sm.worldManager.SpawnedProps[id]
-                    .Hit(damage, explode, attackerID == NetworkManager.Singleton.LocalClientId) && IsHost)
+                    .Hit(damage, explode, attackerID == _sm.myPlayer.NetworkObjectId) && IsHost)
                 brokenProps.Value = brokenProps.Value.Concat(new[] { id }).ToList();
         }
     }

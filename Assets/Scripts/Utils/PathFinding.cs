@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExtensionFunctions;
 using UnityEngine;
+using VoxelEngine;
 
 namespace Utils
 {
@@ -53,11 +54,12 @@ namespace Utils
 
         private static Point3D[] _directions, _diagonalDirections;
 
-        private readonly bool[,,] _isBlock;
+        private bool[,,] _isBlock;
+        private readonly Map _map;
 
-        public AStarPathfinder(bool[,,] isBlock)
+        public AStarPathfinder(Map map)
         {
-            this._isBlock = isBlock;
+            this._map = map;
         }
 
         /// <summary>
@@ -67,6 +69,7 @@ namespace Utils
         /// </summary>
         public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
         {
+            _isBlock = _map.NavMap;
             // Randomize the direction choice
             _directions = BaseDirections.ToList().Shuffle().ToArray();
             _diagonalDirections = BaseDiagonalDirections.ToList().Shuffle().ToArray();

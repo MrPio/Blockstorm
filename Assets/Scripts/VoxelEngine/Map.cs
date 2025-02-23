@@ -54,7 +54,7 @@ namespace VoxelEngine
                 Blocks[block.y, block.x, block.z] = block.type;
             BlocksHealth = new Dictionary<Vector3Int, uint>();
             BlocksEdits = new Dictionary<Vector3Int, byte>();
-            Pathfinder = new AStarPathfinder(NavMap);
+            Pathfinder = new AStarPathfinder(this);
             return this;
         }
 

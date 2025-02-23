@@ -679,7 +679,8 @@ namespace Prefabs.Player
                 attacker._botAI.SwitchState(AIState.Patrolling);
 
             // Show kill HUD
-            if (_sm.networkManager.LocalClientId == attackerID &&
+            // TODO here
+            if (NetworkObjectId == attackerID &&
                 !((attackerID != NetworkObjectId && attacker.Team == Team) || invincible.Value))
                 _sm.killPlusOne.Activate(Team, NetworkObjectId == attackerID, isKill: newStatus.IsDead);
 

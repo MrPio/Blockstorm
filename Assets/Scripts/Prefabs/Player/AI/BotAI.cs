@@ -63,6 +63,12 @@ namespace Prefabs.Player.AI
             { AIState.Attacking, 0.25f },
         };
 
+        private readonly Dictionary<AIState, float> _grenadeProbability = new()
+        {
+            { AIState.Patrolling, 0.002f },
+            { AIState.Attacking, 0.01f },
+        };
+
         #endregion
 
         #region private
@@ -75,7 +81,7 @@ namespace Prefabs.Player.AI
         private List<Vector3Int> _currentPath;
         private int _currentPathIndex, _fireCount;
         private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc, _fireAcc;
-        private float _baseSpeed,_magazine;
+        private float _baseSpeed, _magazine;
         private Model.Weapon _weaponModel;
 
         #endregion
@@ -170,7 +176,7 @@ namespace Prefabs.Player.AI
                     _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
                 }
             }
-            
+
             // Ensure the walking algorithm is run every _logicStep
             _acc += Time.deltaTime;
             if (_acc < LogicStep)
@@ -267,6 +273,10 @@ namespace Prefabs.Player.AI
                         if (Random.value < _jumpProbability[_state])
                             _player.InputInterface.IsJumpDown = true;
 
+                        // Random grenade
+                        if (Random.value < _grenadeProbability[_state])
+                            ThrowGrenade(Random.Range(0.25f, 0.5f), Random.value < 0.4f);
+
                         // Check prop to destroy
                         _patrollingPropCheckAcc += LogicStep;
                         if (_patrollingPropCheckAcc > _propCheckStep[_state])
@@ -284,6 +294,9 @@ namespace Prefabs.Player.AI
                                 }
                             }
                         }
+
+                        // Check placed blocks to destroy
+                        // TODO
                     }
                 }
             }
@@ -400,6 +413,26 @@ namespace Prefabs.Player.AI
             }
         }
 
+        public void ThrowGrenade(float force, bool isSecondary = false)
+        {
+            var status = _player.Status.Value;
+            var grenadeModel = isSecondary ? status.GrenadeSecondary : status.Grenade;
+            _sm.ServerManager.SpawnExplosiveServerRpc(
+                grenadeModel!.Name.ToUpper(),
+                transform.position + transform.forward * 1f + Vector3.down * 0.2f,
+                VectorExtensions.RandomVector3(-180, 180f),
+                transform.forward + Vector3.up * Random.Range(-0.2f, 0.65f),
+                grenadeModel!.Damage,
+                grenadeModel!.ExplosionTime!.Value,
+                grenadeModel!.ExplosionRange!.Value,
+                grenadeModel!.GroundDamageFactor!.Value,
+                _player.NetworkObjectId,
+                force
+            );
+        }
+
+        #region public methods
+
         public void SwitchEquipped(WeaponType weaponType)
         {
             _fireCount = 0;
@@ -428,5 +461,7 @@ namespace Prefabs.Player.AI
 
             _state = newState;
         }
+
+        #endregion
     }
 }

@@ -51,8 +51,6 @@ namespace Network
         [ServerRpc(RequireOwnership = false)]
         public void LootCollectableServerRpc(NetVector3 id)
         {
-            print(id);
-            _sm.worldManager.SpawnedCollectables.Print();
             var newId = _sm.worldManager.FreeCollectablesSpawnPoints.RandomItem();
             _sm.worldManager.FreeCollectablesSpawnPoints.Add(id);
             var looted = _sm.worldManager.SpawnedCollectables.First(it => Vector3.Distance(it.Model.ID ,id)<0.5f);
