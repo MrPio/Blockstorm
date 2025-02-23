@@ -28,6 +28,7 @@ namespace Prefabs
         [SerializeField] private AudioClip lootAudioClip;
 
         public Model.Collectable Model;
+        private bool _collected;
 
         public void Initialize(Model.Collectable collectable)
         {
@@ -88,9 +89,11 @@ namespace Prefabs
 
         private void OnTriggerEnter(Collider other)
         {
+            if (_collected) return;
             var player = other.gameObject.GetComponentInParent<Player.Player>();
             if (player is not null && player.IsOwner && !player.IsBot.Value)
             {
+                _collected = true;
                 player.audioSource.PlayOneShot(lootAudioClip);
                 LootCollectable(player, Model);
 

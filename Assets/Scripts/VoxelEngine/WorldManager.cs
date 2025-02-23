@@ -351,9 +351,9 @@ namespace VoxelEngine
             FreeCollectablesSpawnPoints = transforms.Select(it => (NetVector3)it.position).ToList();
 
             // Spawn random collectable prefabs at some of these spawn points
-            foreach (var collectablesSpawnPoint in
-                     transforms.RandomSublist((int)(transforms.Count / 1.9)).ToList())
-                SpawnCollectableWithID(collectablesSpawnPoint.position);
+            foreach (var sp in
+                     transforms.RandomSublist((int)(transforms.Count / 1.1))) //TODO 1.9
+                SpawnCollectableWithID(sp.position);
         }
 
         /// <summary>
