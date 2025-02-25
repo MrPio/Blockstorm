@@ -70,6 +70,7 @@ namespace Prefabs.Player
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public GameObject circleDamage;
+        [SerializeField] public GameObject bulletPrefab;
         [SerializeField] private GameObject helmetPrefab;
 
         [Header("AudioClips")] [SerializeField]
@@ -622,12 +623,23 @@ namespace Prefabs.Player
 
         // Spawn the muzzle billboard texture on the weapon mouth
         [Rpc(SendTo.Everyone)]
-        public void SpawnWeaponEffectRpc()
+        public void SpawnWeaponEffectRpc(NetVector3 shootDir, float bulletSpeed)
         {
             var mouth = WeaponPrefab.transform.Find("mouth");
             if (mouth)
-                Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation)
-                    .Apply(o => o.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default"));
+            {
+                // Muzzle
+                var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
+                muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
+
+                // Bullet (only for enemies and bots)
+                if (!IsOwner || IsBot.Value)
+                {
+                    var bulletGo = Instantiate(bulletPrefab, mouth.position + mouth.forward * 1f,
+                        Quaternion.identity);
+                    bulletGo.GetComponent<Rigidbody>().linearVelocity = shootDir.ToVector3 * bulletSpeed;
+                }
+            }
         }
 
         [Rpc(SendTo.Everyone)]
@@ -737,7 +749,7 @@ namespace Prefabs.Player
                     if (IsBot.Value)
                     {
                         yield return new WaitForSeconds(1f);
-                        Spawn();
+                        Spawn(isBot: true);
                     }
                     else
                         _sm.InitializeTeamSelection(isFirstSpawn: false);
@@ -797,7 +809,8 @@ namespace Prefabs.Player
         /// The owner, non bot, spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
         /// </summary>
-        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, PlayerStatus? playerStatus = null, bool onlyReposition = false,
+        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, PlayerStatus? playerStatus = null,
+            bool onlyReposition = false,
             bool isBot = false)
         {
             characterController.enabled = false;
@@ -825,7 +838,7 @@ namespace Prefabs.Player
                 Color.cyan);
             active.Value = true;
             invincible.Value = true;
-            
+
             RagdollRpc(0, "", new NetVector3(), true);
             weapon.Magazine.Clear();
             weapon.LeftAmmo.Clear();

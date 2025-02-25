@@ -1440,6 +1440,7 @@ MonoBehaviour:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
   - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
   circleDamage: {fileID: 6303431667206910316, guid: 95b857bfeb59ff24a85579362964d179, type: 3}
+  bulletPrefab: {fileID: 2639992304619941134, guid: 2624975d26ada844fbcbcea0fc678cbe, type: 3}
   helmetPrefab: {fileID: 6964466103270957878, guid: dcf5003cd48a2684e8283206a8265a48, type: 3}
   walkGeneric: {fileID: 8300000, guid: 3aea53a00842f054b97458d787ceb267, type: 3}
   hit: {fileID: 8300000, guid: 663c2b059e2b8f14d89feba2c9240d4e, type: 3}
@@ -1763,6 +1764,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a300d33ff5594ceb9aa3a33318da0c60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponDistance2MaxAngleImprecision:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.5
+      value: 1
+      inSlope: -3.3672931
+      outSlope: -3.3672931
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.03498869
+    - serializedVersion: 3
+      time: 1.2
+      value: 0.025
+      inSlope: -0.31019145
+      outSlope: -0.31019145
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.050790135
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   rotationYSmoothness: 4
 --- !u!1 &4233275833591035670
 GameObject:

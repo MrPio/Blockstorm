@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Model
 {
@@ -87,12 +88,12 @@ namespace Model
             new Weapon(name: "barrett", damage: 180, rof: 4, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
                 scope: "scope5", audio: "BARRETT"),
-            
+
             // 1_400
             new Weapon(name: "barrett", damage: 140, rof: 11, distance: 170, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5.25f, ammo: 20, magazine: 7, reloadTime: 475, variant: "ICE",
                 scope: "scope5", audio: "BARRETT"),
-            
+
             // 1_200
             new Weapon(name: "barrett", damage: 400, rof: 3, distance: 250, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 6.5f, ammo: 10, magazine: 3, reloadTime: 600, variant: "NUCLEAR",
@@ -232,6 +233,8 @@ namespace Model
 
         public string GetNetName => $"{Name}:{Variant ?? ""}";
         public string GetThumbnail => $"Textures/weapons/thumbnail/{Name.ToUpper()}";
+
+        public float BulletSpeed => Mathf.Lerp(100, 300, Distance / 200f);
 
         // Return the upgraded variant of the current weapon, if any
         [CanBeNull]

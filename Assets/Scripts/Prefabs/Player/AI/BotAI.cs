@@ -32,7 +32,7 @@ namespace Prefabs.Player.AI
     {
         #region constants
 
-        private const bool DebugMode = true;
+        private const bool DebugMode = false;
         private const float LogicStep = 1f / 15; // 15 FPS
 
         // Patrolling
@@ -76,10 +76,11 @@ namespace Prefabs.Player.AI
 
         #region serializable
 
+        [SerializeField] private AnimationCurve weaponDistance2MaxAngleImprecision;
         [SerializeField] private float rotationYSmoothness;
 
         #endregion
-        
+
         #region private
 
         [NonSerialized] public Transform Target = null;
@@ -321,6 +322,7 @@ namespace Prefabs.Player.AI
                     }
                 }
             }
+
             // Set y rotation along the direction with smoothness
             _player.transform.rotation = Quaternion.Slerp(
                 _player.transform.rotation,
@@ -337,13 +339,13 @@ namespace Prefabs.Player.AI
             _player.LastShotWeapon.Value = "";
             _player.LastShotWeapon.Value = _weaponModel.GetNetName;
 
-            // Spawn the weapon effect
-            if (_weaponModel.IsGun && !_weaponModel.HasScope)
-                _player.SpawnWeaponEffectRpc();
 
             // Cast a ray to check for collisions
-            var cameraTransform = transform;
-            var ray = new Ray(cameraTransform.position + cameraTransform.forward * 0.5f, cameraTransform.forward);
+            var maxAngle = weaponDistance2MaxAngleImprecision.Evaluate(_weaponModel.Distance / 100f);
+            var randomImprecision =
+                Quaternion.Euler(Random.Range(-maxAngle, maxAngle), Random.Range(-maxAngle, maxAngle), 0);
+            var bulletDir = randomImprecision * transform.forward;
+            var ray = new Ray(transform.position + transform.forward * 0.5f, bulletDir);
 
             // Checks if there was a hit on a prop
             var hasHitHostPlayer =
@@ -382,9 +384,12 @@ namespace Prefabs.Player.AI
                          attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
                     {
                         // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(damage, hostPlayerHit.transform.gameObject.name,
-                            new NetVector3(cameraTransform.forward),
-                            _player.NetworkObjectId);
+                        attackedPlayer.DamageClientRpc(
+                            damage: damage,
+                            bodyPart: hostPlayerHit.transform.gameObject.name,
+                            direction: new NetVector3(bulletDir),
+                            attackerID: _player.NetworkObjectId
+                        );
                     }
                 }
             }
@@ -410,9 +415,12 @@ namespace Prefabs.Player.AI
                          attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
                     {
                         // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(damage, enemyHit.transform.gameObject.name,
-                            new NetVector3(cameraTransform.forward),
-                            _player.NetworkObjectId);
+                        attackedPlayer.DamageClientRpc(
+                            damage: damage,
+                            bodyPart: hostPlayerHit.transform.gameObject.name,
+                            direction: new NetVector3(bulletDir),
+                            attackerID: _player.NetworkObjectId
+                        );
                     }
                 }
             }
@@ -422,7 +430,7 @@ namespace Prefabs.Player.AI
                 groundHit.distance < (hasHitProp ? propHit.distance : 9999f))
             {
                 // Check if the hit block is solid
-                var pos = Vector3Int.FloorToInt(groundHit.point + cameraTransform.forward * 0.05f);
+                var pos = Vector3Int.FloorToInt(groundHit.point + transform.forward * 0.05f);
                 var block = _sm.worldManager.GetVoxel(pos);
                 if (block is not { isSolid: true }) return;
 
@@ -438,6 +446,10 @@ namespace Prefabs.Player.AI
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
                     _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, _player.NetworkObjectId);
             }
+            
+            // Spawn the weapon effect
+            if (_weaponModel.IsGun && !_weaponModel.HasScope)
+                _player.SpawnWeaponEffectRpc(bulletDir,_weaponModel.BulletSpeed);
         }
 
         public void ThrowGrenade(float force, bool isSecondary = false)
@@ -475,7 +487,7 @@ namespace Prefabs.Player.AI
             if (_state == newState) return;
             var delay = 0f;
             if (newState is AIState.Attacking)
-                delay = Random.Range(0.05f, 0.45f);
+                delay = Random.Range(0.05f, 0.35f);
             StartCoroutine(SwitchStateCoroutine());
             return;
 

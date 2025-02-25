@@ -159,7 +159,7 @@ namespace Prefabs.Player
 
             // Spawn the weapon effect
             if (_weaponModel.IsGun && !_weaponModel.HasScope)
-                player.SpawnWeaponEffectRpc();
+                player.SpawnWeaponEffectRpc(cameraMovement.transform.forward,_weaponModel.BulletSpeed);
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {
@@ -233,7 +233,8 @@ namespace Prefabs.Player
                 enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
             {
                 var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
-                if (attackedPlayer.NetworkObjectId != player.NetworkObjectId)
+                
+                if (attackedPlayer is not null && attackedPlayer.NetworkObjectId != player.NetworkObjectId)
                 {
                     var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
                     var distance = Vector3.Distance(player.transform.position, enemyHit.collider.transform.position);
