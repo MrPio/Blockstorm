@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ExtensionFunctions;
+using JetBrains.Annotations;
 using Managers;
 using Model;
 using Network;
@@ -25,6 +26,7 @@ namespace Prefabs.Player.AI
     {
         Dead,
         Patrolling,
+        Searching,
         Attacking
     }
 
@@ -39,37 +41,43 @@ namespace Prefabs.Player.AI
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
         {
             { AIState.Patrolling, new Vector2(15, 65) },
-            { AIState.Attacking, new Vector2(5, 40) },
+            { AIState.Attacking, new Vector2(5, 30) },
+            { AIState.Searching, new Vector2(1, 10) },
         };
 
         private readonly Dictionary<AIState, Vector2> _speedFactorRange = new()
         {
-            { AIState.Patrolling, new Vector2(0.5f, 1f) },
-            { AIState.Attacking, new Vector2(0.9f, 1.3f) },
+            { AIState.Patrolling, new Vector2(0.5f, 0.85f) },
+            { AIState.Attacking, new Vector2(0.9f, 1.2f) },
+            { AIState.Searching, new Vector2(1.15f, 1.45f) },
         };
 
         private readonly Dictionary<AIState, float> _speedChangeStep = new()
         {
             { AIState.Patrolling, 5 },
             { AIState.Attacking, 4 },
+            { AIState.Searching, 4 },
         };
 
         private readonly Dictionary<AIState, float> _propCheckStep = new()
         {
             { AIState.Patrolling, 15 },
             { AIState.Attacking, 7 },
+            { AIState.Searching, 6 },
         };
 
         private readonly Dictionary<AIState, float> _jumpProbability = new()
         {
             { AIState.Patrolling, 0.05f },
             { AIState.Attacking, 0.25f },
+            { AIState.Searching, 0.1f },
         };
 
         private readonly Dictionary<AIState, float> _grenadeProbability = new()
         {
             { AIState.Patrolling, 0.001f },
             { AIState.Attacking, 0.0075f },
+            { AIState.Searching, 0.0025f },
         };
 
         #endregion
@@ -77,28 +85,45 @@ namespace Prefabs.Player.AI
         #region serializable
 
         [SerializeField] private AnimationCurve weaponDistance2MaxAngleImprecision;
-        [SerializeField] private float rotationYSmoothness;
+
+        [SerializeField] private float rotationYSmoothness,
+            sphereRange = 5f,
+            coneRange = 50f,
+            coneAngle = 45f,
+            searchingStateTimeout = 15f,
+            searchForPlayersStep = 0.5f;
 
         #endregion
 
         #region private
 
-        [NonSerialized] public Transform Target = null;
         private SceneManager _sm;
         private Player _player;
+        private Transform _target = null;
+        private Vector3Int? _lastKnownEnemyPosition;
         private AIState _state = AIState.Dead;
-        private Vector3 _lastKnownEnemyPosition;
         private List<Vector3Int> _currentPath;
         private bool _isSearchingPath;
         private Thread _pathThread;
         private float _lastPathThreadDuration;
         private int _currentPathIndex, _fireCount;
-        private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc, _fireAcc;
+        private Coroutine _switchStateCoroutine;
+
+        private float _acc,
+            _speedChangeAcc,
+            _patrollingPropCheckAcc,
+            _indexAcc,
+            _fireAcc,
+            _searchForPlayersAcc,
+            _searchingStart;
+
         private float _baseSpeed, _magazine;
         private Vector2 _lookDir;
         private Model.Weapon _weaponModel;
 
         #endregion
+
+        #region events
 
         private void Awake()
         {
@@ -138,7 +163,8 @@ namespace Prefabs.Player.AI
             if (_acc > LogicStep)
             {
                 _acc = 0;
-                if (_state is AIState.Patrolling or AIState.Attacking)
+                // Walk logic
+                if (_state is AIState.Patrolling or AIState.Attacking or AIState.Searching)
                 {
                     // I've got no path to follow
                     if (_currentPath == null || _currentPath.Count < 3)
@@ -146,7 +172,7 @@ namespace Prefabs.Player.AI
                         if (_pathThread is not { IsAlive: true })
                         {
                             var currentPos = transform.position;
-                            var targetPos = Target?.position ?? Vector3.zero;
+                            var targetPos = _target?.position ?? _lastKnownEnemyPosition ?? Vector3.zero;
                             _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
                             // await Task.Run(() => ChoosePath(currentPos, targetPos));
                             _pathThread.Start();
@@ -169,15 +195,19 @@ namespace Prefabs.Player.AI
                         var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                         var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
                         var dir = (Vector2)new Vector2XZ(transform.position - to);
-                        _lookDir = _state is AIState.Patrolling
-                            ? dir // look forward
-                            : (Vector2)new Vector2XZ(transform.position - Target.position); // look at the target
+                        _lookDir = _state switch
+                        {
+                            AIState.Attacking => (Vector2)new Vector2XZ(transform.position - _target.position),
+                            AIState.Searching => (Vector2)new Vector2XZ(transform.position -
+                                                                        _lastKnownEnemyPosition!.Value),
+                            _ => dir
+                        };
                         var dist = dir.magnitude;
 
                         // Set x head rotation
                         if (_state is AIState.Attacking)
                         {
-                            var fullLookDir = Target.position - transform.position;
+                            var fullLookDir = _target.position - transform.position;
                             var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
                             deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
                             _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
@@ -265,6 +295,27 @@ namespace Prefabs.Player.AI
                         }
                     }
                 }
+
+                // Search state timeout
+                if (_state is AIState.Searching && Time.time - _searchingStart > searchingStateTimeout)
+                    SwitchState(AIState.Patrolling);
+
+                // Search for players
+                if (_state is AIState.Patrolling or AIState.Searching)
+                {
+                    _searchForPlayersAcc += LogicStep;
+
+                    if (_searchForPlayersAcc > searchForPlayersStep)
+                    {
+                        _searchForPlayersAcc = 0;
+                        var enemy = CheckForVisiblePlayers();
+                        if (enemy is not null && enemy.Team != _player.Team)
+                        {
+                            Alert(enemy.transform, hasSeenIt: true);
+                            Debug.Log($"{gameObject.name} has seen {enemy.gameObject.name}!");
+                        }
+                    }
+                }
             }
 
             // Set y rotation along the direction with smoothness
@@ -275,7 +326,10 @@ namespace Prefabs.Player.AI
             );
         }
 
-        
+        #endregion
+
+        # region private methods
+
         /// <summary>
         /// Choose a random path to follow
         /// </summary>
@@ -300,11 +354,11 @@ namespace Prefabs.Player.AI
                     if (_state is AIState.Patrolling)
                         dest = Vector3Int.FloorToInt(currentPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[AIState.Patrolling].RandomRange());
-                    else if (_state is AIState.Attacking)
+                                                     _movingRange[_state].RandomRange());
+                    else if (_state is AIState.Attacking or AIState.Searching)
                         dest = Vector3Int.FloorToInt(targetPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[AIState.Patrolling].RandomRange());
+                                                     _movingRange[_state].RandomRange());
 
                     dest.y = 0;
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
@@ -345,7 +399,7 @@ namespace Prefabs.Player.AI
             var maxAngle = weaponDistance2MaxAngleImprecision.Evaluate(_weaponModel.Distance / 100f);
             var randomImprecision =
                 Quaternion.Euler(Random.Range(-maxAngle, maxAngle), Random.Range(-maxAngle, maxAngle), 0);
-            var shootDir = (Target.position + Vector3.up * 0.2f - transform.position).normalized;
+            var shootDir = (_target.position + Vector3.up * 0.2f - transform.position).normalized;
             var bulletDir = randomImprecision * shootDir;
 
             // Spawn the weapon effect
@@ -462,13 +516,16 @@ namespace Prefabs.Player.AI
             }
         }
 
-        public void ThrowGrenade(float force, bool isSecondary = false)
+        private void ThrowGrenade(float force, bool isSecondary = false)
         {
             var status = _player.Status.Value;
             var grenadeModel = isSecondary ? status.GrenadeSecondary : status.Grenade;
-            var throwDir = _state is AIState.Attacking
-                ? (Target.position - transform.position).normalized
-                : transform.forward;
+            var throwDir = _state switch
+            {
+                AIState.Attacking => (_target.position - transform.position).normalized,
+                AIState.Searching => (_lastKnownEnemyPosition!.Value - transform.position).normalized,
+                _ => transform.forward
+            };
             _sm.ServerManager.SpawnExplosiveServerRpc(
                 grenadeModel!.Name.ToUpper(),
                 transform.position + transform.forward * 1f + Vector3.down * 0.2f,
@@ -482,6 +539,30 @@ namespace Prefabs.Player.AI
                 force
             );
         }
+
+
+        /// <summary>
+        /// Check if any player falls within the visual cone, Regardless of any condition like Team.
+        /// </summary>
+        /// <returns>One visible player, if any</returns>
+        [CanBeNull]
+        private Player CheckForVisiblePlayers()
+        {
+            foreach (var player in FindObjectsByType<Player>(FindObjectsSortMode.None)
+                         .Where(player => player != _player).ToList().Shuffle())
+            {
+                var directionToPlayer = player.transform.position - transform.position;
+                var distance = directionToPlayer.magnitude;
+                var angle = Vector3.Angle(transform.forward, directionToPlayer.normalized);
+                // Check sphere + cone
+                if (distance < sphereRange || (distance < coneRange && angle <= coneAngle))
+                    return player;
+            }
+
+            return null;
+        }
+
+        #endregion
 
         #region public methods
 
@@ -497,31 +578,57 @@ namespace Prefabs.Player.AI
 
         public void SwitchState(AIState newState)
         {
-            if (_state == newState) return;
+            if (_state == newState || _switchStateCoroutine is not null) return;
             var delay = 0f;
             if (newState is AIState.Attacking)
-                delay = Random.Range(0.05f, 0.275f);
-            StartCoroutine(SwitchStateCoroutine());
+                delay = Random.Range(0.025f, 0.2f);
+            if (newState is AIState.Searching)
+            {
+                delay = Random.Range(0.025f, 0.1f);
+            }
+
+            _switchStateCoroutine = StartCoroutine(SwitchStateCoroutine());
             return;
 
             IEnumerator SwitchStateCoroutine()
             {
                 yield return new WaitForSeconds(delay);
-                if (newState is AIState.Dead)
-                {
-                    // Reinitialize AI state
-                    _currentPath = null;
-                }
-                else if (_state is AIState.Patrolling && newState is AIState.Attacking)
-                {
-                    _currentPath = null;
-                }
-                else if (_state is AIState.Attacking && newState is AIState.Patrolling)
-                {
-                    _currentPath = null;
-                }
+                // Reinitialize AI state
+                _currentPath = null;
+
+                if (newState is AIState.Searching)
+                    _searchingStart = Time.time;
+
+                // Reset any target
+                if (newState is not AIState.Searching)
+                    _lastKnownEnemyPosition = null;
+                if (newState is not AIState.Attacking)
+                    _target = null;
 
                 _state = newState;
+                _switchStateCoroutine = null;
+            }
+        }
+
+        public void Alert(Transform playerToAttack, bool hasSeenIt)
+        {
+            if (_state is AIState.Attacking)
+            {
+                if (playerToAttack == _target)
+                    return;
+                if (Random.Range(0f, 1f) < 0.75f)
+                    return;
+            }
+
+            if (hasSeenIt)
+            {
+                _target = playerToAttack;
+                SwitchState(AIState.Attacking);
+            }
+            else
+            {
+                _lastKnownEnemyPosition = Vector3Int.FloorToInt(playerToAttack.position + Vector3.down * 0.5f);
+                SwitchState(AIState.Searching);
             }
         }
 

@@ -139,7 +139,7 @@ namespace UI
 
             if (actionType is ActionType.SelectTeam)
             {
-                if (FindObjectsOfType<Player>().Select(it => it.Team == team).Count() < LobbyManager.MaxPlayers / 4)
+                if (FindObjectsByType<Player>(FindObjectsSortMode.None).Select(it => it.Team == team).Count() < LobbyManager.MaxPlayers / 4)
                     _sm.InitializeInventory(team);
             }
 

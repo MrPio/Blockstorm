@@ -208,7 +208,7 @@ namespace Managers
             crosshair.gameObject.SetActive(true);
             menuCamera.gameObject.SetActive(false);
             lobbyMenuUIContainer.SetActive(false);
-            myPlayer = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value);
+            myPlayer = FindObjectsByType<Player>(FindObjectsSortMode.None).First(it => it.IsOwner && !it.IsBot.Value);
             myPlayer.Spawn(_newTeam, resetStats ? new PlayerStats(username: lobbyManager.Username ?? "Debug") : null);
             if (selectedWeapons is not null || _lastSelectedWeapons is not null)
             {

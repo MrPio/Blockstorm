@@ -98,7 +98,7 @@ namespace UI
             {
                 // Wait for the next frame to ensure that the garbage collector has destroyed the last game objects
                 yield return null;
-                var players = FindObjectsOfType<Player>();
+                var players = FindObjectsByType<Player>(FindObjectsSortMode.None);
                 foreach (var player in players)
                 {
                     if (player.Team is Team.None) continue;

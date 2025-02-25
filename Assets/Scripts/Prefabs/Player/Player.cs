@@ -139,7 +139,8 @@ namespace Prefabs.Player
             }
 
             // Add the player to the mipmap
-            var myPlayer = FindObjectsOfType<Player>().First(it => it.IsOwner && !it.IsBot.Value);
+            var myPlayer = FindObjectsByType<Player>(FindObjectsSortMode.None)
+                .First(it => it.IsOwner && !it.IsBot.Value);
             if (Team is not Team.None && (IsOwner || myPlayer.Team is Team.None || Team == myPlayer.Team))
                 _sm.mipmap.AddPlayerMarker(Team, transform);
 
@@ -435,7 +436,7 @@ namespace Prefabs.Player
 
             // Debug: Kill everyone except myself when pressing the L key
             // if (_inputInterface.GetKeyDown(KeyCode.L))
-            //     foreach (var enemy in FindObjectsOfType<Player>().Where(it => !it.IsOwner))
+            //     foreach (var enemy in FindObjectsByType<Player>(FindObjectsSortMode.None).Where(it => !it.IsOwner))
             //         enemy.DamageClientRpc(999, "chest",
             //             new NetVector3(Vector3.up), OwnerClientId);
 
@@ -689,7 +690,8 @@ namespace Prefabs.Player
             if (IsHost && newStatus.IsDead)
                 FindFirstObjectByType<ScoreCube>().insidePlayers.Remove(this);
 
-            var attacker = FindObjectsOfType<Player>().First(it => it.NetworkObjectId == attackerID);
+            var attacker = FindObjectsByType<Player>(FindObjectsSortMode.None)
+                .First(it => it.NetworkObjectId == attackerID);
 
             // If the attacker is a bot and this is a kill, set its state to patrolling
             if (IsHost && newStatus.IsDead && attacker.IsBot.Value)
@@ -716,7 +718,7 @@ namespace Prefabs.Player
             // If it's a bot, alert it
             if (IsBot.Value && attackerID != NetworkObjectId)
             {
-                botAI.Target = attacker.transform;
+                botAI.Alert(attacker.transform, hasSeenIt: false);
                 botAI.SwitchState(AIState.Attacking);
             }
 

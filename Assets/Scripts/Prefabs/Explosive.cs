@@ -75,7 +75,7 @@ namespace Prefabs
                 _sm.ClientManager.EditVoxelClientRpc(destroyedVoxels.Select(it => (Vector3)it).ToArray(), 0);
 
                 // Check if any player was hit
-                foreach (var player in FindObjectsOfType<Player.Player>())
+                foreach (var player in FindObjectsByType<Player.Player>(FindObjectsSortMode.None))
                 {
                     // Skip if the player is dead or inactive or allied with the attacker
                     if (!player.active.Value || player.Status.Value.IsDead || !(
@@ -141,7 +141,7 @@ namespace Prefabs
                 rb.linearVelocity = transform.forward * speed;
 
             _sm = FindFirstObjectByType<SceneManager>();
-            attackerPlayer = FindObjectsOfType<Player.Player>().First(it => it.NetworkObjectId == attackerId);
+            attackerPlayer = FindObjectsByType<Player.Player>(FindObjectsSortMode.None).First(it => it.NetworkObjectId == attackerId);
 
             if (IsHost && !isMissile)
                 InvokeRepeating(nameof(Explode), ExplosionTime - delayFactor * Delay, 9999);
