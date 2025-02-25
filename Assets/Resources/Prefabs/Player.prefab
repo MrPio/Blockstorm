@@ -1771,12 +1771,12 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0.5
       value: 8
-      inSlope: -22.61606
-      outSlope: -22.61606
+      inSlope: -28.159971
+      outSlope: -28.159971
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.042325087
+      outWeight: 0.03103835
     - serializedVersion: 3
       time: 1.2
       value: 0.025
@@ -1793,10 +1793,12 @@ MonoBehaviour:
   sphereRange: 5
   coneRange: 85
   coneAngle: 50
-  searchingStateTimeout: 15
+  searchStateTimeout: 15
+  attackStateTimeout: 2
   searchForPlayersStep: 1
   secondaryMaxDistance: 15
   meleeMaxDistance: 14
+  missile: {fileID: 8027923701763292337, guid: 1d70b30b2f4e60c45ac95c0d667f125b, type: 3}
 --- !u!1 &4233275833591035670
 GameObject:
   m_ObjectHideFlags: 0

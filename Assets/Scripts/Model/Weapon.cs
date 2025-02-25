@@ -121,7 +121,7 @@ namespace Model
 
         public static readonly List<Weapon> Tertiaries = new()
         {
-            new Weapon(name: "shmel", damage: 240, rof: 10, zoom: 2.75f, explosionRange: 1.75f,
+            new Weapon(name: "shmel", damage: 240, rof: 35, zoom: 2.75f, explosionRange: 1.75f,
                 type: WeaponType.Tertiary, ammo: 0,
                 reloadTime: 200, magazine: 1, scope: "scope7", fireAnimation: "gun"),
             new Weapon(name: "shmel", damage: 210, rof: 50, zoom: 3.15f, explosionRange: 1.5f,

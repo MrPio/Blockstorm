@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using EasyButtons;
 using ExtensionFunctions;
 using Model;
@@ -38,7 +39,7 @@ namespace Managers
             status.Melee = Weapon.Melees.RandomItem();
             status.Primary = Weapon.Primaries.RandomItem();
             status.Secondary = Weapon.Secondaries.RandomItem();
-            status.Tertiary = Weapon.Tertiaries.RandomItem();
+            status.Tertiary = Weapon.Tertiaries.Where(it=>it.Name!="tact").ToList().RandomItem();
             status.Grenade = Weapon.Grenades.RandomItem();
             status.GrenadeSecondary = Weapon.GrenadesSecondary.RandomItem();
 

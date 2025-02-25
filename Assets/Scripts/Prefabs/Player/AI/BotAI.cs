@@ -16,6 +16,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Serialization;
 using Utils;
 using VoxelEngine;
 using Random = UnityEngine.Random;
@@ -35,7 +36,7 @@ namespace Prefabs.Player.AI
         #region constants
 
         private const bool DebugMode = false;
-        private const float LogicStep = 1f / 10; // 10 FPS
+        private const float LogicStep = 1f / 6; // 6 FPS
 
         // Patrolling
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
@@ -48,7 +49,7 @@ namespace Prefabs.Player.AI
         private readonly Dictionary<AIState, Vector2> _speedFactorRange = new()
         {
             { AIState.Patrolling, new Vector2(0.5f, 0.85f) },
-            { AIState.Attacking, new Vector2(0.9f, 1.2f) },
+            { AIState.Attacking, new Vector2(0.9f, 1.1f) },
             { AIState.Searching, new Vector2(1.15f, 1.45f) },
         };
 
@@ -80,6 +81,13 @@ namespace Prefabs.Player.AI
             { AIState.Searching, 0.0025f },
         };
 
+        private readonly Dictionary<AIState, float> _tertiaryProbability = new()
+        {
+            { AIState.Patrolling, 0f },
+            { AIState.Attacking, 0.015f },
+            { AIState.Searching, 0.0025f },
+        };
+
         #endregion
 
         #region serializable
@@ -88,12 +96,15 @@ namespace Prefabs.Player.AI
 
         [SerializeField] private float rotationYSmoothness,
             sphereRange = 5f,
-            coneRange = 85f,
+            coneRange = 70f,
             coneAngle = 50f,
-            searchingStateTimeout = 15f,
+            searchStateTimeout = 15f,
+            attackStateTimeout = 10f,
             searchForPlayersStep = 1f,
             secondaryMaxDistance = 15f,
-            meleeMaxDistance = 7f;
+            meleeMaxDistance = 5f;
+
+        [SerializeField] private GameObject missile;
 
         #endregion
 
@@ -107,7 +118,7 @@ namespace Prefabs.Player.AI
         private List<Vector3Int> _currentPath;
         private bool _isSearchingPath;
         private Thread _pathThread;
-        private float _lastPathThreadDuration;
+        private float _lastPathThreadDuration, _lastTargetHit;
         private int _currentPathIndex, _lostPathPointsCount, _fireCount;
         private Coroutine _switchStateCoroutine;
 
@@ -147,6 +158,8 @@ namespace Prefabs.Player.AI
                 if (_fireAcc > _weaponModel.Delay)
                 {
                     Fire();
+                    if (_weaponModel.Type is WeaponType.Tertiary)
+                        AutoChooseWeapon();
                     _fireAcc = 0;
                 }
 
@@ -219,14 +232,14 @@ namespace Prefabs.Player.AI
                         // Set x head rotation
                         if (State is AIState.Attacking)
                         {
-                            var fullLookDir = Target.position - transform.position;
+                            var fullLookDir = Target!.position - transform.position;
                             var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
                             deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
                             _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
                         }
 
                         // End of the current dir
-                        if (dist < 0.75)
+                        if (dist < 0.85)
                         {
                             _currentPathIndex++;
                             _indexAcc = 0;
@@ -260,7 +273,7 @@ namespace Prefabs.Player.AI
                                     _currentPathIndex--;
                                     _lostPathPointsCount++;
                                     _indexAcc = 0;
-                                    
+
                                     // If map has changed I may be stuck
                                     if (_lostPathPointsCount >= 3)
                                         _currentPath = null;
@@ -289,6 +302,12 @@ namespace Prefabs.Player.AI
                             if (Random.value < _grenadeProbability[State])
                                 ThrowGrenade(Random.Range(0.25f, 0.5f), Random.value < 0.4f);
 
+                            // Random bazooka
+                            if (Random.value < _tertiaryProbability[State] && (Target is null ||
+                                                                               Vector3.Distance(transform.position,
+                                                                                   Target.position) > 8f))
+                                SwitchEquipped(WeaponType.Tertiary);
+
                             // Check prop to destroy
                             _patrollingPropCheckAcc += LogicStep;
                             if (_patrollingPropCheckAcc > _propCheckStep[State])
@@ -314,8 +333,16 @@ namespace Prefabs.Player.AI
                 }
 
                 // Search state timeout
-                if (State is AIState.Searching && Time.time - _searchingStart > searchingStateTimeout)
+                if (State is AIState.Searching && Time.time - _searchingStart > searchStateTimeout)
                     SwitchState(AIState.Patrolling);
+
+                // Attack state timeout
+                if (State is AIState.Attacking && Time.time - _lastTargetHit > attackStateTimeout)
+                {
+                    _lastTargetHit = Time.time;
+                    _lastKnownEnemyPosition = Vector3Int.FloorToInt(Target.position + Vector3.down * 0.5f);
+                    SwitchState(AIState.Searching);
+                }
 
                 // Search for players
                 if (State is AIState.Patrolling or AIState.Searching)
@@ -343,7 +370,8 @@ namespace Prefabs.Player.AI
             );
 
             // Change weapon
-            if (State is AIState.Attacking && Time.frameCount % 200 == 0)
+            if (State is AIState.Attacking && _weaponModel.Type is not WeaponType.Tertiary &&
+                Time.frameCount % (_weaponModel.Type is WeaponType.Melee ? 15 : 100) == 0)
                 AutoChooseWeapon();
         }
 
@@ -428,10 +456,57 @@ namespace Prefabs.Player.AI
             var bulletDir = randomImprecision * shootDir;
 
             // Spawn the weapon effect
-            if (_weaponModel.IsGun)
+            if (_weaponModel.IsGun && _weaponModel.Type is not WeaponType.Tertiary)
                 _player.SpawnWeaponEffectRpc(bulletDir, _weaponModel.BulletSpeed);
 
-            var ray = new Ray(transform.position + shootDir * 0.5f, bulletDir);
+            if (_weaponModel.Type is WeaponType.Tertiary)
+            {
+                if (_weaponModel.Name.ToUpper() == "TACT")
+                {
+                    StartCoroutine(SpawnTACTMissiles());
+
+                    IEnumerator SpawnTACTMissiles()
+                    {
+                        var centre = Target.position;
+                        var model = _weaponModel!;
+                        for (var i = 0; i < 8f / model.Delay; i++)
+                        {
+                            var range = _sm.highlightArea.Range / 2;
+                            _sm.ServerManager.SpawnExplosiveServerRpc(
+                                missile.name,
+                                centre + new Vector3(Random.Range(-range, range), 0, Random.Range(-range, range)) +
+                                Vector3.up * 60,
+                                new NetVector3(90, 0, 0),
+                                Vector3.down,
+                                model.Damage,
+                                model.ExplosionTime!.Value,
+                                model.ExplosionRange!.Value,
+                                model.GroundDamageFactor!.Value,
+                                _player.NetworkObjectId
+                            );
+                            yield return new WaitForSeconds(model.Delay);
+                        }
+                    }
+                }
+                else
+                {
+                    _sm.ServerManager.SpawnExplosiveServerRpc(
+                        missile.name,
+                        transform.position + Vector3.up * 0.3f + transform.forward * 0.5f,
+                        transform.rotation.eulerAngles,
+                        (transform.forward + Vector3.up * 0.8f).normalized,
+                        _weaponModel.Damage,
+                        _weaponModel.ExplosionTime!.Value,
+                        _weaponModel.ExplosionRange!.Value,
+                        _weaponModel!.GroundDamageFactor!.Value,
+                        _player.NetworkObjectId
+                    );
+                }
+
+                return;
+            }
+
+            var ray = new Ray(transform.position + Vector3.up * 0.2f + shootDir * 0.5f, bulletDir);
 
             // Checks if there was a hit on a prop
             var hasHitHostPlayer =
@@ -476,6 +551,7 @@ namespace Prefabs.Player.AI
                             direction: new NetVector3(bulletDir),
                             attackerID: _player.NetworkObjectId
                         );
+                        _lastTargetHit = Time.time;
                     }
                 }
             }
@@ -510,6 +586,7 @@ namespace Prefabs.Player.AI
                                 direction: new NetVector3(bulletDir),
                                 attackerID: _player.NetworkObjectId
                             );
+                            _lastTargetHit = Time.time;
                         }
                     }
                 }
@@ -566,7 +643,6 @@ namespace Prefabs.Player.AI
         {
             if (State is not AIState.Attacking) return;
             var distanceToTarget = Vector3.Distance(transform.position, Target.transform.position);
-            print(distanceToTarget);
             if (distanceToTarget < meleeMaxDistance)
             {
                 if (_weaponModel.Type is not WeaponType.Melee)
@@ -600,7 +676,18 @@ namespace Prefabs.Player.AI
                 var angle = Vector3.Angle(transform.forward, directionToPlayer.normalized);
                 // Check sphere + cone
                 if (distance < sphereRange || (distance < coneRange && angle <= coneAngle))
-                    return player;
+                {
+                    var ray = new Ray(transform.position + directionToPlayer * 0.5f, directionToPlayer);
+                    var hasHitHostPlayer =
+                        Physics.Raycast(ray, out var hostPlayerHit, distance + 1,
+                            1 << LayerMask.NameToLayer("Self")) &&
+                        hostPlayerHit.collider is not null;
+                    var hasHitEnemy =
+                        Physics.Raycast(ray, out var enemyHit, distance + 1, 1 << LayerMask.NameToLayer("Enemy")) &&
+                        enemyHit.collider is not null;
+                    if (hasHitHostPlayer || hasHitEnemy)
+                        return player;
+                }
             }
 
             return null;
@@ -621,6 +708,9 @@ namespace Prefabs.Player.AI
             else if (weaponType is WeaponType.Melee)
                 _magazine = 7;
 
+            // Wait for switch Equip animation to finish
+            _fireAcc = -0.8f;
+
             // Play switch sound
             if (!silent)
             {
@@ -631,7 +721,7 @@ namespace Prefabs.Player.AI
 
         public void SwitchState(AIState newState)
         {
-            Debug.LogWarning($"{gameObject.name} - SwitchState() to {newState}....");
+            _sm.logger.Log($"{gameObject.name} - SwitchState() to {newState}....");
             if (State == newState)
                 return;
             if (_switchStateCoroutine != null)
@@ -667,8 +757,16 @@ namespace Prefabs.Player.AI
                 if (newState is not AIState.Attacking)
                     Target = null;
 
+                // Equip primary
+                if (newState is AIState.Patrolling && _weaponModel is not null &&
+                    _weaponModel.Type is not WeaponType.Primary)
+                    SwitchEquipped(WeaponType.Primary);
+
+                // Reset Attack timeout
+                if (newState is AIState.Attacking)
+                    _lastTargetHit = Time.time;
+
                 State = newState;
-                Debug.LogWarning($"{gameObject.name} - SwitchState() ---> {newState}");
                 _switchStateCoroutine = null;
             }
         }
