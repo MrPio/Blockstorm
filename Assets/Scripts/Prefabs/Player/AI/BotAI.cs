@@ -35,7 +35,7 @@ namespace Prefabs.Player.AI
         #region constants
 
         private const bool DebugMode = false;
-        private const float LogicStep = 1f / 15; // 15 FPS
+        private const float LogicStep = 1f / 10; // 10 FPS
 
         // Patrolling
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
@@ -88,25 +88,27 @@ namespace Prefabs.Player.AI
 
         [SerializeField] private float rotationYSmoothness,
             sphereRange = 5f,
-            coneRange = 50f,
-            coneAngle = 45f,
+            coneRange = 85f,
+            coneAngle = 50f,
             searchingStateTimeout = 15f,
-            searchForPlayersStep = 0.5f;
+            searchForPlayersStep = 1f,
+            secondaryMaxDistance = 15f,
+            meleeMaxDistance = 7f;
 
         #endregion
 
-        #region private
+        #region non serializable
 
+        [NonSerialized] public AIState State = AIState.Dead;
         private SceneManager _sm;
         private Player _player;
-        private Transform _target = null;
+        [NonSerialized] public Transform Target;
         private Vector3Int? _lastKnownEnemyPosition;
-        private AIState _state = AIState.Dead;
         private List<Vector3Int> _currentPath;
         private bool _isSearchingPath;
         private Thread _pathThread;
         private float _lastPathThreadDuration;
-        private int _currentPathIndex, _fireCount;
+        private int _currentPathIndex, _lostPathPointsCount, _fireCount;
         private Coroutine _switchStateCoroutine;
 
         private float _acc,
@@ -139,12 +141,12 @@ namespace Prefabs.Player.AI
         private void FixedUpdate()
         {
             // Shoot ========================================================
-            if (_state is AIState.Attacking)
+            if (State is AIState.Attacking)
             {
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
                 {
-                    StartCoroutine(Fire());
+                    Fire();
                     _fireAcc = 0;
                 }
 
@@ -152,8 +154,16 @@ namespace Prefabs.Player.AI
                 if (_fireCount > math.max(1f, _magazine))
                 {
                     _fireCount = 0;
-                    _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
-                    _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 2f);
+                    if (_weaponModel.IsGun)
+                    {
+                        _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
+                        _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 2f);
+                    }
+                    else if (_weaponModel.Type is WeaponType.Melee)
+                    {
+                        _fireAcc = -Random.Range(0.25f, 1.25f);
+                        _magazine = Random.Range(1, 10);
+                    }
                 }
             }
 
@@ -164,7 +174,7 @@ namespace Prefabs.Player.AI
             {
                 _acc = 0;
                 // Walk logic
-                if (_state is AIState.Patrolling or AIState.Attacking or AIState.Searching)
+                if (State is AIState.Patrolling or AIState.Attacking or AIState.Searching)
                 {
                     // I've got no path to follow
                     if (_currentPath == null || _currentPath.Count < 3)
@@ -172,7 +182,7 @@ namespace Prefabs.Player.AI
                         if (_pathThread is not { IsAlive: true })
                         {
                             var currentPos = transform.position;
-                            var targetPos = _target?.position ?? _lastKnownEnemyPosition ?? Vector3.zero;
+                            var targetPos = Target?.position ?? _lastKnownEnemyPosition ?? Vector3.zero;
                             _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
                             // await Task.Run(() => ChoosePath(currentPos, targetPos));
                             _pathThread.Start();
@@ -195,9 +205,11 @@ namespace Prefabs.Player.AI
                         var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                         var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
                         var dir = (Vector2)new Vector2XZ(transform.position - to);
-                        _lookDir = _state switch
+                        if (State is AIState.Attacking && Target is null)
+                            Debug.LogError($"{gameObject.name} - Target is null");
+                        _lookDir = State switch
                         {
-                            AIState.Attacking => (Vector2)new Vector2XZ(transform.position - _target.position),
+                            AIState.Attacking => (Vector2)new Vector2XZ(transform.position - Target.position),
                             AIState.Searching => (Vector2)new Vector2XZ(transform.position -
                                                                         _lastKnownEnemyPosition!.Value),
                             _ => dir
@@ -205,9 +217,9 @@ namespace Prefabs.Player.AI
                         var dist = dir.magnitude;
 
                         // Set x head rotation
-                        if (_state is AIState.Attacking)
+                        if (State is AIState.Attacking)
                         {
-                            var fullLookDir = _target.position - transform.position;
+                            var fullLookDir = Target.position - transform.position;
                             var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
                             deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
                             _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
@@ -246,7 +258,12 @@ namespace Prefabs.Player.AI
                                 if (_indexAcc > 2 && _currentPathIndex > 1)
                                 {
                                     _currentPathIndex--;
+                                    _lostPathPointsCount++;
                                     _indexAcc = 0;
+                                    
+                                    // If map has changed I may be stuck
+                                    if (_lostPathPointsCount >= 3)
+                                        _currentPath = null;
                                 }
                             }
                             else
@@ -258,23 +275,23 @@ namespace Prefabs.Player.AI
 
                             // Change walking speed
                             _speedChangeAcc += LogicStep;
-                            if (_speedChangeAcc > _speedChangeStep[_state])
+                            if (_speedChangeAcc > _speedChangeStep[State])
                             {
                                 _speedChangeAcc = 0;
-                                _player.speed = _baseSpeed * _speedFactorRange[_state].RandomRange();
+                                _player.speed = _baseSpeed * _speedFactorRange[State].RandomRange();
                             }
 
                             // Random jump
-                            if (Random.value < _jumpProbability[_state])
+                            if (Random.value < _jumpProbability[State])
                                 _player.InputInterface.IsJumpDown = true;
 
                             // Random grenade
-                            if (Random.value < _grenadeProbability[_state])
+                            if (Random.value < _grenadeProbability[State])
                                 ThrowGrenade(Random.Range(0.25f, 0.5f), Random.value < 0.4f);
 
                             // Check prop to destroy
                             _patrollingPropCheckAcc += LogicStep;
-                            if (_patrollingPropCheckAcc > _propCheckStep[_state])
+                            if (_patrollingPropCheckAcc > _propCheckStep[State])
                             {
                                 _patrollingPropCheckAcc = 0;
                                 foreach (var prop in _sm.worldManager.SpawnedProps)
@@ -297,11 +314,11 @@ namespace Prefabs.Player.AI
                 }
 
                 // Search state timeout
-                if (_state is AIState.Searching && Time.time - _searchingStart > searchingStateTimeout)
+                if (State is AIState.Searching && Time.time - _searchingStart > searchingStateTimeout)
                     SwitchState(AIState.Patrolling);
 
                 // Search for players
-                if (_state is AIState.Patrolling or AIState.Searching)
+                if (State is AIState.Patrolling or AIState.Searching)
                 {
                     _searchForPlayersAcc += LogicStep;
 
@@ -321,9 +338,13 @@ namespace Prefabs.Player.AI
             // Set y rotation along the direction with smoothness
             _player.transform.rotation = Quaternion.Slerp(
                 _player.transform.rotation,
-                Quaternion.LookRotation(new Vector3(-_lookDir.x, 0, -_lookDir.y)),
+                Quaternion.LookRotation(new Vector3(-_lookDir.x + 0.001f, 0, -_lookDir.y)),
                 1f / (1f + rotationYSmoothness)
             );
+
+            // Change weapon
+            if (State is AIState.Attacking && Time.frameCount % 200 == 0)
+                AutoChooseWeapon();
         }
 
         #endregion
@@ -351,14 +372,15 @@ namespace Prefabs.Player.AI
 
                 do
                 {
-                    if (_state is AIState.Patrolling)
+                    var isUsingMelee = State is AIState.Attacking && _weaponModel.Type is WeaponType.Melee;
+                    if (State is AIState.Patrolling)
                         dest = Vector3Int.FloorToInt(currentPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[_state].RandomRange());
-                    else if (_state is AIState.Attacking or AIState.Searching)
+                                                     _movingRange[State].RandomRange());
+                    else if (State is AIState.Attacking or AIState.Searching)
                         dest = Vector3Int.FloorToInt(targetPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[_state].RandomRange());
+                                                     (isUsingMelee ? 3f : _movingRange[State].RandomRange()));
 
                     dest.y = 0;
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
@@ -380,13 +402,16 @@ namespace Prefabs.Player.AI
             path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
                 Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
             if (path != null)
+            {
+                _lostPathPointsCount = 0;
                 _currentPathIndex = 1;
+            }
 
             _currentPath = path;
             _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
         }
 
-        private IEnumerator Fire()
+        private void Fire()
         {
             _fireCount++;
 
@@ -399,15 +424,12 @@ namespace Prefabs.Player.AI
             var maxAngle = weaponDistance2MaxAngleImprecision.Evaluate(_weaponModel.Distance / 100f);
             var randomImprecision =
                 Quaternion.Euler(Random.Range(-maxAngle, maxAngle), Random.Range(-maxAngle, maxAngle), 0);
-            var shootDir = (_target.position + Vector3.up * 0.2f - transform.position).normalized;
+            var shootDir = (Target.position + Vector3.up * 0.2f - transform.position).normalized;
             var bulletDir = randomImprecision * shootDir;
 
             // Spawn the weapon effect
             if (_weaponModel.IsGun)
-            {
                 _player.SpawnWeaponEffectRpc(bulletDir, _weaponModel.BulletSpeed);
-                yield return new WaitForSeconds(0.05f);
-            }
 
             var ray = new Ray(transform.position + shootDir * 0.5f, bulletDir);
 
@@ -484,7 +506,7 @@ namespace Prefabs.Player.AI
                             // Send the damage to the enemy
                             attackedPlayer.DamageClientRpc(
                                 damage: damage,
-                                bodyPart: hostPlayerHit.transform.gameObject.name,
+                                bodyPart: enemyHit.transform.gameObject.name,
                                 direction: new NetVector3(bulletDir),
                                 attackerID: _player.NetworkObjectId
                             );
@@ -500,7 +522,7 @@ namespace Prefabs.Player.AI
                 // Check if the hit block is solid
                 var pos = Vector3Int.FloorToInt(groundHit.point + transform.forward * 0.05f);
                 var block = _sm.worldManager.GetVoxel(pos);
-                if (block is not { isSolid: true }) yield break;
+                if (block is not { isSolid: true }) return;
 
                 // Broadcast the damage action
                 _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
@@ -520,9 +542,9 @@ namespace Prefabs.Player.AI
         {
             var status = _player.Status.Value;
             var grenadeModel = isSecondary ? status.GrenadeSecondary : status.Grenade;
-            var throwDir = _state switch
+            var throwDir = State switch
             {
-                AIState.Attacking => (_target.position - transform.position).normalized,
+                AIState.Attacking => (Target.position - transform.position).normalized,
                 AIState.Searching => (_lastKnownEnemyPosition!.Value - transform.position).normalized,
                 _ => transform.forward
             };
@@ -540,6 +562,28 @@ namespace Prefabs.Player.AI
             );
         }
 
+        private void AutoChooseWeapon()
+        {
+            if (State is not AIState.Attacking) return;
+            var distanceToTarget = Vector3.Distance(transform.position, Target.transform.position);
+            print(distanceToTarget);
+            if (distanceToTarget < meleeMaxDistance)
+            {
+                if (_weaponModel.Type is not WeaponType.Melee)
+                    SwitchEquipped(WeaponType.Melee);
+            }
+            else if (distanceToTarget < secondaryMaxDistance)
+            {
+                if (_weaponModel.Type is not WeaponType.Secondary)
+                    SwitchEquipped(WeaponType.Secondary);
+            }
+            else
+            {
+                if (_weaponModel.Type is not WeaponType.Primary)
+                    SwitchEquipped(WeaponType.Primary);
+            }
+        }
+
 
         /// <summary>
         /// Check if any player falls within the visual cone, Regardless of any condition like Team.
@@ -549,7 +593,7 @@ namespace Prefabs.Player.AI
         private Player CheckForVisiblePlayers()
         {
             foreach (var player in FindObjectsByType<Player>(FindObjectsSortMode.None)
-                         .Where(player => player != _player).ToList().Shuffle())
+                         .Where(player => player != _player && !player.Status.Value.IsDead).ToList().Shuffle())
             {
                 var directionToPlayer = player.transform.position - transform.position;
                 var distance = directionToPlayer.magnitude;
@@ -566,26 +610,44 @@ namespace Prefabs.Player.AI
 
         #region public methods
 
-        public void SwitchEquipped(WeaponType weaponType)
+        public void SwitchEquipped(WeaponType weaponType, bool silent = false)
         {
             _fireCount = 0;
             var weapon = _player.Status.Value.WeaponType2Weapon(weaponType);
-            print($"------{weapon.GetNetName}");
             _player.EquippedWeapon.Value = $"{weapon!.Name}:{weapon!.Variant}";
             _weaponModel = weapon;
-            _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
+            if (weapon.IsGun)
+                _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
+            else if (weaponType is WeaponType.Melee)
+                _magazine = 7;
+
+            // Play switch sound
+            if (!silent)
+            {
+                _player.MiscSound.Value = 0;
+                _player.MiscSound.Value = (byte)_player.MiscClips.IndexOf(_player.switchEquippedClip);
+            }
         }
 
         public void SwitchState(AIState newState)
         {
-            if (_state == newState || _switchStateCoroutine is not null) return;
-            var delay = 0f;
-            if (newState is AIState.Attacking)
-                delay = Random.Range(0.025f, 0.2f);
-            if (newState is AIState.Searching)
+            Debug.LogWarning($"{gameObject.name} - SwitchState() to {newState}....");
+            if (State == newState)
+                return;
+            if (_switchStateCoroutine != null)
             {
-                delay = Random.Range(0.025f, 0.1f);
+                StopCoroutine(_switchStateCoroutine);
+                _switchStateCoroutine = null;
+                Debug.LogWarning(
+                    $"Requested SwitchState({newState}), but a coroutine is already pending, aborting the previous one");
             }
+
+            var delay = newState switch
+            {
+                AIState.Attacking => Random.Range(0.025f, 0.2f),
+                AIState.Searching => Random.Range(0.025f, 0.1f),
+                _ => 0
+            };
 
             _switchStateCoroutine = StartCoroutine(SwitchStateCoroutine());
             return;
@@ -603,26 +665,30 @@ namespace Prefabs.Player.AI
                 if (newState is not AIState.Searching)
                     _lastKnownEnemyPosition = null;
                 if (newState is not AIState.Attacking)
-                    _target = null;
+                    Target = null;
 
-                _state = newState;
+                State = newState;
+                Debug.LogWarning($"{gameObject.name} - SwitchState() ---> {newState}");
                 _switchStateCoroutine = null;
             }
         }
 
         public void Alert(Transform playerToAttack, bool hasSeenIt)
         {
-            if (_state is AIState.Attacking)
+            if (State is AIState.Attacking)
             {
-                if (playerToAttack == _target)
+                if (playerToAttack == Target)
                     return;
                 if (Random.Range(0f, 1f) < 0.75f)
                     return;
             }
 
+            Debug.LogWarning(
+                $"{gameObject.name} - has been alerted for {playerToAttack.gameObject.name}, hasSeenIt:{hasSeenIt}");
+
             if (hasSeenIt)
             {
-                _target = playerToAttack;
+                Target = playerToAttack;
                 SwitchState(AIState.Attacking);
             }
             else

@@ -25,9 +25,7 @@ namespace Prefabs.Player
     {
         private SceneManager _sm;
 
-        [Header("Components")] [SerializeField]
-        private AudioClip switchEquippedClip;
-
+        [Header("Components")] 
         [SerializeField] public AudioSource audioSource;
         [SerializeField] public Animator animator;
         [SerializeField] private CameraMovement cameraMovement;
@@ -159,7 +157,7 @@ namespace Prefabs.Player
 
             // Spawn the weapon effect
             if (_weaponModel.IsGun)
-                player.SpawnWeaponEffectRpc(cameraMovement.transform.forward,_weaponModel.BulletSpeed);
+                player.SpawnWeaponEffectRpc(cameraMovement.transform.forward, _weaponModel.BulletSpeed);
 
             if (_weaponModel.Type is WeaponType.Tertiary)
             {
@@ -233,7 +231,7 @@ namespace Prefabs.Player
                 enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
             {
                 var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
-                
+
                 if (attackedPlayer is not null && attackedPlayer.NetworkObjectId != player.NetworkObjectId)
                 {
                     var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
@@ -314,6 +312,15 @@ namespace Prefabs.Player
                 // Broadcast the damage action
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
                     _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, player.NetworkObjectId);
+            }
+
+            // Alert nearby bots
+            foreach (var bot in FindObjectsByType<Player>(FindObjectsSortMode.None)
+                         .Where(p => p.IsBot.Value && p.Team != player.Team))
+            {
+                var distance = (bot.transform.position - player.transform.position).magnitude;
+                if (distance < _weaponModel.SoundRange)
+                    bot.AlertBotRpc(player.NetworkObjectId);
             }
         }
 
@@ -417,7 +424,11 @@ namespace Prefabs.Player
 
             // Play sound and animation
             if (!silent)
-                audioSource.PlayOneShot(switchEquippedClip);
+            {
+                player.MiscSound.Value = 0;
+                player.MiscSound.Value = (byte)player.MiscClips.IndexOf(player.switchEquippedClip);
+            }
+                
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
 
             // Broadcast the new equipment

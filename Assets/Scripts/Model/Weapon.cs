@@ -41,7 +41,7 @@ namespace Model
 
         public static readonly List<Weapon> Blocks = new()
         {
-            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 5, type: WeaponType.Block,
+            new Weapon(name: "block", damage: 0, rof: (uint)(10f / PlaceDelay), distance: 4, type: WeaponType.Block,
                 fireAnimation: "shovel", magazine: 100),
         };
 
@@ -235,6 +235,7 @@ namespace Model
         public string GetThumbnail => $"Textures/weapons/thumbnail/{Name.ToUpper()}";
 
         public float BulletSpeed => Mathf.Lerp(75, 250, Distance / 200f);
+        public float SoundRange => Mathf.Lerp(15, 50, Damage / 100f);
 
         // Return the upgraded variant of the current weapon, if any
         [CanBeNull]

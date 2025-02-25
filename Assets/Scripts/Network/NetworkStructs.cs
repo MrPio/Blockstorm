@@ -145,7 +145,7 @@ namespace Network
             this.tertiaryName = tertiaryName ?? Weapon.Tertiaries[0].GetNetName;
             this.grenadeName = grenadeName ?? Weapon.Grenades[0].GetNetName;
             this.grenadeSecondaryName = grenadeSecondaryName ?? Weapon.GrenadesSecondary[0].GetNetName;
-            Hp = hp ?? 100;
+            Hp = hp ?? 200;
             Armor = armor ?? 50;
             HasHelmet = hasHelmet ?? true;
             LeftGrenades = leftGrenades ?? 2;

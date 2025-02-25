@@ -52,6 +52,7 @@ namespace Prefabs.Player
         [SerializeField] private CharacterController characterController;
         [SerializeField] private Transform groundCheck;
         [SerializeField] private Animator bodyAnimator;
+        [SerializeField] private Animator enemyWeaponContainerAnimator;
         [SerializeField] private Transform enemyWeaponContainer;
         [SerializeField] public Weapon weapon;
         [SerializeField] public AudioSource walkAudioSource;
@@ -79,6 +80,7 @@ namespace Prefabs.Player
         [SerializeField] private AudioClip hit;
         [SerializeField] private AudioClip deadHit;
         [SerializeField] private AudioClip helmetHit;
+        [SerializeField] public AudioClip switchEquippedClip;
 
         [SerializeField] public AudioClip walkMetal;
         [SerializeField] public AudioClip walkWater;
@@ -90,7 +92,10 @@ namespace Prefabs.Player
         [NonSerialized] public InputInterface InputInterface;
         [NonSerialized] public GameObject WeaponPrefab;
         private List<AudioClip> WalkClips => new() { null, walkGeneric, walkMetal, walkWater };
-        private List<AudioClip> MiscClips => new() { null, hit, helmetHit, deadHit, weapon.noAmmoClip };
+
+        public List<AudioClip> MiscClips => new()
+            { null, hit, helmetHit, deadHit, weapon.noAmmoClip, switchEquippedClip };
+
         private SceneManager _sm;
         private Transform _transform;
         private bool _isGrounded;
@@ -191,7 +196,7 @@ namespace Prefabs.Player
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to disable the enemy walking animation
-        private readonly NetworkVariable<long> lastShot = new(0,
+        private readonly NetworkVariable<long> _lastShot = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to play the weapon sound
@@ -199,11 +204,11 @@ namespace Prefabs.Player
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to play misc sounds, like hit, deadHit and helmet hit
-        public readonly NetworkVariable<byte> _miscSound = new(0,
+        public readonly NetworkVariable<byte> MiscSound = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to play the walk sound
-        public readonly NetworkVariable<byte> _walkSound = new(0,
+        private readonly NetworkVariable<byte> _walkSound = new(0,
             NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         // Used to animate the enemy's body tilt
@@ -260,7 +265,7 @@ namespace Prefabs.Player
             {
                 _isWalking.OnValueChanged += (_, newValue) =>
                 {
-                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastShot.Value < 400;
+                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - _lastShot.Value < 400;
                     bodyAnimator.SetTrigger(newValue && !isShooting
                         ? Animator.StringToHash("walk")
                         : Animator.StringToHash("idle"));
@@ -268,20 +273,20 @@ namespace Prefabs.Player
                 _isRunning.OnValueChanged += (_, newValue) =>
                 {
                     walkAudioSource.pitch = newValue ? runMultiplier : 1f;
-                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastShot.Value < 400;
+                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - _lastShot.Value < 400;
                     bodyAnimator.speed = (newValue && _isWalking.Value && !isShooting
                         ? runMultiplier
                         : 1f) * (_isCrouching.Value ? crouchMultiplier : 1f);
                 };
                 _isCrouching.OnValueChanged += (_, newValue) =>
                 {
-                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastShot.Value < 400;
+                    var isShooting = DateTimeOffset.Now.ToUnixTimeMilliseconds() - _lastShot.Value < 400;
                     bodyAnimator.speed = (newValue && _isWalking.Value && !isShooting
                         ? crouchMultiplier
                         : 1f) * (_isRunning.Value ? runMultiplier : 1f);
                     bodyAnimator.SetTrigger(Animator.StringToHash(newValue ? "crouch" : "no_crouch"));
                 };
-                lastShot.OnValueChanged += (_, _) =>
+                _lastShot.OnValueChanged += (_, _) =>
                 {
                     bodyAnimator.SetTrigger(Animator.StringToHash("idle"));
                     // _isPlayerWalking.Value = false;
@@ -289,30 +294,41 @@ namespace Prefabs.Player
                 LastShotWeapon.OnValueChanged += (_, newValue) =>
                 {
                     if (newValue.Message.Value.Length > 0)
-                        audioSource.PlayOneShot(
-                            Resources.Load<AudioClip>(Model.Weapon.Name2Weapon(newValue)!.GetAudioClip),
-                            0.8f);
+                    {
+                        var enemyWeapon = Model.Weapon.Name2Weapon(newValue)!;
+                        audioSource.PlayOneShot(Resources.Load<AudioClip>(enemyWeapon.GetAudioClip));
+                        enemyWeaponContainerAnimator.SetTrigger(
+                            Animator.StringToHash($"fire_{enemyWeapon.FireAnimation}"));
+                    }
                 };
                 EquippedWeapon.OnValueChanged += (_, newValue) =>
                 {
                     var weaponModel = Model.Weapon.Name2Weapon(newValue.Message.Value);
                     if (weaponModel is null)
                         return;
-                    foreach (Transform child in enemyWeaponContainer)
-                        Destroy(child.gameObject);
-                    var go = Resources.Load<GameObject>(weaponModel.GetPrefab(enemy: true));
-                    WeaponPrefab = Instantiate(go, enemyWeaponContainer).Apply(o =>
-                    {
-                        // o.AddComponent<WeaponSway>();
-                        if (weaponModel.Type is WeaponType.Block)
-                            o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
-                                $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType(Team).sideID + 1):D1}");
-                    });
+                    enemyWeaponContainerAnimator.SetTrigger(Animator.StringToHash("inventory_switch"));
+                    StartCoroutine(SwitchWeapon());
+                    return;
 
-                    // Load materials
-                    foreach (var mesh in WeaponPrefab.GetComponentsInChildren<MeshRenderer>(true))
-                        if (!mesh.gameObject.name.Contains("scope") && weaponModel.Variant is not null)
-                            mesh.material = Resources.Load<Material>(weaponModel.GetMaterial);
+                    IEnumerator SwitchWeapon()
+                    {
+                        yield return new WaitForSeconds(0.4f);
+                        foreach (Transform child in enemyWeaponContainer)
+                            Destroy(child.gameObject);
+                        var go = Resources.Load<GameObject>(weaponModel.GetPrefab(enemy: true));
+                        WeaponPrefab = Instantiate(go, enemyWeaponContainer).Apply(o =>
+                        {
+                            // o.AddComponent<WeaponSway>();
+                            if (weaponModel.Type is WeaponType.Block)
+                                o.GetComponent<MeshRenderer>().material = Resources.Load<Material>(
+                                    $"Textures/texturepacks/blockade/Materials/blockade_{(Status.Value.BlockType(Team).sideID + 1):D1}");
+                        });
+
+                        // Load materials
+                        foreach (var mesh in WeaponPrefab.GetComponentsInChildren<MeshRenderer>(true))
+                            if (!mesh.gameObject.name.Contains("scope") && weaponModel.Variant is not null)
+                                mesh.material = Resources.Load<Material>(weaponModel.GetMaterial);
+                    }
                 };
                 CameraRotationX.OnValueChanged += (_, newValue) =>
                 {
@@ -334,7 +350,7 @@ namespace Prefabs.Player
                     InvokeRepeating(nameof(UpdateChunks), 0, 1);
             }
 
-            _miscSound.OnValueChanged += (_, newValue) =>
+            MiscSound.OnValueChanged += (_, newValue) =>
             {
                 if (newValue != 0)
                     audioSource.PlayOneShot(MiscClips[newValue]);
@@ -576,8 +592,8 @@ namespace Prefabs.Player
                     weapon.Reload();
                 else
                 {
-                    _miscSound.Value = 0;
-                    _miscSound.Value = (byte)MiscClips.IndexOf(weapon.noAmmoClip);
+                    MiscSound.Value = 0;
+                    MiscSound.Value = (byte)MiscClips.IndexOf(weapon.noAmmoClip);
                 }
 
             // Handle sprint
@@ -658,8 +674,8 @@ namespace Prefabs.Player
             // Both owner and non-owner hear the hit sound effect
             if (bodyPart == "Head" && Status.Value.HasHelmet)
             {
-                _miscSound.Value = 0;
-                _miscSound.Value = (byte)MiscClips.IndexOf(helmetHit);
+                MiscSound.Value = 0;
+                MiscSound.Value = (byte)MiscClips.IndexOf(helmetHit);
 
                 // Handle helmet removal
                 var rb = Instantiate(helmetPrefab,
@@ -682,8 +698,8 @@ namespace Prefabs.Player
             }
             else
             {
-                _miscSound.Value = 0;
-                _miscSound.Value = (byte)MiscClips.IndexOf(newStatus.IsDead ? deadHit : hit);
+                MiscSound.Value = 0;
+                MiscSound.Value = (byte)MiscClips.IndexOf(newStatus.IsDead ? deadHit : hit);
             }
 
             // Stop adding points
@@ -693,17 +709,18 @@ namespace Prefabs.Player
             var attacker = FindObjectsByType<Player>(FindObjectsSortMode.None)
                 .First(it => it.NetworkObjectId == attackerID);
 
-            // If the attacker is a bot and this is a kill, set its state to patrolling
-            if (IsHost && newStatus.IsDead && attacker.IsBot.Value)
-                attacker.botAI.SwitchState(AIState.Patrolling);
+            // All the bots that had this player as target goto patrolling
+            if (IsHost && newStatus.IsDead)
+                foreach (var bot in FindObjectsByType<Player>(FindObjectsSortMode.None)
+                             .Where(p => p.IsBot.Value && p.botAI.Target == true))
+                    bot.botAI.SwitchState(AIState.Patrolling);
 
             // Show kill HUD
-            if (NetworkObjectId == attackerID || attacker.Team != Team)
+            if (_sm.myPlayer.NetworkObjectId == attackerID)
                 _sm.killPlusOne.Activate(Team, NetworkObjectId == attackerID, isKill: newStatus.IsDead);
-
-
-            if (!IsOwner) return;
+            
             // Owner only ========================================================================================
+            if (!IsOwner) return;
 
             // Check if the enemy is allied or invincible
             if ((attackerID != NetworkObjectId && attacker.Team == Team) || invincible.Value)
@@ -717,10 +734,7 @@ namespace Prefabs.Player
 
             // If it's a bot, alert it
             if (IsBot.Value && attackerID != NetworkObjectId)
-            {
                 botAI.Alert(attacker.transform, hasSeenIt: false);
-                botAI.SwitchState(AIState.Attacking);
-            }
 
             // Ragdoll
             if (newStatus.IsDead)
@@ -808,6 +822,21 @@ namespace Prefabs.Player
         [Rpc(SendTo.Owner)]
         private void UpdateStatServerRpc(PlayerStats playerStats) => Stats.Value = playerStats;
 
+        /// <summary>
+        /// Alerts the bot.
+        /// This Can be used when shooting, to account for noise
+        /// It is assumed that any logic condition, like the team belonging, is made by the caller.
+        /// </summary>
+        /// <param name="playerWhoAlerts">The player who made the noise.</param>
+        [Rpc(SendTo.Owner)]
+        public void AlertBotRpc(ulong playerWhoAlerts)
+        {
+            if (!IsHost) return;
+            var culprit = FindObjectsByType<Player>(FindObjectsSortMode.None)
+                .First(it => it.NetworkObjectId == playerWhoAlerts);
+            botAI.Alert(culprit.transform, hasSeenIt: false);
+        }
+
         #endregion
 
         /// <summary>
@@ -861,7 +890,7 @@ namespace Prefabs.Player
             {
                 yield return new WaitForSeconds(0.15f);
                 if (isBot)
-                    botAI.SwitchEquipped(Random.value < 0.5 ? WeaponType.Primary : WeaponType.Secondary);
+                    botAI.SwitchEquipped(Random.value < 0.5 ? WeaponType.Primary : WeaponType.Secondary, silent: true);
                 else
                     weapon.SwitchEquipped(WeaponType.Block);
             }

@@ -53,7 +53,7 @@ namespace Network
         {
             var newId = _sm.worldManager.FreeCollectablesSpawnPoints.RandomItem();
             _sm.worldManager.FreeCollectablesSpawnPoints.Add(id);
-            var looted = _sm.worldManager.SpawnedCollectables.First(it => Vector3.Distance(it.Model.ID ,id)<0.5f);
+            var looted = _sm.worldManager.SpawnedCollectables.First(it => Vector3.Distance(it.Model.ID ,id)<0.01f);
             _sm.worldManager.SpawnedCollectables.Remove(looted);
             Destroy(looted.gameObject);
 

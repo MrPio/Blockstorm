@@ -1095,7 +1095,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 842eb37f72e85ef4f9432ce02817a0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  switchEquippedClip: {fileID: 8300000, guid: 9fca18fae243d164fbf52acd39ac8348, type: 3}
   audioSource: {fileID: 7486929924204302242}
   animator: {fileID: 661212344934770656}
   cameraMovement: {fileID: 2753835092349440889}
@@ -1335,7 +1334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1893801084
+  GlobalObjectIdHash: 519613176
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1398,6 +1397,7 @@ MonoBehaviour:
   characterController: {fileID: 6541506331053138863}
   groundCheck: {fileID: 2809431145089976558}
   bodyAnimator: {fileID: 6789867817577817733}
+  enemyWeaponContainerAnimator: {fileID: 6789867817577817733}
   enemyWeaponContainer: {fileID: 9084864200341798743}
   weapon: {fileID: 7821993980020846379}
   walkAudioSource: {fileID: 7261302375098064695}
@@ -1446,6 +1446,7 @@ MonoBehaviour:
   hit: {fileID: 8300000, guid: 663c2b059e2b8f14d89feba2c9240d4e, type: 3}
   deadHit: {fileID: 8300000, guid: c07f210df131be342a1b716e714adfc5, type: 3}
   helmetHit: {fileID: 8300000, guid: 34615cec92e78cb419b16a7ccc1c35ef, type: 3}
+  switchEquippedClip: {fileID: 8300000, guid: 9fca18fae243d164fbf52acd39ac8348, type: 3}
   walkMetal: {fileID: 8300000, guid: ea899d7f59e75fb40804d8b45f2e63a8, type: 3}
   walkWater: {fileID: 8300000, guid: 2a0e06d5c7de54b4b9413eaaf7f435e3, type: 3}
   active:
@@ -1789,6 +1790,13 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   rotationYSmoothness: 4
+  sphereRange: 5
+  coneRange: 85
+  coneAngle: 50
+  searchingStateTimeout: 15
+  searchForPlayersStep: 1
+  secondaryMaxDistance: 15
+  meleeMaxDistance: 14
 --- !u!1 &4233275833591035670
 GameObject:
   m_ObjectHideFlags: 0
