@@ -30,20 +30,24 @@ namespace Managers
             _bots.Add(bot);
             var username = $"Bot{_bots.Count}";
             bot.gameObject.name = username;
+            bot.IsBot.Value = true; // Right now, this order is mandadory
+            bot.GetComponent<NetworkObject>().Spawn();
 
             // Load random Equipment
-            var newStatus = bot.Status.Value;
-            newStatus.Melee = Weapon.Melees.RandomItem();
-            newStatus.Primary = Weapon.Primaries.RandomItem();
-            newStatus.Secondary = Weapon.Secondaries.RandomItem();
-            newStatus.Tertiary = Weapon.Tertiaries.RandomItem();
-            newStatus.Grenade = Weapon.Grenades.RandomItem();
-            newStatus.GrenadeSecondary = Weapon.GrenadesSecondary.RandomItem();
-            bot.Status.Value = newStatus;
+            var status = bot.Status.Value;
+            status.Melee = Weapon.Melees.RandomItem();
+            status.Primary = Weapon.Primaries.RandomItem();
+            status.Secondary = Weapon.Secondaries.RandomItem();
+            status.Tertiary = Weapon.Tertiaries.RandomItem();
+            status.Grenade = Weapon.Grenades.RandomItem();
+            status.GrenadeSecondary = Weapon.GrenadesSecondary.RandomItem();
 
-            bot.IsBot.Value = true;
-            bot.GetComponent<NetworkObject>().Spawn();
-            bot.Spawn(team, new PlayerStats(username: username));
+            bot.Spawn(
+                newTeam: team,
+                playerStats: new PlayerStats(username: username),
+                playerStatus: status,
+                isBot: true
+            );
         }
     }
 }

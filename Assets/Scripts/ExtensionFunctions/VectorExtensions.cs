@@ -4,6 +4,8 @@ namespace ExtensionFunctions
 {
     public static class VectorExtensions
     {
+        private static readonly System.Random Random = new();
+
         public static Quaternion ToQuaternion(this Vector2 vector) =>
             Quaternion.Euler(0f, 0f, Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg);
 
@@ -12,15 +14,15 @@ namespace ExtensionFunctions
 
         public static Vector2 GetRandomPointInBounds(this Bounds bounds) =>
             new(
-                Random.Range(bounds.min.x, bounds.max.x),
-                Random.Range(bounds.min.y, bounds.max.y)
+                (float)Random.NextDouble() * (bounds.max.x - bounds.min.x) + bounds.min.x,
+                (float)Random.NextDouble() * (bounds.max.y - bounds.min.y) + bounds.min.y
             );
 
         public static Vector3 RandomVector3(float min, float max)
         {
-            var random = new System.Random();
-            return new Vector3((float)random.NextDouble() * (max - min) + min, (float)random.NextDouble() * (max - min) + min,
-                (float)random.NextDouble() * (max - min) + min);
+            return new Vector3((float)Random.NextDouble() * (max - min) + min,
+                (float)Random.NextDouble() * (max - min) + min,
+                (float)Random.NextDouble() * (max - min) + min);
         }
 
         public static Vector2 RotateByAngle(this Vector2 v, float angleInDegrees)
@@ -33,6 +35,6 @@ namespace ExtensionFunctions
             return new Vector2(newX, newY);
         }
 
-        public static float RandomRange(this Vector2 v) => (float)new System.Random().NextDouble() * (v.y - v.x) + v.x;
+        public static float RandomRange(this Vector2 v) => (float)Random.NextDouble() * (v.y - v.x) + v.x;
     }
 }

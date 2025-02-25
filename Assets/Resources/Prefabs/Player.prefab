@@ -1243,6 +1243,7 @@ GameObject:
   - component: {fileID: 7028093618644688448}
   - component: {fileID: 8022376053833901228}
   - component: {fileID: 6826633397744253666}
+  - component: {fileID: 5235836922252295047}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1334,7 +1335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 519613176
+  GlobalObjectIdHash: 1893801084
   InScenePlacedSourceGlobalObjectIdHash: 1893801084
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1434,6 +1435,7 @@ MonoBehaviour:
   - {fileID: 2856479942211083218}
   - {fileID: 4880856132860918318}
   - {fileID: 3204018419617627344}
+  botAI: {fileID: 5235836922252295047}
   muzzles:
   - {fileID: 2453984841880857352, guid: 1583a3f15e7f447459d3ff64c74ae78f, type: 3}
   - {fileID: 2822455670592909650, guid: c4d023b6d8240044a9a1272ac67d3fa0, type: 3}
@@ -1749,6 +1751,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5235836922252295047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4172920852534759685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a300d33ff5594ceb9aa3a33318da0c60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationYSmoothness: 4
 --- !u!1 &4233275833591035670
 GameObject:
   m_ObjectHideFlags: 0

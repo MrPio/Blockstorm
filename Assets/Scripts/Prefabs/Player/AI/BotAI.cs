@@ -32,7 +32,7 @@ namespace Prefabs.Player.AI
     {
         #region constants
 
-        private const bool DebugMode = false;
+        private const bool DebugMode = true;
         private const float LogicStep = 1f / 15; // 15 FPS
 
         // Patrolling
@@ -74,6 +74,12 @@ namespace Prefabs.Player.AI
 
         #endregion
 
+        #region serializable
+
+        [SerializeField] private float rotationYSmoothness;
+
+        #endregion
+        
         #region private
 
         [NonSerialized] public Transform Target = null;
@@ -88,6 +94,7 @@ namespace Prefabs.Player.AI
         private int _currentPathIndex, _fireCount;
         private float _acc, _speedChangeAcc, _patrollingPropCheckAcc, _indexAcc, _fireAcc;
         private float _baseSpeed, _magazine;
+        private Vector2 _lookDir;
         private Model.Weapon _weaponModel;
 
         #endregion
@@ -153,15 +160,7 @@ namespace Prefabs.Player.AI
             path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
                 Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
             if (path != null)
-            {
                 _currentPathIndex = 1;
-
-                // Debug -- spawn path
-                // if (DebugMode)
-                //     foreach (var point in path)
-                //         Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
-                //             Quaternion.identity);
-            }
 
             _currentPath = path;
             _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
@@ -169,9 +168,7 @@ namespace Prefabs.Player.AI
 
         private void FixedUpdate()
         {
-            if ((Time.frameCount + 1) % 150 == 0)
-                _currentPath = null;
-            // Shoot
+            // Shoot ========================================================
             if (_state is AIState.Attacking)
             {
                 _fireAcc += Time.deltaTime;
@@ -190,135 +187,146 @@ namespace Prefabs.Player.AI
                 }
             }
 
+            // Walk =========================================================
             // Ensure the walking algorithm is run every _logicStep
             _acc += Time.deltaTime;
-            if (_acc < LogicStep)
-                return;
-            _acc = 0;
-
-            // AI Finite State Machine
-            if (_state is AIState.Patrolling or AIState.Attacking)
+            if (_acc > LogicStep)
             {
-                // I've got no path to follow
-                if (_currentPath == null || _currentPath.Count < 3)
+                _acc = 0;
+                if (_state is AIState.Patrolling or AIState.Attacking)
                 {
-                    if (_pathThread is not { IsAlive: true })
+                    // I've got no path to follow
+                    if (_currentPath == null || _currentPath.Count < 3)
                     {
-                        print("===================");
-                        var currentPos = transform.position;
-                        var targetPos = Target?.position ?? Vector3.zero;
-                        _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
-                        // await Task.Run(() => ChoosePath(currentPos, targetPos));
-                        _pathThread.Start();
-                    }
-                }
-                // I'm currently following a path
-                else
-                {
-                    // print($"Find Path took {_lastPathThreadDuration}s");
-                    var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
-                    var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
-                    var dir = (Vector2)new Vector2XZ(transform.position - to);
-                    var lookDir = _state is AIState.Patrolling
-                        ? dir // look forward
-                        : (Vector2)new Vector2XZ(transform.position - Target.position); // look at the target
-                    var dist = dir.magnitude;
-
-                    // Set y rotation along the direction
-                    _player.transform.rotation =
-                        Quaternion.AngleAxis(Mathf.Atan2(-lookDir.x, -lookDir.y) * Mathf.Rad2Deg, Vector3.up);
-
-                    // Set x head rotation
-                    if (_state is AIState.Attacking)
-                    {
-                        var fullLookDir = Target.position - transform.position;
-                        var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
-                        deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
-                        _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
-                    }
-
-                    // End of the current dir
-                    if (dist < 0.55)
-                    {
-                        _currentPathIndex++;
-                        _indexAcc = 0;
-
-                        // End of the current path
-                        if (_currentPathIndex >= _currentPath.Count - 1)
-                            _currentPath = null;
-                        // Jump if there's a stair
-                        else if (_currentPath[_currentPathIndex].y > _currentPath[_currentPathIndex - 1].y)
+                        if (_pathThread is not { IsAlive: true })
                         {
-                            _player.InputInterface.IsJumpDown = true;
-                            _currentPathIndex++;
-                            _indexAcc = 0;
+                            var currentPos = transform.position;
+                            var targetPos = Target?.position ?? Vector3.zero;
+                            _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
+                            // await Task.Run(() => ChoosePath(currentPos, targetPos));
+                            _pathThread.Start();
                         }
                     }
-                    // Still pursuing the current dir
+                    // I'm currently following a path
                     else
                     {
-                        // Move if not falling
-                        if (from.y - to.y < 0.2f)
+                        if (_pathThread != null)
                         {
-                            // Go along the path
-                            var deltaAngle = (Mathf.Atan2(dir.y, dir.x) - Mathf.Atan2(lookDir.y, lookDir.x)) *
-                                             Mathf.Rad2Deg;
-                            _player.InputInterface.Axis = new Vector2(0, 1).RotateByAngle(deltaAngle);
+                            _pathThread = null;
+                            _sm.logger.Log($"Find Path took {_lastPathThreadDuration}s");
+                            // Debug -- spawn path
+                            if (DebugMode)
+                                foreach (var point in _currentPath)
+                                    Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
+                                        Quaternion.identity);
+                        }
 
-                            // Too much time on current point, retry...
-                            _indexAcc += LogicStep;
-                            if (_indexAcc > 2 && _currentPathIndex > 1)
+                        var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
+                        var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
+                        var dir = (Vector2)new Vector2XZ(transform.position - to);
+                        _lookDir = _state is AIState.Patrolling
+                            ? dir // look forward
+                            : (Vector2)new Vector2XZ(transform.position - Target.position); // look at the target
+                        var dist = dir.magnitude;
+
+                        // Set x head rotation
+                        if (_state is AIState.Attacking)
+                        {
+                            var fullLookDir = Target.position - transform.position;
+                            var deltaAngleX = Quaternion.LookRotation(fullLookDir).eulerAngles.x;
+                            deltaAngleX = deltaAngleX > 180f ? deltaAngleX - 360f : deltaAngleX;
+                            _player.CameraRotationX.Value = (byte)((int)deltaAngleX + 128);
+                        }
+
+                        // End of the current dir
+                        if (dist < 0.75)
+                        {
+                            _currentPathIndex++;
+                            _indexAcc = 0;
+
+                            // End of the current path
+                            if (_currentPathIndex >= _currentPath.Count - 1)
+                                _currentPath = null;
+                            // Jump if there's a stair
+                            else if (_currentPath[_currentPathIndex].y > _currentPath[_currentPathIndex - 1].y)
                             {
-                                _currentPathIndex--;
+                                _player.InputInterface.IsJumpDown = true;
+                                _currentPathIndex++;
                                 _indexAcc = 0;
                             }
                         }
+                        // Still pursuing the current dir
                         else
                         {
-                            _player.InputInterface.Axis = Vector2.zero;
-                            _currentPathIndex++;
-                            _indexAcc = 0;
-                        }
-
-                        // Change walking speed
-                        _speedChangeAcc += LogicStep;
-                        if (_speedChangeAcc > _speedChangeStep[_state])
-                        {
-                            _speedChangeAcc = 0;
-                            _player.speed = _baseSpeed * _speedFactorRange[_state].RandomRange();
-                        }
-
-                        // Random jump
-                        if (Random.value < _jumpProbability[_state])
-                            _player.InputInterface.IsJumpDown = true;
-
-                        // Random grenade
-                        if (Random.value < _grenadeProbability[_state])
-                            ThrowGrenade(Random.Range(0.25f, 0.5f), Random.value < 0.4f);
-
-                        // Check prop to destroy
-                        _patrollingPropCheckAcc += LogicStep;
-                        if (_patrollingPropCheckAcc > _propCheckStep[_state])
-                        {
-                            _patrollingPropCheckAcc = 0;
-                            foreach (var prop in _sm.worldManager.SpawnedProps)
+                            // Move if not falling
+                            if (from.y - to.y < 0.2f)
                             {
-                                if (prop.IsDestroyed()) continue;
+                                // Go along the path
+                                var deltaAngle = (Mathf.Atan2(dir.y, dir.x) - Mathf.Atan2(_lookDir.y, _lookDir.x)) *
+                                                 Mathf.Rad2Deg;
+                                _player.InputInterface.Axis = new Vector2(0, 1).RotateByAngle(deltaAngle);
 
-                                if (Vector3.Distance(prop.transform.position, transform.position) <= 2.5)
+                                // Too much time on current point, retry...
+                                _indexAcc += LogicStep;
+                                if (_indexAcc > 2 && _currentPathIndex > 1)
                                 {
-                                    // Broadcast the damage action
-                                    _sm.ClientManager.DamagePropRpc(prop.ID, 9999, true, _player.NetworkObjectId);
-                                    break;
+                                    _currentPathIndex--;
+                                    _indexAcc = 0;
                                 }
                             }
-                        }
+                            else
+                            {
+                                _player.InputInterface.Axis = Vector2.zero;
+                                _currentPathIndex++;
+                                _indexAcc = 0;
+                            }
 
-                        // Check placed blocks to destroy
-                        // TODO
+                            // Change walking speed
+                            _speedChangeAcc += LogicStep;
+                            if (_speedChangeAcc > _speedChangeStep[_state])
+                            {
+                                _speedChangeAcc = 0;
+                                _player.speed = _baseSpeed * _speedFactorRange[_state].RandomRange();
+                            }
+
+                            // Random jump
+                            if (Random.value < _jumpProbability[_state])
+                                _player.InputInterface.IsJumpDown = true;
+
+                            // Random grenade
+                            if (Random.value < _grenadeProbability[_state])
+                                ThrowGrenade(Random.Range(0.25f, 0.5f), Random.value < 0.4f);
+
+                            // Check prop to destroy
+                            _patrollingPropCheckAcc += LogicStep;
+                            if (_patrollingPropCheckAcc > _propCheckStep[_state])
+                            {
+                                _patrollingPropCheckAcc = 0;
+                                foreach (var prop in _sm.worldManager.SpawnedProps)
+                                {
+                                    if (prop.IsDestroyed()) continue;
+
+                                    if (Vector3.Distance(prop.transform.position, transform.position) <= 2.5)
+                                    {
+                                        // Broadcast the damage action
+                                        _sm.ClientManager.DamagePropRpc(prop.ID, 9999, true, _player.NetworkObjectId);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Check placed blocks to destroy
+                            // TODO
+                        }
                     }
                 }
             }
+            // Set y rotation along the direction with smoothness
+            _player.transform.rotation = Quaternion.Slerp(
+                _player.transform.rotation,
+                Quaternion.LookRotation(new Vector3(-_lookDir.x, 0, -_lookDir.y)),
+                1f / (1f + rotationYSmoothness)
+            );
         }
 
         private void Fire()
@@ -456,6 +464,7 @@ namespace Prefabs.Player.AI
         {
             _fireCount = 0;
             var weapon = _player.Status.Value.WeaponType2Weapon(weaponType);
+            print($"------{weapon.GetNetName}");
             _player.EquippedWeapon.Value = $"{weapon!.Name}:{weapon!.Variant}";
             _weaponModel = weapon;
             _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);

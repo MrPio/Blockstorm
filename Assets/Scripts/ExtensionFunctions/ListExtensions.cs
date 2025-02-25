@@ -7,16 +7,16 @@ namespace ExtensionFunctions
 {
     public static class ListExtensions
     {
-        private static readonly System.Random _random = new();
+        private static readonly System.Random Random = new();
         public static T RandomItem<T>(this List<T> list) =>
-            list[new System.Random().Next(0, list.Count)];
+            list[Random.Next(0, list.Count)];
 
         public static List<T> Shuffle<T>(this List<T> list)
         {
             var n = list.Count;
             while (n > 1)
             {
-                var k = _random.Next(n--);
+                var k = Random.Next(n--);
                 (list[n], list[k]) = (list[k], list[n]);
             }
             return list;        }

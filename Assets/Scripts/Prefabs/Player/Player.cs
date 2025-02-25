@@ -14,6 +14,7 @@ using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Utils.Unity.Multiplayer.Samples.Utilities.ClientAuthority;
 using Random = UnityEngine.Random;
 
@@ -65,6 +66,7 @@ namespace Prefabs.Player
         [SerializeField] private WeaponSway weaponSway;
         [SerializeField] private GameObject weaponCamera, playerBody;
         [SerializeField] private GameObject[] bodyColliders;
+        [SerializeField] private BotAI botAI;
 
         [Header("Prefabs")] [SerializeField] public List<GameObject> muzzles;
         [SerializeField] public GameObject circleDamage;
@@ -98,7 +100,6 @@ namespace Prefabs.Player
         private bool isDying;
         private float _usedStamina;
         private Rigidbody _rigidbody;
-        private BotAI _botAI;
 
         private bool CanUseInventory => Team is not Team.None && active.Value &&
                                         _sm.worldManager.Map.spawns.First(it => it.team == Team)
@@ -383,8 +384,9 @@ namespace Prefabs.Player
 
             // Add AI movement if it's a bot
             InputInterface = new InputInterface(IsBot.Value);
-            if (IsOwner && IsBot.Value && !TryGetComponent(out BotAI _))
-                _botAI = transform.AddComponent<BotAI>();
+
+            // Only the host needs to activate the BotAI script. What the bot does is then  networked.
+            botAI.enabled = IsOwner && IsBot.Value;
 
             _sm.logger.Log($"[OnNetworkSpawn] {(IsBot.Value ? "Bot" : "Player")} {OwnerClientId} joined the session!");
         }
@@ -676,7 +678,7 @@ namespace Prefabs.Player
 
             // If the attacker is a bot and this is a kill, set its state to patrolling
             if (IsHost && newStatus.IsDead && attacker.IsBot.Value)
-                attacker._botAI.SwitchState(AIState.Patrolling);
+                attacker.botAI.SwitchState(AIState.Patrolling);
 
             // Show kill HUD
             if (NetworkObjectId == attackerID || attacker.Team != Team)
@@ -699,8 +701,8 @@ namespace Prefabs.Player
             // If it's a bot, alert it
             if (IsBot.Value && attackerID != NetworkObjectId)
             {
-                _botAI.Target = attacker.transform;
-                _botAI.SwitchState(AIState.Attacking);
+                botAI.Target = attacker.transform;
+                botAI.SwitchState(AIState.Attacking);
             }
 
             // Ragdoll
@@ -719,7 +721,7 @@ namespace Prefabs.Player
                 }
 
                 // If it's the bot that's dead, set its state
-                if (IsBot.Value) _botAI.SwitchState(AIState.Dead);
+                if (IsBot.Value) botAI.SwitchState(AIState.Dead);
 
                 var newAttackedStats = Stats.Value;
                 newAttackedStats.Deaths += 1;
@@ -795,14 +797,15 @@ namespace Prefabs.Player
         /// The owner, non bot, spawns the player, adds it to the mipmap and loads the right arm skin texture.
         /// The other clients add the player to the mipmap and load the helmet and the body skin texture.
         /// </summary>
-        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, bool onlyReposition = false)
+        public void Spawn(Team? newTeam = null, PlayerStats? playerStats = null, PlayerStatus? playerStatus = null, bool onlyReposition = false,
+            bool isBot = false)
         {
             characterController.enabled = false;
 
             // Spawn the player location
             // TODO
             transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(IsBot.Value ? Team.Yellow : newTeam ?? Team) +
+                position: _sm.worldManager.Map.GetRandomSpawnPoint(isBot ? Team.Yellow : newTeam ?? Team) +
                           Vector3.up * 0.75f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
                 // Vector3.forward * 4.5f,
@@ -812,23 +815,23 @@ namespace Prefabs.Player
 
             if (onlyReposition) return;
 
-            if (newTeam is not null)
-                team.Value = newTeam.Value;
-            if (playerStats is not null)
-                Stats.Value = playerStats.Value;
+            if (newTeam is not null) team.Value = newTeam.Value;
+            if (playerStats is not null) Stats.Value = playerStats.Value;
+            // The bot status is set by the BotManager
+            Status.Value = playerStatus ?? new PlayerStatus(null);
 
             _sm.logger.Log(
-                $"[Spawn] Spawning {(IsBot.Value ? "Bot" : "Player")} {OwnerClientId}, team = {Team.ToString()}",
+                $"[Spawn] Spawning {(isBot ? "Bot" : "Player")} {OwnerClientId}, team = {Team.ToString()}",
                 Color.cyan);
             active.Value = true;
             invincible.Value = true;
-            Status.Value = new PlayerStatus(null);
+            
             RagdollRpc(0, "", new NetVector3(), true);
             weapon.Magazine.Clear();
             weapon.LeftAmmo.Clear();
             weapon.WeaponModel = null;
 
-            if (IsBot.Value) _botAI.SwitchState(AIState.Patrolling);
+            if (isBot) botAI.SwitchState(AIState.Patrolling);
 
             if (newTeam is not null || playerStats is not null)
                 LoadStatus();
@@ -839,8 +842,8 @@ namespace Prefabs.Player
             IEnumerator EquipBlock()
             {
                 yield return new WaitForSeconds(0.15f);
-                if (IsBot.Value)
-                    _botAI.SwitchEquipped(Random.value < 0.5 ? WeaponType.Primary : WeaponType.Secondary);
+                if (isBot)
+                    botAI.SwitchEquipped(Random.value < 0.5 ? WeaponType.Primary : WeaponType.Secondary);
                 else
                     weapon.SwitchEquipped(WeaponType.Block);
             }
