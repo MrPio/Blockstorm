@@ -628,9 +628,12 @@ namespace Prefabs.Player
             var mouth = WeaponPrefab.transform.Find("mouth");
             if (mouth)
             {
-                // Muzzle
-                var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
-                muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
+                // Muzzle (only if enemy, bot or I'm not aiming)
+                if (!IsOwner || IsBot.Value || Weapon.isAiming)
+                {
+                    var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
+                    muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
+                }
 
                 // Bullet (only for enemies and bots)
                 if (!IsOwner || IsBot.Value)

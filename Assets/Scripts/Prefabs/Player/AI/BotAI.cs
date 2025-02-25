@@ -68,8 +68,8 @@ namespace Prefabs.Player.AI
 
         private readonly Dictionary<AIState, float> _grenadeProbability = new()
         {
-            { AIState.Patrolling, 0.002f },
-            { AIState.Attacking, 0.01f },
+            { AIState.Patrolling, 0.001f },
+            { AIState.Attacking, 0.0075f },
         };
 
         #endregion
@@ -111,62 +111,6 @@ namespace Prefabs.Player.AI
             _baseSpeed = _player.speed;
         }
 
-        /// <summary>
-        /// Choose a random path to follow
-        /// </summary>
-        private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
-        {
-            var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            // Select a random point in the map, in the circle around the player
-            var validDestFound = false;
-            var dest = Vector3Int.zero;
-            var iterations = 0;
-            while (!validDestFound)
-            {
-                iterations++;
-                if (iterations > 20)
-                {
-                    Thread.Sleep(10000);
-                    return;
-                }
-
-                do
-                {
-                    if (_state is AIState.Patrolling)
-                        dest = Vector3Int.FloorToInt(currentPos +
-                                                     VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[AIState.Patrolling].RandomRange());
-                    else if (_state is AIState.Attacking)
-                        dest = Vector3Int.FloorToInt(targetPos +
-                                                     VectorExtensions.RandomVector3(-1, 1) *
-                                                     _movingRange[AIState.Patrolling].RandomRange());
-
-                    dest.y = 0;
-                } while (!_sm.worldManager.IsVoxelInWorld(dest));
-
-                // TODO this
-                // dest = new(_sm.worldManager.Map.size.x / 2, 0, _sm.worldManager.Map.size.x / 2);
-
-                // Find a valid y
-                for (dest.y = 0; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
-                    if (!VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y, dest.x, dest.z]].isSolid &&
-                        !VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y + 1, dest.x, dest.z]].isSolid)
-                        break;
-
-                // Valid y condition
-                validDestFound = dest.y < _sm.worldManager.Map.size.y - 2;
-            }
-
-            List<Vector3Int> path = null;
-            path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
-                Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
-            if (path != null)
-                _currentPathIndex = 1;
-
-            _currentPath = path;
-            _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
-        }
-
         private void FixedUpdate()
         {
             // Shoot ========================================================
@@ -175,7 +119,7 @@ namespace Prefabs.Player.AI
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
                 {
-                    Fire();
+                    StartCoroutine(Fire());
                     _fireAcc = 0;
                 }
 
@@ -184,7 +128,7 @@ namespace Prefabs.Player.AI
                 {
                     _fireCount = 0;
                     _fireAcc = -_weaponModel.ReloadTime!.Value / 100f;
-                    _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 3f);
+                    _magazine = _weaponModel.Magazine!.Value / Random.Range(1f, 2f);
                 }
             }
 
@@ -331,7 +275,64 @@ namespace Prefabs.Player.AI
             );
         }
 
-        private void Fire()
+        
+        /// <summary>
+        /// Choose a random path to follow
+        /// </summary>
+        private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
+        {
+            var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            // Select a random point in the map, in the circle around the player
+            var validDestFound = false;
+            var dest = Vector3Int.zero;
+            var iterations = 0;
+            while (!validDestFound)
+            {
+                iterations++;
+                if (iterations > 20)
+                {
+                    Thread.Sleep(10000);
+                    return;
+                }
+
+                do
+                {
+                    if (_state is AIState.Patrolling)
+                        dest = Vector3Int.FloorToInt(currentPos +
+                                                     VectorExtensions.RandomVector3(-1, 1) *
+                                                     _movingRange[AIState.Patrolling].RandomRange());
+                    else if (_state is AIState.Attacking)
+                        dest = Vector3Int.FloorToInt(targetPos +
+                                                     VectorExtensions.RandomVector3(-1, 1) *
+                                                     _movingRange[AIState.Patrolling].RandomRange());
+
+                    dest.y = 0;
+                } while (!_sm.worldManager.IsVoxelInWorld(dest));
+
+                // TODO this
+                // dest = new(_sm.worldManager.Map.size.x / 2, 0, _sm.worldManager.Map.size.x / 2);
+
+                // Find a valid y
+                for (dest.y = 0; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
+                    if (!VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y, dest.x, dest.z]].isSolid &&
+                        !VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y + 1, dest.x, dest.z]].isSolid)
+                        break;
+
+                // Valid y condition
+                validDestFound = dest.y < _sm.worldManager.Map.size.y - 2;
+            }
+
+            List<Vector3Int> path = null;
+            path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
+                Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
+            if (path != null)
+                _currentPathIndex = 1;
+
+            _currentPath = path;
+            _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
+        }
+
+        private IEnumerator Fire()
         {
             _fireCount++;
 
@@ -344,8 +345,17 @@ namespace Prefabs.Player.AI
             var maxAngle = weaponDistance2MaxAngleImprecision.Evaluate(_weaponModel.Distance / 100f);
             var randomImprecision =
                 Quaternion.Euler(Random.Range(-maxAngle, maxAngle), Random.Range(-maxAngle, maxAngle), 0);
-            var bulletDir = randomImprecision * transform.forward;
-            var ray = new Ray(transform.position + transform.forward * 0.5f, bulletDir);
+            var shootDir = (Target.position + Vector3.up * 0.2f - transform.position).normalized;
+            var bulletDir = randomImprecision * shootDir;
+
+            // Spawn the weapon effect
+            if (_weaponModel.IsGun)
+            {
+                _player.SpawnWeaponEffectRpc(bulletDir, _weaponModel.BulletSpeed);
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            var ray = new Ray(transform.position + shootDir * 0.5f, bulletDir);
 
             // Checks if there was a hit on a prop
             var hasHitHostPlayer =
@@ -399,28 +409,32 @@ namespace Prefabs.Player.AI
                 enemyHit.distance < (hasHitProp ? propHit.distance : 9999f))
             {
                 var attackedPlayer = enemyHit.transform.GetComponentInParent<Player>();
-                var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
-                var distance = Vector3.Distance(transform.position, enemyHit.collider.transform.position);
-                var distanceFactor =
-                    math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
-                var helmetHit = enemyHit.transform.gameObject.name == "Head" && attackedPlayer.Status.Value.HasHelmet;
-
-                var damage = (uint)(_weaponModel.Damage * multiplier *
-                                    (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
-
-                if (!attackedPlayer.Status.Value.IsDead)
+                if (attackedPlayer is not null)
                 {
-                    // Check if the enemy is not allied nor invincible
-                    if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
-                         attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
+                    var multiplier = Model.Weapon.BodyPartMultipliers[enemyHit.transform.gameObject.name];
+                    var distance = Vector3.Distance(transform.position, enemyHit.collider.transform.position);
+                    var distanceFactor =
+                        math.clamp((1f - distance / _weaponModel.Distance) * 2, 0.25f, 1f); // 1f ---> 0.25f
+                    var helmetHit = enemyHit.transform.gameObject.name == "Head" &&
+                                    attackedPlayer.Status.Value.HasHelmet;
+
+                    var damage = (uint)(_weaponModel.Damage * multiplier *
+                                        (_weaponModel.Distance < 100 ? distanceFactor : 1f) * (helmetHit ? 0.6f : 1f));
+
+                    if (!attackedPlayer.Status.Value.IsDead)
                     {
-                        // Send the damage to the enemy
-                        attackedPlayer.DamageClientRpc(
-                            damage: damage,
-                            bodyPart: hostPlayerHit.transform.gameObject.name,
-                            direction: new NetVector3(bulletDir),
-                            attackerID: _player.NetworkObjectId
-                        );
+                        // Check if the enemy is not allied nor invincible
+                        if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
+                             attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
+                        {
+                            // Send the damage to the enemy
+                            attackedPlayer.DamageClientRpc(
+                                damage: damage,
+                                bodyPart: hostPlayerHit.transform.gameObject.name,
+                                direction: new NetVector3(bulletDir),
+                                attackerID: _player.NetworkObjectId
+                            );
+                        }
                     }
                 }
             }
@@ -432,7 +446,7 @@ namespace Prefabs.Player.AI
                 // Check if the hit block is solid
                 var pos = Vector3Int.FloorToInt(groundHit.point + transform.forward * 0.05f);
                 var block = _sm.worldManager.GetVoxel(pos);
-                if (block is not { isSolid: true }) return;
+                if (block is not { isSolid: true }) yield break;
 
                 // Broadcast the damage action
                 _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
@@ -446,21 +460,20 @@ namespace Prefabs.Player.AI
                 if (propHit.transform.TryGetComponent<Prop>(out var prop))
                     _sm.ClientManager.DamagePropRpc(prop.ID, _weaponModel.Damage, false, _player.NetworkObjectId);
             }
-            
-            // Spawn the weapon effect
-            if (_weaponModel.IsGun && !_weaponModel.HasScope)
-                _player.SpawnWeaponEffectRpc(bulletDir,_weaponModel.BulletSpeed);
         }
 
         public void ThrowGrenade(float force, bool isSecondary = false)
         {
             var status = _player.Status.Value;
             var grenadeModel = isSecondary ? status.GrenadeSecondary : status.Grenade;
+            var throwDir = _state is AIState.Attacking
+                ? (Target.position - transform.position).normalized
+                : transform.forward;
             _sm.ServerManager.SpawnExplosiveServerRpc(
                 grenadeModel!.Name.ToUpper(),
                 transform.position + transform.forward * 1f + Vector3.down * 0.2f,
                 VectorExtensions.RandomVector3(-180, 180f),
-                transform.forward + Vector3.up * Random.Range(-0.2f, 0.65f),
+                throwDir + Vector3.up * Random.Range(-0.2f, 0.65f),
                 grenadeModel!.Damage,
                 grenadeModel!.ExplosionTime!.Value,
                 grenadeModel!.ExplosionRange!.Value,
@@ -487,7 +500,7 @@ namespace Prefabs.Player.AI
             if (_state == newState) return;
             var delay = 0f;
             if (newState is AIState.Attacking)
-                delay = Random.Range(0.05f, 0.35f);
+                delay = Random.Range(0.05f, 0.275f);
             StartCoroutine(SwitchStateCoroutine());
             return;
 

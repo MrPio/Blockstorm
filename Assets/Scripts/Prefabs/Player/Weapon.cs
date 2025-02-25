@@ -158,7 +158,7 @@ namespace Prefabs.Player
             }
 
             // Spawn the weapon effect
-            if (_weaponModel.IsGun && !_weaponModel.HasScope)
+            if (_weaponModel.IsGun)
                 player.SpawnWeaponEffectRpc(cameraMovement.transform.forward,_weaponModel.BulletSpeed);
 
             if (_weaponModel.Type is WeaponType.Tertiary)

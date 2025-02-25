@@ -234,7 +234,7 @@ namespace Model
         public string GetNetName => $"{Name}:{Variant ?? ""}";
         public string GetThumbnail => $"Textures/weapons/thumbnail/{Name.ToUpper()}";
 
-        public float BulletSpeed => Mathf.Lerp(100, 300, Distance / 200f);
+        public float BulletSpeed => Mathf.Lerp(75, 250, Distance / 200f);
 
         // Return the upgraded variant of the current weapon, if any
         [CanBeNull]
