@@ -64,7 +64,7 @@ namespace Prefabs.Player.AI
         {
             { AIState.Patrolling, 15 },
             { AIState.Attacking, 7 },
-            { AIState.Searching, 6 },
+            { AIState.Searching, 8 },
         };
 
         private readonly Dictionary<AIState, float> _jumpProbability = new()
@@ -87,7 +87,7 @@ namespace Prefabs.Player.AI
             { AIState.Attacking, 0.015f },
             { AIState.Searching, 0.0025f },
         };
-
+        
         #endregion
 
         #region serializable
@@ -102,7 +102,8 @@ namespace Prefabs.Player.AI
             attackStateTimeout = 10f,
             searchForPlayersStep = 1f,
             secondaryMaxDistance = 15f,
-            meleeMaxDistance = 5f;
+            meleeMaxDistance = 5f,
+            pathPointReachThreshold=1f;
 
         [SerializeField] private GameObject missile;
 
@@ -151,6 +152,7 @@ namespace Prefabs.Player.AI
 
         private void FixedUpdate()
         {
+            if(_player.Status.Value.IsDead) return;
             // Shoot ========================================================
             if (State is AIState.Attacking)
             {
@@ -239,7 +241,7 @@ namespace Prefabs.Player.AI
                         }
 
                         // End of the current dir
-                        if (dist < 0.85)
+                        if (dist < pathPointReachThreshold)
                         {
                             _currentPathIndex++;
                             _indexAcc = 0;
@@ -317,10 +319,10 @@ namespace Prefabs.Player.AI
                                 {
                                     if (prop.IsDestroyed()) continue;
 
-                                    if (Vector3.Distance(prop.transform.position, transform.position) <= 2.5)
+                                    if (Vector3.Distance(prop.transform.position, transform.position) <= 1)
                                     {
                                         // Broadcast the damage action
-                                        _sm.ClientManager.DamagePropRpc(prop.ID, 9999, true, _player.NetworkObjectId);
+                                        _sm.ClientManager.DamagePropRpc(prop.ID, 9999, false, _player.NetworkObjectId);
                                         break;
                                     }
                                 }
@@ -413,11 +415,15 @@ namespace Prefabs.Player.AI
                     dest.y = 0;
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
 
-                // TODO this
-                // dest = new(_sm.worldManager.Map.size.x / 2, 0, _sm.worldManager.Map.size.x / 2);
-
+                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 1.15f)
+                    dest = Vector3Int.FloorToInt(_sm.worldManager.Map.scoreCubePosition +
+                                                 Vector3Int.back * (VectorExtensions.Random.Next(1, 5) *
+                                                                    (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
+                                                 Vector3Int.left * (VectorExtensions.Random.Next(1, 5) *
+                                                                    (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
+                                                 Vector3Int.down * 4);
                 // Find a valid y
-                for (dest.y = 0; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
+                for (dest.y = dest.y; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
                     if (!VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y, dest.x, dest.z]].isSolid &&
                         !VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y + 1, dest.x, dest.z]].isSolid)
                         break;
@@ -777,7 +783,7 @@ namespace Prefabs.Player.AI
             {
                 if (playerToAttack == Target)
                     return;
-                if (Random.Range(0f, 1f) < 0.75f)
+                if (Random.Range(0f, 1f) < 0.5f)
                     return;
             }
 

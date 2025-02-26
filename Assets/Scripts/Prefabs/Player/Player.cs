@@ -176,6 +176,7 @@ namespace Prefabs.Player
             {
                 playerBody.SetActive(value);
                 helmet.SetActive(value);
+                enemyWeaponContainer.gameObject.SetActive(value);
             }
         }
 
@@ -502,8 +503,7 @@ namespace Prefabs.Player
 
             // Broadcast the walking state
             var isWalking = math.abs(x) > 0.1f || math.abs(z) > 0.1f;
-            if (_isWalking.Value != isWalking)
-                _isWalking.Value = isWalking;
+            _isWalking.Value = isWalking;
 
             // Handle jump
             if (InputInterface.IsJumpDown && _isGrounded /*&& !Weapon.isAiming*/)
@@ -716,9 +716,9 @@ namespace Prefabs.Player
                     bot.botAI.SwitchState(AIState.Patrolling);
 
             // Show kill HUD
-            if (_sm.myPlayer.NetworkObjectId == attackerID)
+            if (_sm.myPlayer is not null && _sm.myPlayer.NetworkObjectId == attackerID)
                 _sm.killPlusOne.Activate(Team, NetworkObjectId == attackerID, isKill: newStatus.IsDead);
-            
+
             // Owner only ========================================================================================
             if (!IsOwner) return;
 
@@ -763,7 +763,7 @@ namespace Prefabs.Player
 
                 IEnumerator Respawn()
                 {
-                    yield return new WaitForSeconds(2f);
+                    yield return new WaitForSeconds(2f);//TODO
                     active.Value = false;
                     if (IsBot.Value)
                     {
@@ -813,7 +813,11 @@ namespace Prefabs.Player
                 if (isDying)
                     ragdoll.ApplyForce(bodyPart, direction.ToVector3.normalized * math.clamp(damage * 5, 50f, 500f));
                 else
+                {
                     ragdoll.SetRagdollState(false);
+                    _isWalking.Value = true;
+                    _isWalking.Value = false;
+                }
 
                 gameObject.GetComponent<ClientNetworkTransform>().enabled = !isDying;
             }
@@ -851,9 +855,10 @@ namespace Prefabs.Player
 
             // Spawn the player location
             // TODO
+            GetComponent<ClientNetworkTransform>().Interpolate = false;
             transform.SetPositionAndRotation(
                 position: _sm.worldManager.Map.GetRandomSpawnPoint(isBot ? Team.Yellow : newTeam ?? Team) +
-                          Vector3.up * 0.75f,
+                          Vector3.up * 0.95f,
                 // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
                 // Vector3.forward * 4.5f,
                 rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
@@ -897,7 +902,7 @@ namespace Prefabs.Player
 
             IEnumerator EndInvincibility()
             {
-                yield return new WaitForSeconds(spawnInvincibilityDuration);
+                yield return new WaitForSeconds(spawnInvincibilityDuration); // TODO 5s
                 invincible.Value = false;
             }
         }

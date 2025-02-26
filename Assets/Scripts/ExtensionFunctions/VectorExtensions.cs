@@ -4,7 +4,7 @@ namespace ExtensionFunctions
 {
     public static class VectorExtensions
     {
-        private static readonly System.Random Random = new();
+        public static readonly System.Random Random = new();
 
         public static Quaternion ToQuaternion(this Vector2 vector) =>
             Quaternion.Euler(0f, 0f, Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg);

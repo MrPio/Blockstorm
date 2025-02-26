@@ -147,7 +147,7 @@ namespace Managers
             RenderSettings.fog = false;
             dashboard.gameObject.SetActive(false);
             spawnCamera.gameObject.SetActive(true);
-            spawnCamera.InitializePosition();
+            // spawnCamera.InitializePosition();
             teamSelector.SetActive(isFirstSpawn);
             inventory.SetActive(false);
             clickToRespawn.SetActive(!isFirstSpawn);
