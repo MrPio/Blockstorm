@@ -1357,7 +1357,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 4.75
   stamina: 2.75
-  staminaRecoverSpeed: 0.6
+  staminaRecoverSpeed: 1.2
   runMultiplier: 1.45
   crouchMultiplier: 0.65
   fallSpeed: 2
@@ -1392,7 +1392,7 @@ MonoBehaviour:
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
-  spawnInvincibilityDuration: 1
+  spawnInvincibilityDuration: 3
   capsuleCollider: {fileID: 7028093618644688448}
   characterController: {fileID: 6541506331053138863}
   groundCheck: {fileID: 2809431145089976558}
@@ -1650,7 +1650,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 5
+  MinDistance: 2.25
   MaxDistance: 150
   Pan2D: 0
   rolloffMode: 0
@@ -1716,7 +1716,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.1
+      value: 1.0070416
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1771,12 +1771,12 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0.5
       value: 8
-      inSlope: -28.159971
-      outSlope: -28.159971
+      inSlope: -19.12095
+      outSlope: -19.12095
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.03103835
+      outWeight: 0.03555306
     - serializedVersion: 3
       time: 1.2
       value: 0.025
@@ -1790,15 +1790,15 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   rotationYSmoothness: 4
-  sphereRange: 5
-  coneRange: 85
-  coneAngle: 50
+  sphereRange: 2.5
+  coneRange: 90
+  coneAngle: 60
   searchStateTimeout: 15
   attackStateTimeout: 10
   searchForPlayersStep: 1
   secondaryMaxDistance: 15
   meleeMaxDistance: 5
-  pathPointReachThreshold: 0.9
+  pathPointReachThreshold: 1.1
   missile: {fileID: 8027923701763292337, guid: 1d70b30b2f4e60c45ac95c0d667f125b, type: 3}
 --- !u!1 &4233275833591035670
 GameObject:

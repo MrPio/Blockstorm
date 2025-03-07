@@ -74,9 +74,10 @@ namespace Managers
         public RelayManager relayManager;
         public StorageManager storageManager;
         public BotManager botManager;
+        public DebugManager debugManager;
 
         [Header("Misc")] public AudioMixer audioMixer;
-        public Player myPlayer;
+        [NonSerialized] public Player myPlayer;
 
         private Team? _newTeam = null;
         [CanBeNull] private Dictionary<WeaponType, Weapon> _lastSelectedWeapons = null;
@@ -189,6 +190,20 @@ namespace Managers
             scoresHUD.gameObject.SetActive(true);
             invincibilityHUD.SetActive(false);
             _newTeam = newTeam;
+            
+            // Set Render distance
+            worldManager.SetRenderDistance(BinarySerializer.Instance.Deserialize(
+                                               $"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
+                                               SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
+                                               SliderSetting.steps[SliderSettingType.RenderDistance]) /
+                                           SliderSetting.steps[SliderSettingType.RenderDistance]);
+            
+            // Spawn Bots
+            if (newTeam != null)
+                for (var i = 0; i < debugManager.spawnBotEnemies; i++)
+                    foreach (var team in new List<Team> { Team.Red, Team.Blue, Team.Green, Team.Yellow })
+                        if (team != newTeam!.Value)
+                            botManager.SpawnBot(team);
         }
 
         /// <summary>
@@ -231,9 +246,6 @@ namespace Managers
             pauseMenu.SetActive(false);
             scoresHUD.gameObject.SetActive(true);
             inventory.SetActive(false);
-
-            // TODO remove
-            botManager.SpawnBot(Team.Blue);
         }
     }
 }

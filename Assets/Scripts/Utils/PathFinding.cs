@@ -55,11 +55,11 @@ namespace Utils
         private static Point3D[] _directions, _diagonalDirections;
 
         private byte[,,] _blocks;
-        private readonly Map _map;
+
 
         public AStarPathfinder(Map map)
         {
-            this._map = map;
+            _blocks = (byte[,,])map.Blocks.Clone();
         }
 
         /// <summary>
@@ -69,8 +69,6 @@ namespace Utils
         /// </summary>
         public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
         {
-            _blocks = (byte[,,])_map.Blocks.Clone();
-
             // Randomize the direction choice
             _directions = BaseDirections.ToList().Shuffle().ToArray();
             _diagonalDirections = BaseDiagonalDirections.ToList().Shuffle().ToArray();
@@ -95,7 +93,7 @@ namespace Utils
                         pathBuffer.Add(point);
                     return new List<Vector3Int>(pathBuffer); // Allocate only once
                     // ERA QUESTO IL FOTTUTO COLPEVOLE DEL LAG SUL MAIN THREAD!! LINQ CAUSAVA PESANTE LAVORO DI GARBAGE COLLECTOR!
-                    return ReconstructPath(cameFrom, current).Select(point3D => (Vector3Int)point3D).ToList();
+                    // return ReconstructPath(cameFrom, current).Select(point3D => (Vector3Int)point3D).ToList();
                 }
 
                 foreach (var neighbor in GetNeighbors(current))
@@ -138,7 +136,7 @@ namespace Utils
             var ground = new Point3D(p.X, (short)(p.Y - 1), p.Z);
 
             // Check if I'm grounded, otherwise keep falling
-            if (InBounds(ground) && !VoxelData.BlockTypes[_blocks[ground.Y, ground.X, ground.Z]].isSolid)
+            if (InBounds(ground) && !IsSolidAndNotPlayerBlock(ground))
                 yield return ground;
             else
             {
@@ -151,7 +149,7 @@ namespace Utils
 
                     // Jump up by 1 block, but only if there's a step to jump on.
                     var jump = new Point3D(np.X, (short)(np.Y + 1), np.Z);
-                    if (IsValidPos(jump) && VoxelData.BlockTypes[_blocks[jump.Y - 1, jump.X, jump.Z]].isSolid)
+                    if (IsValidPos(jump) && IsSolidAndNotPlayerBlock(new Point3D(jump.X, (short)(jump.Y - 1), jump.Z)))
                         yield return jump;
                 }
 
@@ -178,17 +176,22 @@ namespace Utils
         }
 
         // Checks if the player can occupy the given position.
-        private bool IsValidPos(Point3D pos)
+        public bool IsValidPos(Vector3Int pos)
         {
-            var above = new Point3D(pos.X, (short)(pos.Y + 1), pos.Z);
+            var above = pos + Vector3Int.up;
             return InBounds(pos) && InBounds(above) &&
-                   !VoxelData.BlockTypes[_blocks[pos.Y, pos.X, pos.Z]].isSolid &&
-                   !VoxelData.BlockTypes[_blocks[above.Y, above.X, above.Z]].isSolid;
+                   !IsSolidAndNotPlayerBlock(pos) && !IsSolidAndNotPlayerBlock(above);
         }
 
         private bool InBounds(Point3D pos) =>
             pos.Y >= 0 && pos.Y < _blocks.GetLength(0) &&
             pos.X >= 0 && pos.X < _blocks.GetLength(1) &&
             pos.Z >= 0 && pos.Z < _blocks.GetLength(2);
+
+        private bool IsSolidAndNotPlayerBlock(Point3D pos)
+        {
+            var block = VoxelData.BlockTypes[_blocks[pos.Y, pos.X, pos.Z]];
+            return block.isSolid && !block.name.Contains("player_block");
+        }
     }
 }

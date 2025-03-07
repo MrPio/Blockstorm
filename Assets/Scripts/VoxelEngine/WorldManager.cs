@@ -51,6 +51,7 @@ namespace VoxelEngine
             viewDistance = (int)math.lerp(32f, 256f, value);
             if (NetworkManager.Singleton.IsHost)
                 viewDistance = 512;
+
             if (HasRendered)
                 UpdatePlayerPos(_playerLastPos, force: true);
         }
@@ -59,11 +60,6 @@ namespace VoxelEngine
         {
             _sm = FindFirstObjectByType<SceneManager>();
             chunkSize = math.max(1, chunkSize);
-            SetRenderDistance(BinarySerializer.Instance.Deserialize(
-                                  $"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
-                                  SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
-                                  SliderSetting.steps[SliderSettingType.RenderDistance]) /
-                              SliderSetting.steps[SliderSettingType.RenderDistance]);
         }
 
         private async Task LoadMap(string mapName)

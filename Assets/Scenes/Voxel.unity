@@ -398,6 +398,10 @@ PrefabInstance:
       propertyPath: isMultiplayer
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+      propertyPath: spawnBotEnemies
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2572,6 +2576,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6885468941481134890, guid: c79b0a4b35e37ee4199444827d6b2967, type: 3}
   m_PrefabInstance: {fileID: 4256741301692626721}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &478424374 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+  m_PrefabInstance: {fileID: 70279535}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7a1b9bf030ea0d48b8b50cacdf4e4aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &526720853
 GameObject:
   m_ObjectHideFlags: 0
@@ -3988,8 +4003,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: e5ccba3150114e64fa375de342575fd6, type: 2}
   transparentMaterial: {fileID: 2100000, guid: 56087e1e31432574a9dc39f1bfbd2a0f, type: 2}
-  chunkSize: 10
-  viewDistance: 192
+  chunkSize: 16
+  viewDistance: 128
   atlasCount: 16
   collectable: {fileID: 2791876225109273032, guid: 38c460983c04cfb4ea333447d2264182, type: 3}
   scoreCube: {fileID: 2921159031840815111, guid: f2de9b2ca063927419e75cb4641d4636, type: 3}
@@ -6212,7 +6227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1607405885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7302,8 +7317,8 @@ MonoBehaviour:
   relayManager: {fileID: 1236175146}
   storageManager: {fileID: 1145990819}
   botManager: {fileID: 1887548119}
+  debugManager: {fileID: 478424374}
   audioMixer: {fileID: 24100000, guid: d82e523b67e0b9b45ac2ac5b5739b55e, type: 2}
-  myPlayer: {fileID: 0}
 --- !u!4 &1804926417
 Transform:
   m_ObjectHideFlags: 0

@@ -16,6 +16,8 @@ namespace Managers
 
         [SerializeField] private bool isMultiplayer;
         [SerializeField] private string mapName;
+        [SerializeField] public bool botDrawPath, spawnInCenter;
+        [SerializeField] public int spawnBotEnemies;
 
         private void Awake()
         {

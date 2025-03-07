@@ -50,7 +50,7 @@ namespace Prefabs.Player
         private CapsuleCollider capsuleCollider;
 
         [SerializeField] private CharacterController characterController;
-        [SerializeField] private Transform groundCheck;
+        [SerializeField] public Transform groundCheck;
         [SerializeField] private Animator bodyAnimator;
         [SerializeField] private Animator enemyWeaponContainerAnimator;
         [SerializeField] private Transform enemyWeaponContainer;
@@ -646,7 +646,7 @@ namespace Prefabs.Player
             if (mouth)
             {
                 // Muzzle (only if enemy, bot or I'm not aiming)
-                if (!IsOwner || IsBot.Value || Weapon.isAiming)
+                if (!IsOwner || IsBot.Value || !Weapon.isAiming)
                 {
                     var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
                     muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
@@ -763,7 +763,7 @@ namespace Prefabs.Player
 
                 IEnumerator Respawn()
                 {
-                    yield return new WaitForSeconds(2f);//TODO
+                    yield return new WaitForSeconds(2f); //TODO
                     active.Value = false;
                     if (IsBot.Value)
                     {
@@ -854,14 +854,18 @@ namespace Prefabs.Player
             characterController.enabled = false;
 
             // Spawn the player location
-            // TODO
             GetComponent<ClientNetworkTransform>().Interpolate = false;
-            transform.SetPositionAndRotation(
-                position: _sm.worldManager.Map.GetRandomSpawnPoint(isBot ? Team.Yellow : newTeam ?? Team) +
-                          Vector3.up * 0.95f,
-                // position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
-                // Vector3.forward * 4.5f,
-                rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
+            if (_sm.debugManager.spawnInCenter)
+                transform.SetPositionAndRotation(
+                    position: (Vector3Int)_sm.worldManager.Map.scoreCubePosition + Vector3.up * 2.1f +
+                              Vector3.forward * (isBot ? 12f : 4.5f),
+                    rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
+            else
+                transform.SetPositionAndRotation(
+                    position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) +
+                              Vector3.up * 0.95f,
+                    rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
+
             GetComponent<ClientNetworkTransform>().Interpolate = true;
             characterController.enabled = true;
 

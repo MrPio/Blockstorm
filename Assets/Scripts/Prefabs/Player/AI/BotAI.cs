@@ -34,22 +34,20 @@ namespace Prefabs.Player.AI
     public class BotAI : MonoBehaviour
     {
         #region constants
-
-        private const bool DebugMode = false;
         private const float LogicStep = 1f / 6; // 6 FPS
 
         // Patrolling
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
         {
-            { AIState.Patrolling, new Vector2(15, 65) },
+            { AIState.Patrolling, new Vector2(15, 45) },
             { AIState.Attacking, new Vector2(5, 30) },
             { AIState.Searching, new Vector2(1, 10) },
         };
 
         private readonly Dictionary<AIState, Vector2> _speedFactorRange = new()
         {
-            { AIState.Patrolling, new Vector2(0.5f, 0.85f) },
-            { AIState.Attacking, new Vector2(0.9f, 1.1f) },
+            { AIState.Patrolling, new Vector2(0.8f, 1.25f) },
+            { AIState.Attacking, new Vector2(0.9f, 1.35f) },
             { AIState.Searching, new Vector2(1.15f, 1.45f) },
         };
 
@@ -65,6 +63,13 @@ namespace Prefabs.Player.AI
             { AIState.Patrolling, 15 },
             { AIState.Attacking, 7 },
             { AIState.Searching, 8 },
+        };
+
+        private readonly Dictionary<AIState, float> _playerBlockCheckStep = new()
+        {
+            { AIState.Patrolling, 1 },
+            { AIState.Attacking, 0.75f },
+            { AIState.Searching, 0.8f },
         };
 
         private readonly Dictionary<AIState, float> _jumpProbability = new()
@@ -87,7 +92,7 @@ namespace Prefabs.Player.AI
             { AIState.Attacking, 0.015f },
             { AIState.Searching, 0.0025f },
         };
-        
+
         #endregion
 
         #region serializable
@@ -103,7 +108,7 @@ namespace Prefabs.Player.AI
             searchForPlayersStep = 1f,
             secondaryMaxDistance = 15f,
             meleeMaxDistance = 5f,
-            pathPointReachThreshold=1f;
+            pathPointReachThreshold = 1f;
 
         [SerializeField] private GameObject missile;
 
@@ -122,10 +127,12 @@ namespace Prefabs.Player.AI
         private float _lastPathThreadDuration, _lastTargetHit;
         private int _currentPathIndex, _lostPathPointsCount, _fireCount;
         private Coroutine _switchStateCoroutine;
+        private List<Vector3> _blocksTargets = new();
 
         private float _acc,
             _speedChangeAcc,
-            _patrollingPropCheckAcc,
+            _propCheckAcc,
+            _playerBlockCheckAcc,
             _indexAcc,
             _fireAcc,
             _searchForPlayersAcc,
@@ -152,14 +159,14 @@ namespace Prefabs.Player.AI
 
         private void FixedUpdate()
         {
-            if(_player.Status.Value.IsDead) return;
+            if (_player.Status.Value.IsDead) return;
             // Shoot ========================================================
-            if (State is AIState.Attacking)
+            if (State is AIState.Attacking || _blocksTargets.Count > 0)
             {
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
                 {
-                    Fire();
+                    Fire(_blocksTargets.Count > 0 ? _blocksTargets[0] : Target.position);
                     if (_weaponModel.Type is WeaponType.Tertiary)
                         AutoChooseWeapon();
                     _fireAcc = 0;
@@ -168,6 +175,8 @@ namespace Prefabs.Player.AI
                 // Reload
                 if (_fireCount > math.max(1f, _magazine))
                 {
+                    if (_blocksTargets.Count > 0)
+                        _blocksTargets.RemoveAt(0);
                     _fireCount = 0;
                     if (_weaponModel.IsGun)
                     {
@@ -176,9 +185,12 @@ namespace Prefabs.Player.AI
                     }
                     else if (_weaponModel.Type is WeaponType.Melee)
                     {
-                        _fireAcc = -Random.Range(0.25f, 1.25f);
+                        _fireAcc = -Random.Range(0.25f, 1f);
                         _magazine = Random.Range(1, 10);
                     }
+
+                    if (_blocksTargets.Count > 0)
+                        _fireAcc = -Random.Range(0f, 0.15f);
                 }
             }
 
@@ -201,6 +213,7 @@ namespace Prefabs.Player.AI
                             _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
                             // await Task.Run(() => ChoosePath(currentPos, targetPos));
                             _pathThread.Start();
+                            Debug.LogWarning("===============");
                         }
                     }
                     // I'm currently following a path
@@ -211,25 +224,30 @@ namespace Prefabs.Player.AI
                             _pathThread = null;
                             _sm.logger.Log($"Find Path took {_lastPathThreadDuration}s");
                             // Debug -- spawn path
-                            if (DebugMode)
+                            if (_sm.debugManager.botDrawPath)
                                 foreach (var point in _currentPath)
                                     Instantiate(_sm.pathPointPrefab, point + Vector3.one * 0.5f,
                                         Quaternion.identity);
                         }
 
+                        if (_currentPathIndex > _currentPath.Count - 1)
+                        {
+                            _currentPath = null;
+                            return;
+                        }
+
                         var from = _currentPath[_currentPathIndex - 1] + Vector3.one * 0.5f;
                         var to = _currentPath[_currentPathIndex] + Vector3.one * 0.5f;
-                        var dir = (Vector2)new Vector2XZ(transform.position - to);
-                        if (State is AIState.Attacking && Target is null)
-                            Debug.LogError($"{gameObject.name} - Target is null");
+                        var dir3 = transform.position - to;
+                        var dir2 = new Vector2(dir3.x, dir3.z);
                         _lookDir = State switch
                         {
                             AIState.Attacking => (Vector2)new Vector2XZ(transform.position - Target.position),
                             AIState.Searching => (Vector2)new Vector2XZ(transform.position -
                                                                         _lastKnownEnemyPosition!.Value),
-                            _ => dir
+                            _ => dir2
                         };
-                        var dist = dir.magnitude;
+                        var dist = dir2.magnitude;
 
                         // Set x head rotation
                         if (State is AIState.Attacking)
@@ -241,35 +259,33 @@ namespace Prefabs.Player.AI
                         }
 
                         // End of the current dir
-                        if (dist < pathPointReachThreshold)
+                        if (dist < pathPointReachThreshold && Mathf.Abs(_player.groundCheck.position.y - to.y) < 0.75f)
                         {
                             _currentPathIndex++;
                             _indexAcc = 0;
 
                             // End of the current path
-                            if (_currentPathIndex >= _currentPath.Count - 1)
+                            if (_currentPathIndex >= _currentPath.Count - 2)
                                 _currentPath = null;
-                            // Jump if there's a stair
-                            else if (_currentPath[_currentPathIndex].y > _currentPath[_currentPathIndex - 1].y)
-                            {
-                                _player.InputInterface.IsJumpDown = true;
-                                _currentPathIndex++;
-                                _indexAcc = 0;
-                            }
                         }
                         // Still pursuing the current dir
                         else
                         {
+                            // Jump if there's a stair
+                            if (to.y - from.y > 0.5f && _blocksTargets.Count<=0)
+                                _player.InputInterface.IsJumpDown = true;
+
                             // Move if not falling
                             if (from.y - to.y < 0.2f)
                             {
                                 // Go along the path
-                                var deltaAngle = (Mathf.Atan2(dir.y, dir.x) - Mathf.Atan2(_lookDir.y, _lookDir.x)) *
+                                var deltaAngle = (Mathf.Atan2(dir2.y, dir2.x) - Mathf.Atan2(_lookDir.y, _lookDir.x)) *
                                                  Mathf.Rad2Deg;
                                 _player.InputInterface.Axis = new Vector2(0, 1).RotateByAngle(deltaAngle);
 
                                 // Too much time on current point, retry...
-                                _indexAcc += LogicStep;
+                                if (_blocksTargets.Count <= 0)
+                                    _indexAcc += LogicStep;
                                 if (_indexAcc > 2 && _currentPathIndex > 1)
                                 {
                                     _currentPathIndex--;
@@ -297,7 +313,7 @@ namespace Prefabs.Player.AI
                             }
 
                             // Random jump
-                            if (Random.value < _jumpProbability[State])
+                            if (Random.value < _jumpProbability[State] && _blocksTargets.Count<=0)
                                 _player.InputInterface.IsJumpDown = true;
 
                             // Random grenade
@@ -311,10 +327,10 @@ namespace Prefabs.Player.AI
                                 SwitchEquipped(WeaponType.Tertiary);
 
                             // Check prop to destroy
-                            _patrollingPropCheckAcc += LogicStep;
-                            if (_patrollingPropCheckAcc > _propCheckStep[State])
+                            _propCheckAcc += LogicStep;
+                            if (_propCheckAcc > _propCheckStep[State])
                             {
-                                _patrollingPropCheckAcc = 0;
+                                _propCheckAcc = 0;
                                 foreach (var prop in _sm.worldManager.SpawnedProps)
                                 {
                                     if (prop.IsDestroyed()) continue;
@@ -328,8 +344,14 @@ namespace Prefabs.Player.AI
                                 }
                             }
 
+
                             // Check placed blocks to destroy
-                            // TODO
+                            _playerBlockCheckAcc += LogicStep;
+                            if (_playerBlockCheckAcc > _playerBlockCheckStep[State] && _blocksTargets.Count <= 0)
+                            {
+                                _playerBlockCheckAcc = 0;
+                                CheckForDig(from, to, dir2);
+                            }
                         }
                     }
                 }
@@ -372,8 +394,9 @@ namespace Prefabs.Player.AI
             );
 
             // Change weapon
-            if (State is AIState.Attacking && _weaponModel.Type is not WeaponType.Tertiary &&
-                Time.frameCount % (_weaponModel.Type is WeaponType.Melee ? 15 : 100) == 0)
+            if ((State is AIState.Attacking || _blocksTargets.Count > 0) &&
+                _weaponModel.Type is not WeaponType.Tertiary &&
+                Time.frameCount % (_weaponModel.Type is WeaponType.Melee ? 25 : 100) == 0)
                 AutoChooseWeapon();
         }
 
@@ -387,6 +410,7 @@ namespace Prefabs.Player.AI
         private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
         {
             var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            var aStar = new AStarPathfinder(_sm.worldManager.Map);
             // Select a random point in the map, in the circle around the player
             var validDestFound = false;
             var dest = Vector3Int.zero;
@@ -412,10 +436,11 @@ namespace Prefabs.Player.AI
                                                      VectorExtensions.RandomVector3(-1, 1) *
                                                      (isUsingMelee ? 3f : _movingRange[State].RandomRange()));
 
-                    dest.y = 0;
+                    dest.y = State is AIState.Patrolling ? 0 : math.max(0, (int)(targetPos.y - 4));
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
 
-                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 1.15f)
+                // Goto center
+                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 0.15f)
                     dest = Vector3Int.FloorToInt(_sm.worldManager.Map.scoreCubePosition +
                                                  Vector3Int.back * (VectorExtensions.Random.Next(1, 5) *
                                                                     (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
@@ -423,17 +448,27 @@ namespace Prefabs.Player.AI
                                                                     (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
                                                  Vector3Int.down * 4);
                 // Find a valid y
+                var startY = dest.y;
                 for (dest.y = dest.y; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
-                    if (!VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y, dest.x, dest.z]].isSolid &&
-                        !VoxelData.BlockTypes[_sm.worldManager.Map.Blocks[dest.y + 1, dest.x, dest.z]].isSolid)
+                    if (aStar.IsValidPos(new(dest.x, dest.y, dest.z)))
+                    {
+                        validDestFound = true;
                         break;
+                    }
 
-                // Valid y condition
-                validDestFound = dest.y < _sm.worldManager.Map.size.y - 2;
+                if (!validDestFound)
+                {
+                    for (dest.y = 0; dest.y < startY + 1; dest.y++)
+                        if (aStar.IsValidPos(new(dest.x, dest.y, dest.z)))
+                        {
+                            validDestFound = true;
+                            break;
+                        }
+                }
             }
 
             List<Vector3Int> path = null;
-            path = new AStarPathfinder(_sm.worldManager.Map).FindPath(
+            path = aStar.FindPath(
                 Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
             if (path != null)
             {
@@ -445,7 +480,7 @@ namespace Prefabs.Player.AI
             _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
         }
 
-        private void Fire()
+        private void Fire(Vector3 targetPos)
         {
             _fireCount++;
 
@@ -458,7 +493,7 @@ namespace Prefabs.Player.AI
             var maxAngle = weaponDistance2MaxAngleImprecision.Evaluate(_weaponModel.Distance / 100f);
             var randomImprecision =
                 Quaternion.Euler(Random.Range(-maxAngle, maxAngle), Random.Range(-maxAngle, maxAngle), 0);
-            var shootDir = (Target.position + Vector3.up * 0.2f - transform.position).normalized;
+            var shootDir = (targetPos + Vector3.up * 0.2f - transform.position).normalized;
             var bulletDir = randomImprecision * shootDir;
 
             // Spawn the weapon effect
@@ -473,7 +508,7 @@ namespace Prefabs.Player.AI
 
                     IEnumerator SpawnTACTMissiles()
                     {
-                        var centre = Target.position;
+                        var centre = targetPos;
                         var model = _weaponModel!;
                         for (var i = 0; i < 8f / model.Delay; i++)
                         {
@@ -647,8 +682,9 @@ namespace Prefabs.Player.AI
 
         private void AutoChooseWeapon()
         {
-            if (State is not AIState.Attacking) return;
-            var distanceToTarget = Vector3.Distance(transform.position, Target.transform.position);
+            if (State is not AIState.Attacking && _blocksTargets.Count <= 0) return;
+            var distanceToTarget = Vector3.Distance(transform.position,
+                _blocksTargets.Count > 0 ? _blocksTargets[0] : Target.transform.position);
             if (distanceToTarget < meleeMaxDistance)
             {
                 if (_weaponModel.Type is not WeaponType.Melee)
@@ -697,6 +733,42 @@ namespace Prefabs.Player.AI
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Checks if I need to dig some player blocks to proceed
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="dir2"></param>
+        private void CheckForDig(Vector3 from, Vector3 to, Vector2 dir2)
+        {
+            _blocksTargets.Clear();
+            var top = Vector3Int.FloorToInt(transform.position) + Vector3Int.up;
+            var bottom = Vector3Int.FloorToInt(transform.position) + Vector3Int.down;
+            var middleForward =
+                Vector3Int.FloorToInt(transform.position + transform.forward * 0.75f);
+            var bottomForward = middleForward + Vector3Int.down;
+            var topForward = middleForward + Vector3Int.up;
+            if (_sm.worldManager.Map.GetBlock(middleForward).name.Contains("player_block"))
+                _blocksTargets.Add(middleForward + Vector3.one * 0.5f);
+            if (_sm.worldManager.Map.GetBlock(top).name.Contains("player_block"))
+                _blocksTargets.Add(top + Vector3.one * 0.5f);
+            if (dir2.sqrMagnitude < 0.1 && to.y - from.y < -0.5f)
+            {
+                if (_sm.worldManager.Map.GetBlock(bottom).name.Contains("player_block"))
+                    _blocksTargets.Add(bottom + Vector3.one * 0.5f);
+            }
+            else if (to.y - from.y > 0.5f)
+            {
+                if (_sm.worldManager.Map.GetBlock(topForward).name.Contains("player_block"))
+                    _blocksTargets.Add(topForward + Vector3.one * 0.5f);
+            }
+            else if (to.y - from.y < -0.5f)
+            {
+                if (_sm.worldManager.Map.GetBlock(bottomForward).name.Contains("player_block"))
+                    _blocksTargets.Add(bottomForward + Vector3.one * 0.5f);
+            }
         }
 
         #endregion
@@ -770,7 +842,10 @@ namespace Prefabs.Player.AI
 
                 // Reset Attack timeout
                 if (newState is AIState.Attacking)
+                {
                     _lastTargetHit = Time.time;
+                    _fireAcc = _weaponModel.Delay * 0.5f;
+                }
 
                 State = newState;
                 _switchStateCoroutine = null;
