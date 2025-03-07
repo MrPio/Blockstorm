@@ -3,6 +3,9 @@
 An FPS game in the style of Minecraft. This is my first attempt at writing a **voxel engine** and **multiplayer** system
 in Unity.
 
+> [!NOTE]  
+> Interested in this project? Unfortunately, the game is still in development when you see this message. As a student, I'm often busy between exams and classes. Anyway, any help is welcome!
+
 <div>    
      <img src="https://github.com/user-attachments/assets/8ccb789e-1b06-46de-9cff-e70d94923898" width="23.5%"/>
      <img src="https://github.com/user-attachments/assets/5a127610-b014-49ff-b222-7d3d095be44c" width="23.5%"/>
@@ -84,7 +87,8 @@ In this project, to switch between localhost and remote modes you should:
 |   Creating and deleting blocks   |  ✅   |
 | Submeshes for transparent blocks |  ✅   |
 |       Inventory management       |  ✅   |
-|    Multiplayer implementation    |  🟨  |
+|    Multiplayer implementation    |  ✅  |
+|    Bot AI logic    |  🟨  |
 
 ## 🖼️ In-Game Screenshots
 
