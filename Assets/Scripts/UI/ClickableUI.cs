@@ -139,22 +139,28 @@ namespace UI
 
             if (actionType is ActionType.SelectTeam)
             {
-                if (FindObjectsByType<Player>(FindObjectsSortMode.None).Select(it => it.Team == team).Count() < LobbyManager.MaxPlayers / 4)
+                if (FindObjectsByType<Player>(FindObjectsSortMode.None).Select(it => it.Team == team).Count() <
+                    LobbyManager.MaxPlayers / 4)
                     _sm.InitializeInventory(team);
             }
 
             if (actionType is ActionType.QuitLobby)
             {
                 NetworkManager.Singleton.Shutdown();
-                await _sm.lobbyManager.LeaveLobby();
-                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
-                    .GetActiveScene().buildIndex);
+                if (_sm.debugManager.isActiveAndEnabled)
+                    Application.Quit();
+                else
+                {
+                    await _sm.lobbyManager.LeaveLobby();
+                    UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager
+                        .GetActiveScene().buildIndex);
+                }
             }
 
             if (actionType is ActionType.InventorySpawn)
             {
                 var inventory = FindFirstObjectByType<Inventory>();
-                _sm.InitializeSpawn(selectedWeapons:inventory.selectedWeapons);
+                _sm.InitializeSpawn(selectedWeapons: inventory.selectedWeapons);
             }
         }
     }

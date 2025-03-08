@@ -440,7 +440,7 @@ namespace Prefabs.Player.AI
                 } while (!_sm.worldManager.IsVoxelInWorld(dest));
 
                 // Goto center
-                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 0.15f)
+                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 0.25f)
                     dest = Vector3Int.FloorToInt(_sm.worldManager.Map.scoreCubePosition +
                                                  Vector3Int.back * (VectorExtensions.Random.Next(1, 5) *
                                                                     (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +

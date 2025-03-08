@@ -190,14 +190,14 @@ namespace Managers
             scoresHUD.gameObject.SetActive(true);
             invincibilityHUD.SetActive(false);
             _newTeam = newTeam;
-            
+
             // Set Render distance
             worldManager.SetRenderDistance(BinarySerializer.Instance.Deserialize(
                                                $"{ISerializer.ConfigsDir}/{SliderSetting.configFiles[SliderSettingType.Volume]}{SliderSetting.configFiles[SliderSettingType.RenderDistance]}",
                                                SliderSetting.defaultValues[SliderSettingType.RenderDistance] *
                                                SliderSetting.steps[SliderSettingType.RenderDistance]) /
                                            SliderSetting.steps[SliderSettingType.RenderDistance]);
-            
+
             // Spawn Bots
             if (newTeam != null)
                 for (var i = 0; i < debugManager.spawnBotEnemies; i++)
@@ -231,7 +231,7 @@ namespace Managers
                 _lastSelectedWeapons = selectedWeapons;
                 var newStatus = myPlayer.Status.Value;
                 newStatus.Melee = selectedWeapons[WeaponType.Melee];
-                newStatus.Primary =Weapon.Name2Weapon("BARRETT:GOLD"); //selectedWeapons[WeaponType.Primary];
+                newStatus.Primary = selectedWeapons[WeaponType.Primary];
                 newStatus.Secondary = selectedWeapons[WeaponType.Secondary];
                 newStatus.Tertiary = selectedWeapons[WeaponType.Tertiary];
                 newStatus.Grenade = selectedWeapons[WeaponType.Grenade];
