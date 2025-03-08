@@ -78,6 +78,11 @@ namespace Model
                 fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 21, reloadTime: 350, variant: "SURVIVAL",
                 scope: "scope4"),
 
+            // 6_460
+            new Weapon(name: "ak47", damage: 38, rof: 170, distance: 250, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 4.5f, ammo: 300, magazine: 52, reloadTime: 375, variant: "GOLD",
+                scope: "scope3", audio: "AK47_NY22"),
+
             // BARRETT =====================================================================================
             // 300
             new Weapon(name: "barrett", damage: 140, rof: 5, distance: 150, type: WeaponType.Primary,
@@ -98,6 +103,11 @@ namespace Model
             new Weapon(name: "barrett", damage: 400, rof: 3, distance: 250, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 6.5f, ammo: 10, magazine: 3, reloadTime: 600, variant: "NUCLEAR",
                 scope: "scope5", audio: "BARRETT"),
+
+            // 2_800
+            new Weapon(name: "barrett", damage: 140, rof: 22, distance: 300, type: WeaponType.Primary,
+                fireAnimation: "gun", zoom: 7f, ammo: 33, magazine: 13, reloadTime: 500, variant: "GOLD",
+                scope: "scope5", audio: "BARRETT"),
         };
 
         public static readonly List<Weapon> Secondaries = new()
@@ -116,7 +126,7 @@ namespace Model
 
             // 2_250
             new Weapon(name: "m1911", damage: 75, rof: 30, distance: 85, type: WeaponType.Secondary,
-                fireAnimation: "gun", zoom: 1.55f, ammo: 60, magazine: 5, reloadTime: 80, variant: "GOLD"),
+                fireAnimation: "gun", zoom: 1.55f, ammo: 75, magazine: 5, reloadTime: 65, variant: "GOLD"),
         };
 
         public static readonly List<Weapon> Tertiaries = new()
@@ -132,7 +142,7 @@ namespace Model
                 reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD"),
             new Weapon(name: "tact", damage: 120, rof: 160, explosionRange: 2f,
                 type: WeaponType.Tertiary, ammo: 1, hasAim: false, groundDamageFactor: 0.35f,
-                reloadTime: 1000, magazine: 1, fireAnimation: "gun"),
+                reloadTime: 700, magazine: 1, fireAnimation: "gun"),
         };
 
         public static readonly List<Weapon> Grenades = new()

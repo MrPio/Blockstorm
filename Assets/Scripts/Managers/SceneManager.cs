@@ -231,7 +231,7 @@ namespace Managers
                 _lastSelectedWeapons = selectedWeapons;
                 var newStatus = myPlayer.Status.Value;
                 newStatus.Melee = selectedWeapons[WeaponType.Melee];
-                newStatus.Primary = selectedWeapons[WeaponType.Primary];
+                newStatus.Primary =Weapon.Name2Weapon("BARRETT:GOLD"); //selectedWeapons[WeaponType.Primary];
                 newStatus.Secondary = selectedWeapons[WeaponType.Secondary];
                 newStatus.Tertiary = selectedWeapons[WeaponType.Tertiary];
                 newStatus.Grenade = selectedWeapons[WeaponType.Grenade];

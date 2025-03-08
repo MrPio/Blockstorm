@@ -30,8 +30,8 @@ namespace Model
         };
         private static readonly Dictionary<WeaponType, float> WeaponProbabilities = new()
         {
-            { Model.WeaponType.Primary, 2 },
-            { Model.WeaponType.Secondary, 2 },
+            { Model.WeaponType.Primary, 4 },
+            { Model.WeaponType.Secondary, 3 },
             { Model.WeaponType.Tertiary, 1 },
         };
 
