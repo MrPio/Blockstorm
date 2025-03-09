@@ -13,8 +13,11 @@ in Unity.
      <img src="https://github.com/user-attachments/assets/86425bf6-7405-4ffc-82f2-4e9ccc84e551" width="23.5%"/>
 </div>
 
-## Gameplay
+## Gameplays
 <p align="center">
+  <a href="https://www.youtube.com/watch?v=OE2q-xtLZgo">
+  	<img style="width: 66%; height: auto;" src="https://github.com/user-attachments/assets/479077bc-e86d-4a6b-be3e-7b3b1ed68923" alt="Gameplay">
+  </a>
   <a href="https://www.youtube.com/watch?v=C-A74l0gyEs&t=323s">
   	<img style="width: 66%; height: auto;" src="https://github.com/user-attachments/assets/a13c94a5-6950-4405-850b-8d41120d3964" alt="Gameplay">
   </a>
