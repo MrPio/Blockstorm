@@ -4,7 +4,7 @@ An FPS game in the style of Minecraft. This is my first attempt at writing a **v
 in Unity.
 
 > [!NOTE]  
-> Interested in this project? Unfortunately, the game is still in development when you see this message. As a student, I'm often busy between exams and classes. Anyway, any help is welcome!
+> Would you be interested in this project? Unfortunately, the game is still under development as you see this message. As a student, I'm often busy between exams and classes. Anyway, any help is welcome!
 
 <div>    
      <img src="https://github.com/user-attachments/assets/8ccb789e-1b06-46de-9cff-e70d94923898" width="23.5%"/>
@@ -12,6 +12,13 @@ in Unity.
      <img src="https://github.com/user-attachments/assets/2e7b5210-39d5-4c19-b4e8-bee7c4441b09" width="23.5%"/>
      <img src="https://github.com/user-attachments/assets/86425bf6-7405-4ffc-82f2-4e9ccc84e551" width="23.5%"/>
 </div>
+
+## Gameplay
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=C-A74l0gyEs&t=323s">
+  	<img style="width: 66%; height: auto;" src="https://github.com/user-attachments/assets/a13c94a5-6950-4405-850b-8d41120d3964" alt="Gameplay">
+  </a>
+</p>
 
 ## 🧊 What is a Voxel Engine?
 
@@ -89,6 +96,7 @@ In this project, to switch between localhost and remote modes you should:
 |       Inventory management       |  ✅   |
 |    Multiplayer implementation    |  ✅  |
 |    Bot AI logic    |  🟨  |
+|    Multiplayer testing    |  🟥  |
 
 ## 🖼️ In-Game Screenshots
 
