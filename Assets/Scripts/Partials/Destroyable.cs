@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ namespace Partials
     public class Destroyable : MonoBehaviour
     {
         public float lifespan = 30;
+        [SerializeField] private bool destroyOnTrigger = false;
 
         private float _startTime;
 
@@ -25,6 +27,12 @@ namespace Partials
                 if (networkObject is null || NetworkManager.Singleton.IsHost)
                     Destroy(gameObject);
             }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (destroyOnTrigger)
+                Destroy(gameObject);
         }
     }
 }

@@ -31,6 +31,7 @@ namespace VoxelEngine
         [NonSerialized] public byte[,,] Blocks; // y,x,z
         [NonSerialized] public Dictionary<Vector3Int, uint> BlocksHealth;
         [NonSerialized] public Dictionary<Vector3Int, byte> BlocksEdits;
+        [NonSerialized] public AStarPathfinderOptimized Pathfinder;
         [SerializeField] public SerializableVector3Int size;
         [SerializeField] public List<Spawn> spawns;
         [SerializeField] public List<Prop> props;
@@ -53,6 +54,7 @@ namespace VoxelEngine
                 Blocks[block.y, block.x, block.z] = block.type;
             BlocksHealth = new Dictionary<Vector3Int, uint>();
             BlocksEdits = new Dictionary<Vector3Int, byte>();
+            Pathfinder = new AStarPathfinderOptimized(this);
             return this;
         }
 

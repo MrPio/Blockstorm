@@ -77,5 +77,7 @@ namespace Model
         }
 
         public string GetMaterial => $"Textures/texturepacks/blockade/Materials/blockade_{topID + 1:D2}";
+
+        public bool IsDiggable => blockHealth != BlockHealth.Indestructible && blockHealth != BlockHealth.NonDiggable;
     }
 }

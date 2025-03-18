@@ -330,7 +330,7 @@ namespace Utils
                 Destroy(point);
             _instantiatedPathPoints.Clear();
             var path = new AStarPathfinder(_wm.Map).FindPath(Vector3Int.FloorToInt(from.position),
-                Vector3Int.FloorToInt(to.position));
+                Vector3Int.FloorToInt(to.position),false);
             foreach (var point in path)
             {
                 print(point);

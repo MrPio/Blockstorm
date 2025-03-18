@@ -178,7 +178,7 @@ namespace Network
         [Rpc(SendTo.Everyone)]
         public void DamagePropRpc(ushort id, uint damage, bool explode, ulong attackerID)
         {
-            if (_sm.worldManager.SpawnedProps[id]
+            if (_sm.worldManager.SpawnedProps.Count > id && _sm.worldManager.SpawnedProps[id]
                     .Hit(damage, explode, attackerID == _sm.myPlayer.NetworkObjectId) && IsHost)
                 brokenProps.Value = brokenProps.Value.Concat(new[] { id }).ToList();
         }

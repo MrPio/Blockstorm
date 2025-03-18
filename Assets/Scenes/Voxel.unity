@@ -392,7 +392,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: mapName
-      value: Harbor
+      value: City
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+      propertyPath: botDrawPath
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+      propertyPath: botsAreAllies
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: isMultiplayer
@@ -401,6 +409,10 @@ PrefabInstance:
     - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
       propertyPath: spawnBotEnemies
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861158194370912279, guid: cf47e4d439b1a9c47bfc211016c8c2ae, type: 3}
+      propertyPath: botsAttackPlayer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

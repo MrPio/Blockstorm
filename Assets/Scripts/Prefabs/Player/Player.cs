@@ -646,18 +646,21 @@ namespace Prefabs.Player
             if (mouth)
             {
                 // Muzzle (only if enemy, bot or I'm not aiming)
-                if (!IsOwner || IsBot.Value || !Weapon.isAiming)
-                {
+                // if (!IsOwner || IsBot.Value || !Weapon.isAiming)
+                // {
                     var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
                     muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
-                }
+                // }
 
                 // Bullet (only for enemies and bots)
-                if (!IsOwner || IsBot.Value)
+                if (!IsOwner || IsBot.Value || Weapon.isAiming)
                 {
-                    var bulletGo = Instantiate(bulletPrefab, mouth.position + mouth.forward * 1f,
+                    var bulletGo = Instantiate(bulletPrefab,
+                        mouth.position + (Weapon.isAiming ? cameraTransform.forward : transform.forward) *
+                        (Weapon.isAiming ? 1.25f : 0.5f),
                         Quaternion.identity);
-                    bulletGo.GetComponent<Rigidbody>().linearVelocity = shootDir.ToVector3 * bulletSpeed;
+                    bulletGo.GetComponent<Rigidbody>().linearVelocity =
+                        shootDir.ToVector3 * (bulletSpeed * (Weapon.isAiming ? 1.5f : 1f));
                 }
             }
         }

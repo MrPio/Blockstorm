@@ -25,8 +25,9 @@ namespace Prefabs.Player
     {
         private SceneManager _sm;
 
-        [Header("Components")] 
-        [SerializeField] public AudioSource audioSource;
+        [Header("Components")] [SerializeField]
+        public AudioSource audioSource;
+
         [SerializeField] public Animator animator;
         [SerializeField] private CameraMovement cameraMovement;
         [SerializeField] private Camera mainCamera;
@@ -351,18 +352,21 @@ namespace Prefabs.Player
                 rightArm.SetActive(true);
                 yield return new WaitForSeconds(0.35f);
                 var grenadeModel = isSecondary ? newStatus.GrenadeSecondary : newStatus.Grenade;
-                _sm.ServerManager.SpawnExplosiveServerRpc(
-                    grenadeModel!.Name.ToUpper(),
-                    mainCamera.transform.position + mainCamera.transform.forward * 0.75f + Vector3.down * 0.2f,
-                    VectorExtensions.RandomVector3(-180, 180f),
-                    mainCamera.transform.forward,
-                    grenadeModel!.Damage,
-                    grenadeModel!.ExplosionTime!.Value,
-                    grenadeModel!.ExplosionRange!.Value,
-                    grenadeModel!.GroundDamageFactor!.Value,
-                    player.NetworkObjectId,
-                    force
-                );
+                foreach (var angle in new[] { -Mathf.Lerp(5f, 30f, 1f - force), 0, Mathf.Lerp(5f, 30f, 1f - force) })
+                    _sm.ServerManager.SpawnExplosiveServerRpc(
+                        grenadeModel!.Name.ToUpper(),
+                        mainCamera.transform.position +
+                        Quaternion.Euler(0, angle, 0) * mainCamera.transform.forward * 0.5f +
+                        Vector3.down * (0.2f * VectorExtensions.RandomRange(-2, 2)),
+                        VectorExtensions.RandomVector3(-180, 180f),
+                        Quaternion.Euler(0, angle, 0) * mainCamera.transform.forward,
+                        grenadeModel!.Damage,
+                        grenadeModel!.ExplosionTime!.Value,
+                        grenadeModel!.ExplosionRange!.Value,
+                        grenadeModel!.GroundDamageFactor!.Value,
+                        player.NetworkObjectId,
+                        force
+                    );
             }
         }
 
@@ -428,7 +432,7 @@ namespace Prefabs.Player
                 player.MiscSound.Value = 0;
                 player.MiscSound.Value = (byte)player.MiscClips.IndexOf(player.switchEquippedClip);
             }
-                
+
             animator.SetTrigger(Animator.StringToHash("inventory_switch"));
 
             // Broadcast the new equipment

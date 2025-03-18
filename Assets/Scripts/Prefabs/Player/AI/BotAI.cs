@@ -33,15 +33,18 @@ namespace Prefabs.Player.AI
 
     public class BotAI : MonoBehaviour
     {
+        private static readonly System.Random RandomSys = new();
+
         #region constants
+
         private const float LogicStep = 1f / 6; // 6 FPS
 
         // Patrolling
         private readonly Dictionary<AIState, Vector2> _movingRange = new()
         {
-            { AIState.Patrolling, new Vector2(15, 45) },
-            { AIState.Attacking, new Vector2(5, 30) },
-            { AIState.Searching, new Vector2(1, 10) },
+            { AIState.Patrolling, new Vector2(5, 45) },
+            { AIState.Attacking, new Vector2(0, 2) },
+            { AIState.Searching, new Vector2(0, 3) },
         };
 
         private readonly Dictionary<AIState, Vector2> _speedFactorRange = new()
@@ -60,9 +63,9 @@ namespace Prefabs.Player.AI
 
         private readonly Dictionary<AIState, float> _propCheckStep = new()
         {
-            { AIState.Patrolling, 15 },
-            { AIState.Attacking, 7 },
-            { AIState.Searching, 8 },
+            { AIState.Patrolling, 3 },
+            { AIState.Attacking, 2 },
+            { AIState.Searching, 2 },
         };
 
         private readonly Dictionary<AIState, float> _playerBlockCheckStep = new()
@@ -103,8 +106,8 @@ namespace Prefabs.Player.AI
             sphereRange = 5f,
             coneRange = 70f,
             coneAngle = 50f,
-            searchStateTimeout = 15f,
-            attackStateTimeout = 10f,
+            searchStateTimeout = 60f,
+            attackStateTimeout = 150f,
             searchForPlayersStep = 1f,
             secondaryMaxDistance = 15f,
             meleeMaxDistance = 5f,
@@ -122,8 +125,11 @@ namespace Prefabs.Player.AI
         [NonSerialized] public Transform Target;
         private Vector3Int? _lastKnownEnemyPosition;
         private List<Vector3Int> _currentPath;
+
         private bool _isSearchingPath;
-        private Thread _pathThread;
+
+        // private Thread _pathThread;
+        private Task _pathTask;
         private float _lastPathThreadDuration, _lastTargetHit;
         private int _currentPathIndex, _lostPathPointsCount, _fireCount;
         private Coroutine _switchStateCoroutine;
@@ -166,7 +172,7 @@ namespace Prefabs.Player.AI
                 _fireAcc += Time.deltaTime;
                 if (_fireAcc > _weaponModel.Delay)
                 {
-                    Fire(_blocksTargets.Count > 0 ? _blocksTargets[0] : Target.position);
+                    Fire(_blocksTargets.Count > 0 ? _blocksTargets[0] : Target.position, _blocksTargets.Count > 0);
                     if (_weaponModel.Type is WeaponType.Tertiary)
                         AutoChooseWeapon();
                     _fireAcc = 0;
@@ -206,22 +212,23 @@ namespace Prefabs.Player.AI
                     // I've got no path to follow
                     if (_currentPath == null || _currentPath.Count < 3)
                     {
-                        if (_pathThread is not { IsAlive: true })
+                        if (_pathTask == null || _pathTask.IsCompleted)
                         {
                             var currentPos = transform.position;
                             var targetPos = Target?.position ?? _lastKnownEnemyPosition ?? Vector3.zero;
-                            _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
-                            // await Task.Run(() => ChoosePath(currentPos, targetPos));
-                            _pathThread.Start();
+
+                            // _pathThread = new Thread(() => ChoosePath(currentPos, targetPos));
+                            _pathTask = Task.Run(() => ChoosePath(currentPos, targetPos));
                             Debug.LogWarning("===============");
                         }
                     }
                     // I'm currently following a path
                     else
                     {
-                        if (_pathThread != null)
+                        if (_pathTask != null)
                         {
-                            _pathThread = null;
+                            _pathTask?.Dispose();
+                            _pathTask = null;
                             _sm.logger.Log($"Find Path took {_lastPathThreadDuration}s");
                             // Debug -- spawn path
                             if (_sm.debugManager.botDrawPath)
@@ -272,7 +279,7 @@ namespace Prefabs.Player.AI
                         else
                         {
                             // Jump if there's a stair
-                            if (to.y - from.y > 0.5f && _blocksTargets.Count<=0)
+                            if (to.y - from.y > 0.5f && _blocksTargets.Count <= 0)
                                 _player.InputInterface.IsJumpDown = true;
 
                             // Move if not falling
@@ -286,9 +293,10 @@ namespace Prefabs.Player.AI
                                 // Too much time on current point, retry...
                                 if (_blocksTargets.Count <= 0)
                                     _indexAcc += LogicStep;
-                                if (_indexAcc > 2 && _currentPathIndex > 1)
+                                if (_indexAcc > 2)
                                 {
-                                    _currentPathIndex--;
+                                    if (_currentPathIndex > 1)
+                                        _currentPathIndex--;
                                     _lostPathPointsCount++;
                                     _indexAcc = 0;
 
@@ -313,7 +321,7 @@ namespace Prefabs.Player.AI
                             }
 
                             // Random jump
-                            if (Random.value < _jumpProbability[State] && _blocksTargets.Count<=0)
+                            if (Random.value < _jumpProbability[State] && _blocksTargets.Count <= 0)
                                 _player.InputInterface.IsJumpDown = true;
 
                             // Random grenade
@@ -335,10 +343,11 @@ namespace Prefabs.Player.AI
                                 {
                                     if (prop.IsDestroyed()) continue;
 
-                                    if (Vector3.Distance(prop.transform.position, transform.position) <= 1)
+                                    if (Vector3.Distance(prop.transform.position, transform.position) <= 3)
                                     {
                                         // Broadcast the damage action
-                                        _sm.ClientManager.DamagePropRpc(prop.ID, 9999, false, _player.NetworkObjectId);
+                                        Debug.LogWarning("damaged prop!");
+                                        _sm.ClientManager.DamagePropRpc(prop.ID, 250, false, _player.NetworkObjectId);
                                         break;
                                     }
                                 }
@@ -375,6 +384,9 @@ namespace Prefabs.Player.AI
 
                     if (_searchForPlayersAcc > searchForPlayersStep)
                     {
+                        if (_sm.debugManager.botsAttackPlayer && _sm.myPlayer is not null)
+                            Alert(_sm.myPlayer.transform, hasSeenIt: true);
+
                         _searchForPlayersAcc = 0;
                         var enemy = CheckForVisiblePlayers();
                         if (enemy is not null && enemy.Team != _player.Team)
@@ -410,66 +422,78 @@ namespace Prefabs.Player.AI
         private void ChoosePath(Vector3 currentPos, Vector3 targetPos)
         {
             var start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var aStar = new AStarPathfinder(_sm.worldManager.Map);
+            var startPos = Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f);
+            var aStar = _sm.worldManager.Map.Pathfinder;
             // Select a random point in the map, in the circle around the player
             var validDestFound = false;
             var dest = Vector3Int.zero;
             var iterations = 0;
-            while (!validDestFound)
-            {
-                iterations++;
-                if (iterations > 20)
+            if (State is AIState.Attacking or AIState.Searching)
+                dest = Vector3Int.FloorToInt(targetPos + Vector3.down * 0.75f);
+            else if (State is AIState.Patrolling)
+                while (!validDestFound)
                 {
-                    Thread.Sleep(10000);
-                    return;
-                }
+                    iterations++;
+                    if (iterations > 20)
+                    {
+                        Thread.Sleep(10000);
+                        return;
+                    }
 
-                do
-                {
-                    var isUsingMelee = State is AIState.Attacking && _weaponModel.Type is WeaponType.Melee;
-                    if (State is AIState.Patrolling)
+                    do
+                    {
                         dest = Vector3Int.FloorToInt(currentPos +
                                                      VectorExtensions.RandomVector3(-1, 1) *
                                                      _movingRange[State].RandomRange());
-                    else if (State is AIState.Attacking or AIState.Searching)
-                        dest = Vector3Int.FloorToInt(targetPos +
-                                                     VectorExtensions.RandomVector3(-1, 1) *
-                                                     (isUsingMelee ? 3f : _movingRange[State].RandomRange()));
+                        dest.y = 0;
+                    } while (!_sm.worldManager.IsVoxelInWorld(dest));
 
-                    dest.y = State is AIState.Patrolling ? 0 : math.max(0, (int)(targetPos.y - 4));
-                } while (!_sm.worldManager.IsVoxelInWorld(dest));
-
-                // Goto center
-                if (State is AIState.Patrolling && VectorExtensions.Random.NextDouble() < 0.25f)
-                    dest = Vector3Int.FloorToInt(_sm.worldManager.Map.scoreCubePosition +
-                                                 Vector3Int.back * (VectorExtensions.Random.Next(1, 5) *
-                                                                    (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
-                                                 Vector3Int.left * (VectorExtensions.Random.Next(1, 5) *
-                                                                    (VectorExtensions.Random.Next() < 0.5 ? -1 : 1)) +
-                                                 Vector3Int.down * 4);
-                // Find a valid y
-                var startY = dest.y;
-                for (dest.y = dest.y; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
-                    if (aStar.IsValidPos(new(dest.x, dest.y, dest.z)))
+                    // Goto center
+                    if (RandomSys.NextDouble() < 0.25f)
+                        dest = Vector3Int.FloorToInt(_sm.worldManager.Map.scoreCubePosition +
+                                                     Vector3Int.back * (RandomSys.Next(1, 5) *
+                                                                        (RandomSys.Next() < 0.5
+                                                                            ? -1
+                                                                            : 1)) +
+                                                     Vector3Int.left * (RandomSys.Next(1, 5) *
+                                                                        (RandomSys.Next() < 0.5
+                                                                            ? -1
+                                                                            : 1)) +
+                                                     Vector3Int.down * 4);
+                    // Find a valid y
+                    var startY = dest.y;
+                    for (dest.y = dest.y; dest.y < _sm.worldManager.Map.size.y - 1; dest.y++)
                     {
-                        validDestFound = true;
-                        break;
-                    }
-
-                if (!validDestFound)
-                {
-                    for (dest.y = 0; dest.y < startY + 1; dest.y++)
-                        if (aStar.IsValidPos(new(dest.x, dest.y, dest.z)))
+                        var isValidDest = aStar.IsValidPos(dest);
+                        if (isValidDest.Bool(0) && !isValidDest.Bool(1) && !isValidDest.Bool(2))
                         {
                             validDestFound = true;
                             break;
                         }
+                    }
+
+                    if (!validDestFound)
+                    {
+                        var isValidDest = aStar.IsValidPos(dest);
+                        for (dest.y = 0; dest.y < startY + 1; dest.y++)
+                            if (isValidDest.Bool(0) && !isValidDest.Bool(1) && !isValidDest.Bool(2))
+                            {
+                                validDestFound = true;
+                                break;
+                            }
+                    }
                 }
-            }
 
             List<Vector3Int> path = null;
-            path = aStar.FindPath(
-                Vector3Int.FloorToInt(currentPos + Vector3.down * 0.75f), dest);
+            try
+            {
+                path = aStar.FindPath(startPos, dest, true);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+
             if (path != null)
             {
                 _lostPathPointsCount = 0;
@@ -480,7 +504,7 @@ namespace Prefabs.Player.AI
             _lastPathThreadDuration = (DateTimeOffset.Now.ToUnixTimeMilliseconds() - start) / 1000f;
         }
 
-        private void Fire(Vector3 targetPos)
+        private void Fire(Vector3 targetPos, bool isTargetingBlock = false)
         {
             _fireCount++;
 
@@ -535,7 +559,7 @@ namespace Prefabs.Player.AI
                         missile.name,
                         transform.position + Vector3.up * 0.3f + transform.forward * 0.5f,
                         transform.rotation.eulerAngles,
-                        (transform.forward + Vector3.up * 0.8f).normalized,
+                        (bulletDir + Vector3.up * 0.35f).normalized,
                         _weaponModel.Damage,
                         _weaponModel.ExplosionTime!.Value,
                         _weaponModel.ExplosionRange!.Value,
@@ -547,7 +571,8 @@ namespace Prefabs.Player.AI
                 return;
             }
 
-            var ray = new Ray(transform.position + Vector3.up * 0.2f + shootDir * 0.5f, bulletDir);
+            var ray = new Ray(transform.position + Vector3.up * 0.2f + shootDir * (isTargetingBlock ? 0.15f : 0.5f),
+                bulletDir);
 
             // Checks if there was a hit on a prop
             var hasHitHostPlayer =
@@ -616,9 +641,13 @@ namespace Prefabs.Player.AI
 
                     if (!attackedPlayer.Status.Value.IsDead)
                     {
+                        // Prevent the bot from shooting itself
+                        if (attackedPlayer.NetworkObjectId == _player.NetworkObjectId)
+                            hasHitEnemy = false;
+
                         // Check if the enemy is not allied nor invincible
-                        if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
-                             attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
+                        else if (((attackedPlayer.IsOwner && attackedPlayer.IsBot.Value) ||
+                                  attackedPlayer.Team != _player.Team) && !attackedPlayer.invincible.Value)
                         {
                             // Send the damage to the enemy
                             attackedPlayer.DamageClientRpc(
@@ -643,7 +672,7 @@ namespace Prefabs.Player.AI
                 if (block is not { isSolid: true }) return;
 
                 // Broadcast the damage action
-                _sm.ClientManager.DamageVoxelRpc(pos, _weaponModel.Damage);
+                _sm.ClientManager.DamageVoxelRpc(pos, (uint)(_weaponModel.Damage * (isTargetingBlock ? 1.5 : 1)));
             }
 
             // Checks if there was a hit on a prop
@@ -713,6 +742,8 @@ namespace Prefabs.Player.AI
             foreach (var player in FindObjectsByType<Player>(FindObjectsSortMode.None)
                          .Where(player => player != _player && !player.Status.Value.IsDead).ToList().Shuffle())
             {
+                if (_sm.debugManager.botsAreAllies && player.IsBot.Value)
+                    continue;
                 var directionToPlayer = player.transform.position - transform.position;
                 var distance = directionToPlayer.magnitude;
                 var angle = Vector3.Angle(transform.forward, directionToPlayer.normalized);
@@ -738,37 +769,57 @@ namespace Prefabs.Player.AI
         /// <summary>
         /// Checks if I need to dig some player blocks to proceed
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="dir2"></param>
-        private void CheckForDig(Vector3 from, Vector3 to, Vector2 dir2)
+        private void CheckForDig(Vector3 from, Vector3 to, Vector2 dir)
         {
             _blocksTargets.Clear();
             var top = Vector3Int.FloorToInt(transform.position) + Vector3Int.up;
             var bottom = Vector3Int.FloorToInt(transform.position) + Vector3Int.down;
-            var middleForward =
-                Vector3Int.FloorToInt(transform.position + transform.forward * 0.75f);
-            var bottomForward = middleForward + Vector3Int.down;
-            var topForward = middleForward + Vector3Int.up;
-            if (_sm.worldManager.Map.GetBlock(middleForward).name.Contains("player_block"))
-                _blocksTargets.Add(middleForward + Vector3.one * 0.5f);
-            if (_sm.worldManager.Map.GetBlock(top).name.Contains("player_block"))
-                _blocksTargets.Add(top + Vector3.one * 0.5f);
-            if (dir2.sqrMagnitude < 0.1 && to.y - from.y < -0.5f)
+
+            // Forward, ForwardL, ForwardR
+            foreach (var angle in new[] { -30f, 0, 30f })
             {
-                if (_sm.worldManager.Map.GetBlock(bottom).name.Contains("player_block"))
+                var pos = Vector3Int.FloorToInt(transform.position +
+                                                Quaternion.Euler(0, angle, 0) * transform.forward * 0.75f);
+                if (_sm.worldManager.Map.GetBlock(pos).IsDiggable)
+                    _blocksTargets.Add(pos + Vector3.one * 0.5f);
+            }
+
+            // Top
+            if (_sm.worldManager.Map.GetBlock(top).IsDiggable)
+                _blocksTargets.Add(top + Vector3.one * 0.5f);
+
+            // Bottom
+            if (dir.sqrMagnitude < 0.1 && to.y - from.y < -0.5f)
+            {
+                if (_sm.worldManager.Map.GetBlock(bottom).IsDiggable)
                     _blocksTargets.Add(bottom + Vector3.one * 0.5f);
             }
+            // Top Forward
             else if (to.y - from.y > 0.5f)
             {
-                if (_sm.worldManager.Map.GetBlock(topForward).name.Contains("player_block"))
-                    _blocksTargets.Add(topForward + Vector3.one * 0.5f);
+                foreach (var angle in new[] { -30f, 0, 30f })
+                {
+                    var pos = Vector3Int.up + Vector3Int.FloorToInt(transform.position +
+                                                                    Quaternion.Euler(0, angle, 0) * transform.forward *
+                                                                    0.75f);
+                    if (_sm.worldManager.Map.GetBlock(pos).IsDiggable)
+                        _blocksTargets.Add(pos + Vector3.one * 0.5f);
+                }
             }
-            else if (to.y - from.y < -0.5f)
+            // Bottom Forward
+            else if (to.y - from.y < 0.5f)
             {
-                if (_sm.worldManager.Map.GetBlock(bottomForward).name.Contains("player_block"))
-                    _blocksTargets.Add(bottomForward + Vector3.one * 0.5f);
+                foreach (var angle in new[] { -30f, 0, 30f })
+                {
+                    var pos = Vector3Int.down + Vector3Int.FloorToInt(transform.position +
+                                                                      Quaternion.Euler(0, angle, 0) *
+                                                                      transform.forward * 0.75f);
+                    if (_sm.worldManager.Map.GetBlock(pos).IsDiggable)
+                        _blocksTargets.Add(pos + Vector3.one * 0.5f);
+                }
             }
+
+            // Debug.LogWarning($"_blocksTargets = {_blocksTargets.Count}");
         }
 
         #endregion
@@ -799,9 +850,9 @@ namespace Prefabs.Player.AI
 
         public void SwitchState(AIState newState)
         {
-            _sm.logger.Log($"{gameObject.name} - SwitchState() to {newState}....");
             if (State == newState)
                 return;
+            _sm.logger.Log($"{gameObject.name} - SwitchState() to {newState}....");
             if (_switchStateCoroutine != null)
             {
                 StopCoroutine(_switchStateCoroutine);

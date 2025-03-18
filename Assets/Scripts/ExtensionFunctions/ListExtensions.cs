@@ -32,8 +32,9 @@ namespace ExtensionFunctions
 
         public static void Print<T>(this List<T> list)
         {
-            foreach (var item in list)
-                Debug.Log(item.ToString());
+            Debug.Log(string.Join(", ", list));
+            // foreach (var item in list)
+                // Debug.Log(item.ToString());
         }
     }
 }

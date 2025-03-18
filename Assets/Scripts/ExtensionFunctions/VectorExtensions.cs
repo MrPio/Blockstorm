@@ -36,5 +36,6 @@ namespace ExtensionFunctions
         }
 
         public static float RandomRange(this Vector2 v) => (float)Random.NextDouble() * (v.y - v.x) + v.x;
+        public static float RandomRange(float a, float b) => (float)Random.NextDouble() * (b - a) + a;
     }
 }

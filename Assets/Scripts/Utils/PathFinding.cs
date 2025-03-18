@@ -67,8 +67,9 @@ namespace Utils
         /// The map is a 3D int array where 0 = air, 1 = block.
         /// The player occupies two vertical cells.
         /// </summary>
-        public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal)
+        public List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal, bool canDig)
         {
+            // TODO if canDig, dig NESW blocks as last resource
             // Randomize the direction choice
             _directions = BaseDirections.ToList().Shuffle().ToArray();
             _diagonalDirections = BaseDiagonalDirections.ToList().Shuffle().ToArray();
@@ -96,7 +97,7 @@ namespace Utils
                     // return ReconstructPath(cameFrom, current).Select(point3D => (Vector3Int)point3D).ToList();
                 }
 
-                foreach (var neighbor in GetNeighbors(current))
+                foreach (var neighbor in GetMoves(current))
                 {
                     var tentativeG = gScore[current] + 1;
                     if (!gScore.ContainsKey(neighbor) || tentativeG < gScore[neighbor])
@@ -131,7 +132,7 @@ namespace Utils
             // Euclidean distance
             (int)Math.Pow(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2) + Math.Pow(a.Z - b.Z, 2), 0.5);
 
-        private IEnumerable<Point3D> GetNeighbors(Point3D p)
+        private IEnumerable<Point3D> GetMoves(Point3D p)
         {
             var ground = new Point3D(p.X, (short)(p.Y - 1), p.Z);
 
@@ -166,7 +167,7 @@ namespace Utils
                     var np1 = new Point3D((short)(p.X + d.X), (short)(p.Y + d.Y), p.Z);
                     var np2 = new Point3D(p.X, (short)(p.Y + d.Y), (short)(p.Z + d.Z));
                     if (IsValidPos(np) && IsValidPos(np1) && IsValidPos(np2))
-                        yield return np;
+                        yield return np;    
                 }
 
                 // Fall down by 1 block.

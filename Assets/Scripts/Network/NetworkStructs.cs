@@ -148,7 +148,7 @@ namespace Network
             Hp = hp ?? 100;
             Armor = armor ?? 50;
             HasHelmet = hasHelmet ?? true;
-            LeftGrenades = leftGrenades ?? 2;
+            LeftGrenades = leftGrenades ?? 5;
             LeftSecondaryGrenades = leftSecondaryGrenades ?? (this.grenadeSecondaryName.Value.ToLower() == "smoke"
                 ? (byte)2
                 : (byte)1);

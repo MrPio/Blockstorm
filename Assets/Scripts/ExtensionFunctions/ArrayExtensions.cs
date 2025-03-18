@@ -4,6 +4,7 @@ namespace ExtensionFunctions
 {
     public static class ArrayExtensions
     {
+        private static readonly System.Random Random = new();
         public static T[,,] GetSubArray<T>(this T[,,] array, int? from1 = null, int? to1 = null, int? from2 = null,
             int? to2 = null, int? from3 = null, int? to3 = null)
         {
@@ -29,6 +30,16 @@ namespace ExtensionFunctions
             for (var i3 = 0; i3 < size3; i3++)
                 result[i1, i2, i3] = array[(int)from1 + i1, (int)from2 + i2, (int)from3 + i3];
             return result;
+        }
+        
+        // In-place Fisher–Yates shuffle for direction arrays.
+        public static void Shuffle<T>(this T[] array)
+        {
+            for (var i = array.Length - 1; i > 0; i--)
+            {
+                var j = Random.Next(i + 1);
+                (array[i], array[j]) = (array[j], array[i]);
+            }
         }
     }
 }

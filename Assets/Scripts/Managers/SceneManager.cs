@@ -200,10 +200,13 @@ namespace Managers
 
             // Spawn Bots
             if (newTeam != null)
+            {
+                // botManager.SpawnBot(Team.Yellow);   
                 for (var i = 0; i < debugManager.spawnBotEnemies; i++)
                     foreach (var team in new List<Team> { Team.Red, Team.Blue, Team.Green, Team.Yellow })
                         if (team != newTeam!.Value)
                             botManager.SpawnBot(team);
+            }
         }
 
         /// <summary>

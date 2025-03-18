@@ -36,10 +36,10 @@ namespace Managers
 
             // Load random Equipment
             var status = bot.Status.Value;
-            status.Melee = Weapon.Melees.RandomItem();
-            status.Primary = Weapon.Primaries.RandomItem();
-            status.Secondary = Weapon.Secondaries.RandomItem();
-            status.Tertiary = Weapon.Tertiaries.Where(it=>it.Name!="tact").ToList().RandomItem();
+            status.Melee = Weapon.Melees.Where(it=>it.Level<=2).ToList().RandomItem();
+            status.Primary = Weapon.Primaries.Where(it=>it.Level<=3).ToList().RandomItem();
+            status.Secondary = Weapon.Secondaries.Where(it=>it.Level<=3).ToList().RandomItem();
+            status.Tertiary = Weapon.Tertiaries.Where(it=>it.Level<=2).Where(it=>it.Name!="tact").ToList().RandomItem();
             status.Grenade = Weapon.Grenades.RandomItem();
             status.GrenadeSecondary = Weapon.GrenadesSecondary.RandomItem();
 

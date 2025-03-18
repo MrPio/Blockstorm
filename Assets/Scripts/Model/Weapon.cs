@@ -61,27 +61,27 @@ namespace Model
             // 2,880
             new Weapon(name: "ak47", damage: 24, rof: 120, distance: 88, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 1.75f, ammo: 120, magazine: 26, reloadTime: 300,
-                variant: "DESERT_STORM"),
+                variant: "DESERT_STORM",level:2),
 
             // 3_200
             new Weapon(name: "ak47", damage: 20, rof: 160, distance: 90, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 2f, ammo: 120, magazine: 34, reloadTime: 250, variant: "NY22",
-                scope: "scope0"),
+                scope: "scope0",level:3),
 
             // 3_360
             new Weapon(name: "ak47", damage: 28, rof: 120, distance: 98, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 3.35f, ammo: 160, magazine: 28, reloadTime: 300, variant: "SNOW",
-                scope: "scope3"),
+                scope: "scope3",level:4),
 
             // 3_000
             new Weapon(name: "ak47", damage: 50, rof: 60, distance: 110, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4f, ammo: 120, magazine: 21, reloadTime: 350, variant: "SURVIVAL",
-                scope: "scope4"),
+                scope: "scope4",level:5),
 
             // 6_460
             new Weapon(name: "ak47", damage: 38, rof: 170, distance: 250, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4.5f, ammo: 300, magazine: 52, reloadTime: 375, variant: "GOLD",
-                scope: "scope3", audio: "AK47_NY22"),
+                scope: "scope3", audio: "AK47_NY22",level:6),
 
             // BARRETT =====================================================================================
             // 300
@@ -92,22 +92,22 @@ namespace Model
             // 540
             new Weapon(name: "barrett", damage: 180, rof: 4, distance: 150, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 4.75f, ammo: 15, magazine: 5, reloadTime: 600, variant: "DESERT_STORM",
-                scope: "scope5", audio: "BARRETT"),
+                scope: "scope5", audio: "BARRETT",level:2),
 
             // 1_400
             new Weapon(name: "barrett", damage: 140, rof: 11, distance: 170, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 5.25f, ammo: 20, magazine: 7, reloadTime: 475, variant: "ICE",
-                scope: "scope5", audio: "BARRETT"),
+                scope: "scope5", audio: "BARRETT",level:3),
 
             // 1_200
             new Weapon(name: "barrett", damage: 400, rof: 3, distance: 250, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 6.5f, ammo: 10, magazine: 3, reloadTime: 600, variant: "NUCLEAR",
-                scope: "scope5", audio: "BARRETT"),
+                scope: "scope5", audio: "BARRETT",level:4),
 
             // 2_800
             new Weapon(name: "barrett", damage: 140, rof: 22, distance: 300, type: WeaponType.Primary,
                 fireAnimation: "gun", zoom: 7f, ammo: 33, magazine: 13, reloadTime: 500, variant: "GOLD",
-                scope: "scope5", audio: "BARRETT"),
+                scope: "scope5", audio: "BARRETT",level:5),
         };
 
         public static readonly List<Weapon> Secondaries = new()
@@ -118,15 +118,15 @@ namespace Model
 
             // 1_472
             new Weapon(name: "m1911", damage: 32, rof: 46, distance: 60, type: WeaponType.Secondary,
-                fireAnimation: "gun", zoom: 1.55f, ammo: 56, magazine: 11, reloadTime: 160, variant: "MILITARY"),
+                fireAnimation: "gun", zoom: 1.55f, ammo: 56, magazine: 11, reloadTime: 160, variant: "MILITARY",level:2),
 
             // 1_600
             new Weapon(name: "m1911", damage: 40, rof: 40, distance: 65, type: WeaponType.Secondary,
-                fireAnimation: "gun", zoom: 1.55f, ammo: 77, magazine: 11, reloadTime: 200, variant: "ICE"),
+                fireAnimation: "gun", zoom: 1.55f, ammo: 77, magazine: 11, reloadTime: 200, variant: "ICE",level:3),
 
             // 2_250
             new Weapon(name: "m1911", damage: 75, rof: 30, distance: 85, type: WeaponType.Secondary,
-                fireAnimation: "gun", zoom: 1.55f, ammo: 75, magazine: 5, reloadTime: 65, variant: "GOLD"),
+                fireAnimation: "gun", zoom: 1.55f, ammo: 75, magazine: 5, reloadTime: 65, variant: "GOLD",level:4),
         };
 
         public static readonly List<Weapon> Tertiaries = new()
@@ -136,13 +136,13 @@ namespace Model
                 reloadTime: 200, magazine: 1, scope: "scope7", fireAnimation: "gun"),
             new Weapon(name: "shmel", damage: 210, rof: 50, zoom: 3.15f, explosionRange: 1.5f,
                 type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
-                reloadTime: 300, magazine: 2, scope: "scope7", fireAnimation: "gun", variant: "ICE"),
+                reloadTime: 300, magazine: 2, scope: "scope7", fireAnimation: "gun", variant: "ICE",level:2),
             new Weapon(name: "shmel", damage: 300, rof: 35, zoom: 3.5f, explosionRange: 1.95f,
                 type: WeaponType.Tertiary, ammo: 0, audio: "shmel",
-                reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD"),
+                reloadTime: 400, magazine: 4, scope: "scope7", fireAnimation: "gun", variant: "GOLD",level:3),
             new Weapon(name: "tact", damage: 120, rof: 160, explosionRange: 2f,
                 type: WeaponType.Tertiary, ammo: 1, hasAim: false, groundDamageFactor: 0.35f,
-                reloadTime: 700, magazine: 1, fireAnimation: "gun"),
+                reloadTime: 700, magazine: 1, fireAnimation: "gun",level:4),
         };
 
         public static readonly List<Weapon> Grenades = new()
@@ -162,7 +162,7 @@ namespace Model
 
 
         public string Name, Audio, FireAnimation;
-        public uint Damage, Rof, Distance;
+        public uint Damage, Rof, Distance,Level;
         public ushort? Magazine, Ammo, ReloadTime;
         public float? ExplosionRange, ExplosionTime, FogDuration, GroundDamageFactor;
         public float Zoom; // ex: 1.5x
@@ -177,7 +177,7 @@ namespace Model
             WeaponType type = WeaponType.Primary,
             float zoom = 1.0f, float explosionRange = 0, float explosionTime = 0, float fogDuration = 0,
             string scope = null,
-            string variant = null, bool hasAim = true, float groundDamageFactor = 1f)
+            string variant = null, bool hasAim = true, float groundDamageFactor = 1f,uint level=1)
         {
             Name = name;
             Audio = audio ?? (variant is null ? name : $"{name}_{variant}");
@@ -197,6 +197,7 @@ namespace Model
             Variant = variant;
             HasAim = hasAim;
             GroundDamageFactor = groundDamageFactor;
+            Level = level;
         }
 
         public float Delay => 1f / (Rof / 10f); // rof = 10 => Delay = 1 sec
