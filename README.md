@@ -4,7 +4,7 @@ An FPS game in the style of Minecraft. This is my first attempt at writing a **v
 in Unity.
 
 > [!NOTE]  
-> Interested in this project? Unfortunately, the game is still in development when you see this message. As a student, I'm often busy between exams and classes. Anyway, any help is welcome!
+> Would you be interested in this project? Unfortunately, the game is still under development as you see this message. As a student, I'm often busy between exams and classes. Anyway, any help is welcome!
 
 <div>    
      <img src="https://github.com/user-attachments/assets/8ccb789e-1b06-46de-9cff-e70d94923898" width="23.5%"/>
@@ -12,6 +12,16 @@ in Unity.
      <img src="https://github.com/user-attachments/assets/2e7b5210-39d5-4c19-b4e8-bee7c4441b09" width="23.5%"/>
      <img src="https://github.com/user-attachments/assets/86425bf6-7405-4ffc-82f2-4e9ccc84e551" width="23.5%"/>
 </div>
+
+## Gameplays
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=OE2q-xtLZgo">
+  	<img style="width: 66%; height: auto;" src="https://github.com/user-attachments/assets/479077bc-e86d-4a6b-be3e-7b3b1ed68923" alt="Gameplay">
+  </a>
+  <a href="https://www.youtube.com/watch?v=C-A74l0gyEs&t=323s">
+  	<img style="width: 66%; height: auto;" src="https://github.com/user-attachments/assets/a13c94a5-6950-4405-850b-8d41120d3964" alt="Gameplay">
+  </a>
+</p>
 
 ## 🧊 What is a Voxel Engine?
 
@@ -89,10 +99,10 @@ In this project, to switch between localhost and remote modes you should:
 |       Inventory management       |  ✅   |
 |    Multiplayer implementation    |  ✅  |
 |    Bot AI logic    |  🟨  |
+|    Multiplayer testing    |  🟥  |
 
 ## 🖼️ In-Game Screenshots
 
-![vlcsnap-2024-09-08-14h37m25s975](https://github.com/user-attachments/assets/6e773bf0-e7f6-4977-895f-f0c4c2a02303)
 ![vlcsnap-2024-09-08-14h37m23s070](https://github.com/user-attachments/assets/95e0ca90-fefa-4160-8668-bea6450d50b4)
 ![vlcsnap-2024-09-08-14h44m27s061](https://github.com/user-attachments/assets/2dae2157-ea19-4524-9a41-401877e1571f)
 ![vlcsnap-2024-09-08-14h37m08s955](https://github.com/user-attachments/assets/37200ac3-7a12-4037-ae95-052df54203a6)
