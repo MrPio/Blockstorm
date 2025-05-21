@@ -12,6 +12,7 @@ namespace UI
 {
     public class Inventory : MonoBehaviour
     {
+        [SerializeField] private bool loadAllWeapons;
         [SerializeField] private Transform bodyContent;
         [SerializeField] private GameObject weaponTilePrefab;
         [SerializeField] private Image footerImage;
@@ -55,11 +56,13 @@ namespace UI
                 foreach (var inventoryTab in inventoryTabs)
                     inventoryTab.UpdateUI();
                 var weapons = Weapon.Weapons.Where(it =>
-                    it.Type == selectedWeaponType && it.Variant == null && it.Name.ToLower() != "tact").ToList();
+                    it.Type == selectedWeaponType &&
+                    (loadAllWeapons || (it.Variant == null && it.Name.ToLower() != "tact"))).ToList();
                 foreach (var weapon in weapons)
                 {
                     var weaponTile = Instantiate(weaponTilePrefab, bodyContent).transform;
-                    weaponTile.Find("Header").Find("WeaponName").GetComponent<TextMeshProUGUI>().text = weapon.Name;
+                    weaponTile.Find("Header").Find("WeaponName").GetComponent<TextMeshProUGUI>().text =
+                        weapon.GetNetName.Replace(":", " ");
                     weaponTile.Find("Image").GetComponent<Image>().sprite = Resources.Load<Sprite>(weapon.GetThumbnail);
                     weaponTile.GetComponent<InventoryWeaponTile>().Weapon = weapon;
                 }

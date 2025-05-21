@@ -78,6 +78,7 @@ namespace Managers
 
         [Header("Misc")] public AudioMixer audioMixer;
         [NonSerialized] public Player myPlayer;
+        [NonSerialized] public int numBots;
 
         private Team? _newTeam = null;
         [CanBeNull] private Dictionary<WeaponType, Weapon> _lastSelectedWeapons = null;
@@ -202,10 +203,10 @@ namespace Managers
             if (newTeam != null)
             {
                 // botManager.SpawnBot(Team.Yellow);   
-                for (var i = 0; i < debugManager.spawnBotEnemies; i++)
+                for (var i = 0; i < (debugManager.gameObject.activeSelf ? debugManager.spawnBotEnemies : numBots); i++)
                     foreach (var team in new List<Team> { Team.Red, Team.Blue, Team.Green, Team.Yellow })
-                        if (team != newTeam!.Value)
-                            botManager.SpawnBot(team);
+                        //if (team != newTeam!.Value)
+                        botManager.SpawnBot(team);
             }
         }
 

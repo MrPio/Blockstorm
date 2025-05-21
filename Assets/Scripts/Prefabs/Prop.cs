@@ -71,7 +71,7 @@ namespace Prefabs
         {
             if (_rb.IsDestroyed()) return;
             Destroy(_rb);
-            foreach (var mesh in transform.GetComponentsInChildren<MeshRenderer>())
+            foreach (var mesh in transform.GetComponentsInChildren<MeshRenderer>()) // Error
             {
                 var rb = mesh.AddComponent<Rigidbody>();
                 rb.collisionDetectionMode = CollisionDetectionMode.Continuous;

@@ -348,7 +348,7 @@ namespace VoxelEngine
 
             // Spawn random collectable prefabs at some of these spawn points
             foreach (var sp in
-                     transforms.RandomSublist((int)(transforms.Count / 1.1))) //TODO 1.9
+                     transforms.RandomSublist((int)(transforms.Count / 1.6))) //TODO 1.9
                 SpawnCollectableWithID(sp.position);
         }
 

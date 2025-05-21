@@ -90,10 +90,11 @@ namespace Managers
         /// <param name="map"> The name of the map. Defaults to "Harbor".</param>
         /// <param name="password"> The lobby password. If not provided, the lobby is public. </param>
         public async Task CreateLobby(string lobbyName, string gameMode = "4 Teams",
-            string map = "Harbor", string password = null)
+            string map = "Harbor", string password = null, string numBots = "0")
         {
             try
             {
+                _sm.numBots = int.Parse(numBots.Split(' ')[0]) / 4;
                 await _sm.worldManager.RenderMap(map);
                 var relayCode = await _sm.relayManager.CreateRelay();
                 var options = new CreateLobbyOptions()
@@ -120,6 +121,7 @@ namespace Managers
                         : password + new string(PasswordFillChar, 8 - password.Length);
                 HostedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, MaxPlayers, options);
                 _joinedLobby = HostedLobby;
+                GUIUtility.systemCopyBuffer = _joinedLobby.LobbyCode;
                 Debug.Log($"Lobby '{HostedLobby.Name}' created!");
                 CancelInvoke(nameof(UpdateLobbies));
                 while (!_sm.worldManager.HasRendered)
@@ -177,7 +179,7 @@ namespace Managers
                         new(true, QueryOrder.FieldOptions.AvailableSlots)
                     }
                 });
-                return response.Results/*.Where(it => it.LobbyCode is not null && it.LobbyCode != "")*/.ToList();
+                return response.Results /*.Where(it => it.LobbyCode is not null && it.LobbyCode != "")*/.ToList();
             }
             catch (LobbyServiceException e)
             {

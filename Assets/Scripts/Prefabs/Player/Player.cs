@@ -145,8 +145,9 @@ namespace Prefabs.Player
 
             // Add the player to the mipmap
             var myPlayer = FindObjectsByType<Player>(FindObjectsSortMode.None)
-                .First(it => it.IsOwner && !it.IsBot.Value);
-            if (Team is not Team.None && (IsOwner || myPlayer.Team is Team.None || Team == myPlayer.Team))
+                .FirstOrDefault(it => it.IsOwner && !it.IsBot.Value);
+            if (myPlayer is not null && Team is not Team.None &&
+                (IsOwner || myPlayer.Team is Team.None || Team == myPlayer.Team))
                 _sm.mipmap.AddPlayerMarker(Team, transform);
 
             // Load the body skin
@@ -642,14 +643,14 @@ namespace Prefabs.Player
         [Rpc(SendTo.Everyone)]
         public void SpawnWeaponEffectRpc(NetVector3 shootDir, float bulletSpeed)
         {
-            var mouth = WeaponPrefab.transform.Find("mouth");
+            var mouth = WeaponPrefab.transform.Find("mouth"); // NPE
             if (mouth)
             {
                 // Muzzle (only if enemy, bot or I'm not aiming)
                 // if (!IsOwner || IsBot.Value || !Weapon.isAiming)
                 // {
-                    var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
-                    muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
+                var muzzleGo = Instantiate(muzzles.RandomItem(), mouth.position, mouth.rotation);
+                muzzleGo.layer = LayerMask.NameToLayer(IsOwner && !IsBot.Value ? "WeaponCamera" : "Default");
                 // }
 
                 // Bullet (only for enemies and bots)
@@ -677,8 +678,11 @@ namespace Prefabs.Player
             // Both owner and non-owner hear the hit sound effect
             if (bodyPart == "Head" && Status.Value.HasHelmet)
             {
-                MiscSound.Value = 0;
-                MiscSound.Value = (byte)MiscClips.IndexOf(helmetHit);
+                if (IsOwner)
+                {
+                    MiscSound.Value = 0;
+                    MiscSound.Value = (byte)MiscClips.IndexOf(helmetHit);
+                }
 
                 // Handle helmet removal
                 var rb = Instantiate(helmetPrefab,
@@ -699,7 +703,7 @@ namespace Prefabs.Player
                     helmet.SetActive(false);
                 // damage /= 2; Already halved by Fire()
             }
-            else
+            else if(IsOwner)
             {
                 MiscSound.Value = 0;
                 MiscSound.Value = (byte)MiscClips.IndexOf(newStatus.IsDead ? deadHit : hit);
@@ -766,7 +770,7 @@ namespace Prefabs.Player
 
                 IEnumerator Respawn()
                 {
-                    yield return new WaitForSeconds(2f); //TODO
+                    yield return new WaitForSeconds(1f); //TODO
                     active.Value = false;
                     if (IsBot.Value)
                     {
@@ -818,8 +822,11 @@ namespace Prefabs.Player
                 else
                 {
                     ragdoll.SetRagdollState(false);
-                    _isWalking.Value = true;
-                    _isWalking.Value = false;
+                    if (IsOwner)
+                    {
+                        _isWalking.Value = true;
+                        _isWalking.Value = false;
+                    }
                 }
 
                 gameObject.GetComponent<ClientNetworkTransform>().enabled = !isDying;
@@ -865,7 +872,7 @@ namespace Prefabs.Player
                     rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
             else
                 transform.SetPositionAndRotation(
-                    position: _sm.worldManager.Map.GetRandomSpawnPoint(newTeam ?? Team) +
+                    position: _sm.worldManager.Map.GetRandomSpawnPoint(Team.Yellow) + // TODO newTeam ?? Team
                               Vector3.up * 0.95f,
                     rotation: Quaternion.Euler(0, Random.Range(-180f, 180f), 0));
 
@@ -909,7 +916,7 @@ namespace Prefabs.Player
 
             IEnumerator EndInvincibility()
             {
-                yield return new WaitForSeconds(spawnInvincibilityDuration); // TODO 5s
+                yield return new WaitForSeconds(spawnInvincibilityDuration);
                 invincible.Value = false;
             }
         }
